@@ -1,0 +1,56 @@
+{
+  "name": "structure-ts",
+  "version": "0.0.1",
+  "description": "A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.",
+  "main": "lib/main.js",
+  "types": "lib/main.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "formate": "prettier ./src --check",
+    "formate:fix": "prettier ./src -w",
+    "dev": "cd local && tsx --watch src/main.ts",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahulroy0322/structure-ts.git"
+  },
+  "author": "Rahul Roy <rahulroyapd80@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rahulroy0322/structure-ts/issues"
+  },
+  "homepage": "https://github.com/rahulroy0322/structure-ts#readme",
+  "engines": {
+    "node": ">= 16.14"
+  },
+  "keywords": [
+    "structure-ts",
+    "framework",
+    "django",
+    "opinionated",
+    "structure",
+    "web",
+    "http",
+    "rest",
+    "restful",
+    "router",
+    "app"
+  ],
+  "dependencies": {
+    "joi": "^17.13.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@trivago/prettier-plugin-sort-imports": "5.2.2",
+    "@types/node": "^22.13.13",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "10.1.1",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0"
+  }
+}
