@@ -13,7 +13,7 @@ const Structure = async <T = ServerRespnsceType>(
   opts: ServerOptionsType = DEFAULT_OPTIONS
 ) => {
   const routes = await checkApps<T>();
-  
+
   const { handel } = Handler<T>(routes);
 
   let isListening = false;

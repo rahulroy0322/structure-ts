@@ -5,7 +5,7 @@ import type {
   ReadOnlyRouterRoutesType,
   ReplyType,
 } from '../../@types';
-import { getCleanResponseUrl, getParams, } from './utils';
+import { getCleanResponseUrl, getParams } from './utils';
 
 const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
   type HandlerReturnType =
@@ -17,8 +17,6 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
         error?: unknown;
         notFound?: boolean;
       };
-
-
 
   const getControllerForUrl = (
     url: string,
@@ -39,7 +37,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
   ): ControllerType<T> | boolean => {
     const urlIndex = 0;
     const methodIndex = 2;
-         
+
     for (const route of dynamic) {
       if (!route[urlIndex].test(url)) {
         continue;
@@ -104,7 +102,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
       return {
         success: true,
       };
-    } catch (error) {   
+    } catch (error) {
       return {
         success: false,
         error,
@@ -121,6 +119,5 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
     handel,
   };
 };
-
 
 export { Handler };

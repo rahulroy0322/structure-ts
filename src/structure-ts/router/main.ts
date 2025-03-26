@@ -50,12 +50,11 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
       path.indexOf(DELIMITER) === notPresent &&
       path.indexOf(CATCH_ALL) === notPresent
     ) {
-
-      if(!routes.main[path]){
-        routes.main[path]={}
+      if (!routes.main[path]) {
+        routes.main[path] = {};
       }
 
-      (routes.main[path]!)[methode]= controller
+      routes.main[path]![methode] = controller;
 
       return;
     }

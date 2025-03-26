@@ -168,8 +168,6 @@ const getCleanPath = (baseUrl: string, path: string) => {
   return `/${path}`;
 };
 
-
-
 const getParams = (
   { regexp, keys }: ReturnType<typeof getRegexpFromUrl>,
   url: string
@@ -194,4 +192,10 @@ const getParams = (
   return { path, params };
 };
 
-export { getParams,getRegexpFromUrl, getCleanResponseUrl, getCleanBaseUrl, getCleanPath };
+export {
+  getParams,
+  getRegexpFromUrl,
+  getCleanResponseUrl,
+  getCleanBaseUrl,
+  getCleanPath,
+};

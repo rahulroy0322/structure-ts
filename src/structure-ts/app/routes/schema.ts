@@ -13,13 +13,12 @@ const keyValSchema = Joi.object({
 });
 
 const dynamicRoutes = Joi.array().items(
-  Joi.array()
-    .ordered(
-      Joi.object().pattern(Joi.string(), Joi.string()).required(),
-      Joi.array().items(keyValSchema).required(),
-      methods,
-      func
-    )
+  Joi.array().ordered(
+    Joi.object().pattern(Joi.string(), Joi.string()).required(),
+    Joi.array().items(keyValSchema).required(),
+    methods,
+    func
+  )
 );
 
 const routesSchema = Joi.object().pattern(
@@ -39,7 +38,7 @@ const routesSchema = Joi.object().pattern(
       .required(),
     func
   )
-)
+);
 
 const routeSchema = Joi.object({
   main: routesSchema.required(),

@@ -1,14 +1,14 @@
 import type { SettingsType } from '../../@types';
 import { ERROR_EXIT_CODE } from '../constents';
-import { settingsSchema } from './schema';
 import { errorController, notFoundController } from '../controllers';
+import { settingsSchema } from './schema';
 
 const getSetting = () => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { default: s } = require(`${BASE_DIR}/settings`);
 
-    const setting = s as SettingsType
+    const setting = s as SettingsType;
 
     if (!setting.NOT_FOUND_CONTROLLER) {
       setting.NOT_FOUND_CONTROLLER = notFoundController;

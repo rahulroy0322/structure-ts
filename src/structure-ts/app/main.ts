@@ -27,7 +27,7 @@ const checkApps = async <T>() => {
 
         const route = await checkSchemaFiles<T>(app);
 
-        return route
+        return route;
       } catch (err) {
         console.error(err);
         process.exit(ERROR_EXIT_CODE);
@@ -35,23 +35,26 @@ const checkApps = async <T>() => {
     })
   );
 
-  return routes.reduce((acc, curr) => {
-    if (curr.main) {
-      acc.main = {
-        ...acc.main,
-        ...curr.main
+  return routes.reduce(
+    (acc, curr) => {
+      if (curr.main) {
+        acc.main = {
+          ...acc.main,
+          ...curr.main,
+        };
       }
-    }
 
-    if (curr.dynamic) {
-      (acc.dynamic as RouterRoutesType<T>['dynamic']).push(...curr.dynamic)
-    }
+      if (curr.dynamic) {
+        (acc.dynamic as RouterRoutesType<T>['dynamic']).push(...curr.dynamic);
+      }
 
-    return acc
-  }, {
-    main: {},
-    dynamic: []
-  } as RouterRoutesType<T>)
+      return acc;
+    },
+    {
+      main: {},
+      dynamic: [],
+    } as RouterRoutesType<T>
+  );
 };
 
 const checkSchemaFiles = async <T>(app: string) => {
