@@ -55,6 +55,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
+    "@commitlint/types": "^19.8.0",
     "@eslint/js": "^9.23.0",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/node": "^22.13.13",
