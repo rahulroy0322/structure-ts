@@ -10,7 +10,8 @@
     "formate:fix": "prettier ./src -w",
     "dev": "cd local && tsx --watch src/main.ts",
     "lint": "eslint ./src",
-    "lint:fix": "eslint --fix ./src"
+    "lint:fix": "eslint --fix ./src",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "eslint": "^9.23.0",
     "eslint-config-prettier": "10.1.1",
     "globals": "^16.0.0",
+    "husky": "^9.1.7",
     "prettier": "3.5.3",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
