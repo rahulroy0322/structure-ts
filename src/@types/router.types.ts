@@ -14,7 +14,7 @@ type MethodsType =
 type ControllerType<ReplyT = ServerRespnsceType> = (
   question: QuestionType,
   reply: ReplyType<ReplyT>
-) => void;
+) => void | Promise<void>;
 
 type ErrorControllerType<ReplyT> = (
   error: unknown,
