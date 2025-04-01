@@ -3,7 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { ERROR_EXIT_CODE } from '../../structure-ts/constents';
-import SETTINGS, { APP_PATH, BASE_DIR } from '../../structure-ts/settings';
+import SETTINGS, { BASE_DIR } from '../../structure-ts/settings';
+import { MANEGER_FILE, MIGRATION_DIR, SQL_DIR } from './config';
 import type {
   ColumnSchemaType,
   IndexSchemaType,
@@ -11,10 +12,6 @@ import type {
   StateType,
   TableSchemaType,
 } from './types';
-
-const MIGRATION_DIR = `${APP_PATH}/.migrations`;
-const SQL_DIR = `${MIGRATION_DIR}/sql`;
-const MANEGER_FILE = `${MIGRATION_DIR}/main.json`;
 
 const LAST_ITEM = -1;
 const { APPS } = SETTINGS;
@@ -31,6 +28,10 @@ const loadManeger = async (): Promise<StateType> => {
   } satisfies StateType;
 };
 
+const removeUnnesesoryLine = (text: string) => {
+  return text.trim().replace(/\n\n/gi, '\n').replace(/\n\n/gi, '\n');
+};
+
 const saveManeger = async (state: StateType) =>
   await writeFile(MANEGER_FILE, JSON.stringify(state));
 
@@ -39,7 +40,7 @@ const saveSql = async (path: string, sql: string) => {
   if (!existsSync(SQL_DIR)) {
     await mkdir(_path);
   }
-  await writeFile(_path, sql);
+  await writeFile(_path, removeUnnesesoryLine(sql));
 
   return path;
 };
@@ -57,14 +58,14 @@ const getNewState = (
           key,
           default: d as string,
           required,
-          pk,
         });
 
         if (unique !== undefined) {
           acc.indexes.push({
             key,
-            name: `idx-${key}`,
+            name: `idx-${name}:${key}`,
             unique,
+            pk: pk ?? false,
           });
         }
 
@@ -96,42 +97,33 @@ const getNewState = (
 const generateColumnDefinition = (col: ColumnSchemaType) => {
   const sqls = [`\`${col.key}\``];
   sqls.push(`${col.type}`);
-  if (col.pk) {
-    sqls.push('PRIMARY KEY');
-  }
+
   if (col.required) {
     sqls.push('NOT NULL');
   }
   if (col.default !== undefined) {
     sqls.push(`DEFAULT ${col.default}`);
   }
-  return sqls.join('\t');
+  return sqls.join(' ');
 };
 
 const generateCreateTableSQL = (table: TableSchemaType) => {
   const sqls = [`CREATE TABLE \`${table.name}\` (`];
 
-  const cols = table.columns
-    .map((col) => `\t${generateColumnDefinition(col)}`)
-    .join(',\n');
+  const cols = table.columns.map((col) => generateColumnDefinition(col));
 
-  sqls.push(cols);
+  const indexes = table.indexes.map((index) =>
+    [
+      'CONSTRAINT',
+      `\`${index.name}\``,
+      index.pk ? 'PRIMARY KEY' : index.unique ? 'UNIQUE' : 'INDEX',
+      `(\`${index.key}\`)`,
+    ].join(' ')
+  );
+
+  sqls.push([...cols, ...indexes].join(',\n '));
+
   sqls.push(');');
-
-  const indexes = table.indexes
-    .map((index) =>
-      [
-        'CREATE',
-        index.unique ? 'UNIQUE INDEX' : 'INDEX',
-        `\`${index.name}\``,
-        'ON',
-        `\`${table.name}\``,
-        `(\`${index.key}\`);`,
-      ].join('\t')
-    )
-    .join('\n');
-
-  sqls.push(indexes);
 
   return sqls.join('\n');
 };
@@ -170,7 +162,7 @@ const generateAlterTableSQL = (
           'COLUMN',
           generateColumnDefinition(newColumn),
           ';',
-        ].join('\t')
+        ].join(' ')
       )
       .join('\n')
   );
@@ -185,7 +177,7 @@ const generateAlterTableSQL = (
           'DROP',
           'COLUMN',
           `\`${droppedColumn.key}\`;`,
-        ].join('\t')
+        ].join(' ')
       )
       .join('\n')
   );
@@ -201,7 +193,89 @@ const generateAlterTableSQL = (
           'COLUMN',
           generateColumnDefinition(modifiedColumn),
           ';',
-        ].join('\t')
+        ].join(' ')
+      )
+      .join('\n')
+  );
+
+  // Generate ALTER TABLE statements for new indexs
+  const newIndexs = newTable.indexes.filter(
+    (i) => !oldTable.indexes.find((ind) => ind.key === i.key)
+  );
+
+  sqls.push(
+    newIndexs
+      .map((newIndex) =>
+        [
+          'ALTER',
+          'TABLE',
+          `\`${newTable.name}\``,
+          'ADD',
+          'CONSTRAINT',
+          `\`${newIndex.name}\``,
+          newIndex.pk ? 'PRIMARY KEY' : newIndex.unique ? 'UNIQUE' : 'INDEX',
+          `(\`${newIndex.key}\`);`,
+        ].join(' ')
+      )
+      .join('\n')
+  );
+
+  // Generate ALTER TABLE statements for droped indexs
+  const droppedIndexs = oldTable.indexes.filter(
+    (i) => !newTable.indexes.find((ind) => ind.key == i.key)
+  );
+
+  sqls.push(
+    droppedIndexs
+      .map((dIndex) =>
+        [
+          'ALTER',
+          'TABLE',
+          `\`${newTable.name}\``,
+          'DROP',
+          'CONSTRAINT',
+          `\`${dIndex.name}\`;`,
+        ].join(' ')
+      )
+      .join('\n')
+  );
+
+  // todo Generate ALTER TABLE statements for modified indexs
+
+  const modifiedIndexs = newTable.indexes.filter((newIndex) => {
+    const oldIndex = oldTable.indexes.find((i) => i.key === newIndex.key);
+
+    if (!oldIndex) {
+      return false;
+    }
+
+    return newIndex.pk !== oldIndex.pk || newIndex.unique !== oldIndex.unique;
+  });
+
+  sqls.push(
+    modifiedIndexs
+      .map((index) =>
+        [
+          [
+            'ALTER',
+            'TABLE',
+            `\`${newTable.name}\``,
+            'DROP',
+            'CONSTRAINT',
+            `\`${index.name}\`;`,
+          ].join(' '),
+          [
+            'ALTER',
+            'TABLE',
+            `\`${newTable.name}\``,
+            'ADD',
+            'CONSTRAINT',
+            `\`${index.name}\``,
+            index.pk ? 'PRIMARY KEY' : index.unique ? 'UNIQUE' : 'INDEX',
+            `(\`${index.key}\`);`,
+          ].join(' '),
+          '--> statement-breakpoint',
+        ].join('\n')
       )
       .join('\n')
   );
@@ -210,7 +284,7 @@ const generateAlterTableSQL = (
 };
 
 const getSql = (currentState: StateType, newState: StateType) => {
-  const sqls = [`-- Migration '${newState.at}'`];
+  const sqls = [`-- Migration start '${newState.at}'`];
 
   // Detect new tables
   const newTables = newState.tables.filter(
@@ -223,16 +297,21 @@ const getSql = (currentState: StateType, newState: StateType) => {
   );
 
   // Generate SQL for new tables
-  newTables.map((table) => {
+  newTables.map((table, index) => {
     sqls.push(generateCreateTableSQL(table));
-    sqls.push('\n');
+    // eslint-disable-next-line no-magic-numbers
+    if (index !== newTables.length - 1) {
+      sqls.push('--> statement-breakpoint');
+    }
   });
 
+  sqls.push('--> statement-breakpoint');
   // Generate SQL for dropped tables
   droppedTables.map((table) => {
     sqls.push(`DROP TABLE IF EXISTS \`${table.name}\`;`);
     sqls.push('\n');
   });
+  sqls.push('--> statement-breakpoint');
 
   // Detect altered tables (simplified)
   newState.tables.map((newTable) => {
@@ -241,7 +320,9 @@ const getSql = (currentState: StateType, newState: StateType) => {
       sqls.push(generateAlterTableSQL(oldTable, newTable));
     }
   });
+  sqls.push('--> statement-breakpoint');
 
+  sqls.push(`-- Migration end '${newState.at}'`);
   return sqls.join('\n');
 };
 
@@ -311,6 +392,8 @@ const main = async () => {
   }
 };
 
-if (require.main === module) {
-  main();
-}
+// if (require.main === module) {
+//   main();
+// }
+
+export { main };

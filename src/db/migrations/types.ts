@@ -13,13 +13,13 @@ type ColumnSchemaType = {
   type: string;
   required?: boolean;
   default?: string;
-  pk?: boolean;
 };
 
 type IndexSchemaType = {
   name: string;
   key: string;
   unique: boolean;
+  pk: boolean;
 };
 
 type TableSchemaType = {
