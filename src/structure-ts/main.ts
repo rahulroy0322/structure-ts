@@ -1,4 +1,5 @@
 import type { ServerOptionsType, ServerRespnsceType } from '../@types';
+import { main } from '../db/main';
 import { checkApps } from './app';
 import { DEFAULT_OPTIONS } from './config';
 import { ERROR_EXIT_CODE, SUCCESS_EXIT_CODE } from './constents';
@@ -12,6 +13,7 @@ const { PORT } = SETTINGS;
 const Structure = async <T = ServerRespnsceType>(
   opts: ServerOptionsType = DEFAULT_OPTIONS
 ) => {
+  await main();
   const routes = await checkApps<T>();
 
   const { handel } = Handler<T>(routes);

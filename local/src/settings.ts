@@ -4,7 +4,7 @@ const PORT = 2000;
 
 const APPS = ['app', 'base'];
 
-const ADMIN_PANEL_URL = '/admin';
+// const ADMIN_PANEL_URL = '/admin';
 
 const dbConnected = () => {
   // eslint-disable-next-line no-console
@@ -26,7 +26,7 @@ const DATABASE = {
 
 export default {
   PORT,
-  ADMIN_PANEL_URL,
+  // ADMIN_PANEL_URL,
   APPS,
   DATABASE,
 } satisfies SettingsType;

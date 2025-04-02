@@ -28,7 +28,7 @@ const DATABASE = Joi.object<DatabaseType>({
 const settingsSchema = Joi.object<SettingsType>({
   PORT: Joi.number().min(MIN_PORT_NUMBER).required(),
   APPS: Joi.array().items(str).required(),
-  ADMIN_PANEL_URL: str.required(),
+  // ADMIN_PANEL_URL: str.required(),
   NOT_FOUND_CONTROLLER: func.required(),
   ERROR_CONTROLLER: func.required(),
   DATABASE: DATABASE.required(),

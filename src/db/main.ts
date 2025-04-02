@@ -17,6 +17,4 @@ const main = async () => {
   }
 };
 
-main();
-
-export { db };
+export { db, main };
