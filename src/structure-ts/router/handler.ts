@@ -1,3 +1,5 @@
+import type { ObjectSchema } from 'joi';
+
 import type {
   ControllerType,
   MethodsType,
@@ -16,25 +18,30 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
         success: false;
         error?: unknown;
         notFound?: boolean;
+        required?: string;
       };
+
+  type ControllerReturnType = {
+    controller: ControllerType<T>;
+    body: ObjectSchema | null;
+  };
 
   const getControllerForUrl = (
     url: string,
     method: MethodsType
-  ): ControllerType<T> | false => {
+  ): ControllerReturnType | false => {
     if (!routes[url]) {
       return false;
     }
     const route = routes[url];
-    const controller = route[method];
 
-    return controller || false;
+    return route[method] || false;
   };
 
   const getControllerForDynamicUrl = (
     url: string,
     method: MethodsType
-  ): ControllerType<T> | boolean => {
+  ): ControllerReturnType | boolean => {
     const urlIndex = 0;
     const methodIndex = 2;
 
@@ -45,7 +52,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
       if (route[methodIndex] !== method) {
         continue;
       }
-      const [regexp, keys, , controller] = route;
+      const [regexp, keys, , controller, { body }] = route;
 
       const params = getParams(
         {
@@ -55,7 +62,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
         url
       );
 
-      return params === false ? true : controller;
+      return params === false ? true : { controller, body };
     }
 
     return false;
@@ -64,13 +71,13 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
   const getController = (url: string, method: MethodsType) => {
     const controller = getControllerForUrl(url, method);
 
-    if (typeof controller === 'function') {
-      return controller;
+    if ((controller as ControllerReturnType)?.controller) {
+      return controller as ControllerReturnType;
     }
     const dynamicController = getControllerForDynamicUrl(url, method);
 
-    if (typeof dynamicController === 'function') {
-      return dynamicController;
+    if ((dynamicController as ControllerReturnType)?.controller) {
+      return dynamicController as ControllerReturnType;
     }
 
     if (dynamicController === true) {
@@ -80,23 +87,37 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
     return false;
   };
 
-  const handleImpl = (
+  const handleImpl = async (
     question: QuestionType,
     reply: ReplyType<T>
-  ): HandlerReturnType => {
+  ): Promise<HandlerReturnType> => {
     const method = question.method();
 
     const url = getCleanResponseUrl(question.url() || '/');
 
     try {
-      const controller = getController(url, method);
+      const res = getController(url, method);
 
-      if (controller === false) {
+      if (res === false) {
         return {
           success: false,
           notFound: true,
         };
       }
+
+      const { body, controller } = res;
+
+      if (body) {
+        const { body: _body } = await question.body();
+        const { error } = body.validate(_body);
+        if (error) {
+          return {
+            success: false,
+            required: error.details.map((value) => value.message).join('\n'),
+          };
+        }
+      }
+
       controller(question, reply);
 
       return {
@@ -110,10 +131,10 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
     }
   };
 
-  const handel = (
+  const handel = async (
     qestion: QuestionType,
     reply: ReplyType<T>
-  ): HandlerReturnType => handleImpl(qestion, reply);
+  ): Promise<HandlerReturnType> => await handleImpl(qestion, reply);
 
   return {
     handel,

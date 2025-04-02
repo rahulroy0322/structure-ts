@@ -4,17 +4,31 @@ import type { ReplyType } from '../@types';
 import { Question } from './question/main';
 import { Reply } from './reply';
 import type { Handler } from './router';
-import { internalServerError, notFound } from './status';
+import { badRequest, internalServerError, notFound } from './status';
 
 const handler =
   <T>(handel: ReturnType<typeof Handler<T>>['handel']) =>
-  (req: IncomingMessage, res: ServerResponse<IncomingMessage>): void => {
+  async (
+    req: IncomingMessage,
+    res: ServerResponse<IncomingMessage>
+  ): Promise<void> => {
     const reply = Reply(res);
     const question = Question(req);
 
-    const handlerReply = handel(question, reply as ReplyType<T>);
+    const handlerReply = await handel(question, reply as ReplyType<T>);
 
     if (handlerReply.success) {
+      return;
+    }
+
+    if (handlerReply.required) {
+      reply.status(badRequest()).json({
+        success: false,
+        error: {
+          name: 'validation failed!',
+          message: handlerReply.required,
+        },
+      });
       return;
     }
 

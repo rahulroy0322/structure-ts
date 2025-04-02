@@ -1,4 +1,7 @@
+import { ObjectSchema } from 'joi';
+
 import type { QuestionType, ReplyType, ServerRespnsceType } from '.';
+import type { VALID_TYPES } from '../structure-ts/constents';
 
 type MethodsType =
   | 'get'
@@ -25,7 +28,15 @@ type ErrorControllerType<ReplyT> = (
 
 type RoutesType<T> = Record<
   string,
-  Partial<Record<MethodsType, ControllerType<T>>>
+  Partial<
+    Record<
+      MethodsType,
+      {
+        controller: ControllerType<T>;
+        body: ObjectSchema | null;
+      }
+    >
+  >
 >;
 
 type KeyValType = {
@@ -40,18 +51,64 @@ type DynamicRoutesType<T> = [
   KeyValType[],
   MethodsType,
   ControllerType<T>,
+  {
+    body: ObjectSchema | null;
+  },
 ];
+
+type ControllerOptionType = {
+  body: Record<
+    string,
+    {
+      type: (typeof VALID_TYPES)[number];
+    } & {
+      required?: boolean;
+    }
+  >;
+};
 
 /* eslint-disable no-unused-vars */
 type RouterMethodeType<T> = {
-  get: (path: string, handler: ControllerType<T>) => void;
-  post: (path: string, handler: ControllerType<T>) => void;
-  put: (path: string, handler: ControllerType<T>) => void;
-  patch: (path: string, handler: ControllerType<T>) => void;
-  delete: (path: string, handler: ControllerType<T>) => void;
-  options: (path: string, handler: ControllerType<T>) => void;
-  head: (path: string, handler: ControllerType<T>) => void;
-  connect: (path: string, handler: ControllerType<T>) => void;
+  get: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  post: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  put: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  patch: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  delete: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  options: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  head: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
+  connect: (
+    path: string,
+    handler: ControllerType<T>,
+    options?: ControllerOptionType
+  ) => void;
 };
 /* eslint-enable no-unused-vars */
 
@@ -74,4 +131,5 @@ export type {
   RouterRoutesType,
   ReadOnlyRouterRoutesType,
   ErrorControllerType,
+  ControllerOptionType,
 };
