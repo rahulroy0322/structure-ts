@@ -1,6 +1,8 @@
+import Joi from 'joi';
 import { METHODS } from 'node:http';
 
 import type {
+  ControllerOptionType,
   ControllerType,
   MethodsType,
   ReadOnlyRouterRoutesType,
@@ -15,6 +17,29 @@ const methods = METHODS.map((method) => method.toLowerCase()) as MethodsType[];
 const DELIMITER = '<';
 const CATCH_ALL = '*';
 
+const getType = (type: ControllerOptionType['body'][string]['type']) => {
+  switch (type) {
+    case 'string':
+      return Joi.string();
+    case 'email':
+      return Joi.string().email();
+    case 'number':
+      return Joi.number();
+    default:
+      throw new TypeError(`unknown type "${type}"`);
+  }
+};
+
+const getBodySchema = (option: ControllerOptionType['body']) => {
+  const _schema = {} as Record<string, ReturnType<typeof getType>>;
+  for (const op in option) {
+    const value = option[op]!;
+    const type = getType(value.type);
+    _schema[op] = value.required ? type.required() : type;
+  }
+  return Joi.object(_schema).required();
+};
+
 const Router = <T = ServerRespnsceType>(baseUrl = '') => {
   const routes = {
     main: {},
@@ -22,22 +47,28 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
   } as RouterRoutesType<T>;
 
   const route: RouterMethodeType<T> = {
-    get: (path, handler) => _route(path, 'get', handler),
-    post: (path, handler) => _route(path, 'post', handler),
-    patch: (path, handler) => _route(path, 'patch', handler),
-    put: (path, handler) => _route(path, 'put', handler),
-    delete: (path, handler) => _route(path, 'delete', handler),
-    head: (path, handler) => _route(path, 'head', handler),
-    options: (path, handler) => _route(path, 'options', handler),
-    connect: (path, handler) => _route(path, 'connect', handler),
+    get: (path, handler, options) => _route(path, 'get', handler, options),
+    post: (path, handler, options) => _route(path, 'post', handler, options),
+    patch: (path, handler, options) => _route(path, 'patch', handler, options),
+    put: (path, handler, options) => _route(path, 'put', handler, options),
+    delete: (path, handler, options) =>
+      _route(path, 'delete', handler, options),
+    head: (path, handler, options) => _route(path, 'head', handler, options),
+    options: (path, handler, options) =>
+      _route(path, 'options', handler, options),
+    connect: (path, handler, options) =>
+      _route(path, 'connect', handler, options),
   };
 
   const _route = (
     path: string,
     methode: MethodsType,
-    controller: ControllerType<T>
+    controller: ControllerType<T>,
+    options?: ControllerOptionType
   ) => {
     const notPresent = -1;
+
+    const bodySchema = options?.body ? getBodySchema(options.body) : null;
 
     if (!methods.includes(methode)) {
       console.error('Methode Not Allowed!');
@@ -54,7 +85,10 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
         routes.main[path] = {};
       }
 
-      routes.main[path]![methode] = controller;
+      routes.main[path]![methode] = {
+        controller,
+        body: bodySchema,
+      };
 
       return;
     }
@@ -62,7 +96,15 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
     const { regexp, keys } = getRegexpFromUrl(path);
 
     // [RegExp, KeyValType[], MethodsType, ControllerType<T>]
-    routes.dynamic.push([regexp, keys, methode, controller]);
+    routes.dynamic.push([
+      regexp,
+      keys,
+      methode,
+      controller,
+      {
+        body: bodySchema,
+      },
+    ]);
   };
 
   return {
