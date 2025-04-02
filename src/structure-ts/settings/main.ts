@@ -58,6 +58,6 @@ if (warning) {
   console.warn(warning);
 }
 
-export { ENV, IS_PROD, BASE_DIR };
+export { ENV, IS_PROD, BASE_DIR, APP_PATH };
 
 export default SETTINGS as SettingsType;
