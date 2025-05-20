@@ -1,6 +1,4 @@
-import { existsSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import path from 'node:path';
 
 import type {
   CookieOptions,
@@ -8,15 +6,9 @@ import type {
   ServerRespnsceType,
 } from '../../@types';
 import { ERROR_EXIT_CODE } from '../constents';
-import { Question } from '../question/main';
-import SETTINGS, { BASE_DIR } from '../settings';
-import { ok } from '../status';
 import { stringify } from '../utils';
 import { setCookie } from './cookie';
-import { renderEjs } from './render';
-
-const TEMPLATE_DIR = SETTINGS.TEMPLATE_DIR!;
-const ERROR_CONTROLLER = SETTINGS.ERROR_CONTROLLER!;
+import { render as r } from './render';
 
 const Reply = <T = ServerRespnsceType>(
   reply: ServerResponse<IncomingMessage>
@@ -123,43 +115,16 @@ const Reply = <T = ServerRespnsceType>(
     return res;
   };
 
-  const render = (template: string, data?: Record<string, unknown>) => {
-    const templatePath = path.relative(
-      process.cwd(),
-      path.join(TEMPLATE_DIR, template.concat('.ejs'))
+  const render = (template: string, data?: Record<string, unknown>) =>
+    r(
+      {
+        write,
+        res,
+        reply,
+      },
+      template,
+      data
     );
-
-    try {
-      if (!existsSync(templatePath)) {
-        throw new Error(`"${template}" template does not exists!`);
-      }
-
-      const include = (template: string, data?: Record<string, unknown>) => {
-        const includePath = path.relative(
-          process.cwd(),
-          path.join(TEMPLATE_DIR, template.concat('.ejs'))
-        );
-        if (!existsSync(templatePath)) {
-          throw new Error(`"${template}" layout does not exists!`);
-        }
-
-        return renderEjs(includePath, data);
-      };
-
-      Object.assign(data as object, { include });
-
-      const html = renderEjs(templatePath, data);
-
-      status(ok()).type('text/html');
-      write(html);
-    } catch (e) {
-      if (BASE_DIR === 'src') {
-        console.error(e);
-      }
-      const qns = Question(reply.req);
-      ERROR_CONTROLLER(e, qns, res as ReplyType<unknown>);
-    }
-  };
 
   const res: ReplyType<T> = {
     get,

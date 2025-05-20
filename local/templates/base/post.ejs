@@ -1,25 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>post</title>
-</head>
-
-<body>
-  <h3>
-    <b>Email :</b> <%= email%>
-  </h3>
-  <%- include('layout/main') %>
-  <h4>
-    <b>Name :</b> <%= name%>
-  </h4>
-  <% if (work){%>
-  <h4>
-    <b>Work :</b> <%= work%>
-  </h4>
-  <% }%>
-</body>
-
-</html>
+<%- include('layout/header',{title:'post page ' + email}) %>
+<h3>
+  <b>Email :</b> <%= email %>
+</h3>
+<h4>
+  <b>Name :</b> <%= name %>
+</h4>
+<% if (work){%>
+<h4>
+  <b>Work :</b> <%= work %>
+</h4>
+<% }%>
+<%- include('layout/footer') %>
