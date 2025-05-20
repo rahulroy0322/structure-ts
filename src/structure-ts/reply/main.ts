@@ -1,5 +1,4 @@
-import ejs from 'ejs';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 
@@ -14,6 +13,7 @@ import SETTINGS, { BASE_DIR } from '../settings';
 import { ok } from '../status';
 import { stringify } from '../utils';
 import { setCookie } from './cookie';
+import { renderEjs } from './render';
 
 const TEMPLATE_DIR = SETTINGS.TEMPLATE_DIR!;
 const ERROR_CONTROLLER = SETTINGS.ERROR_CONTROLLER!;
@@ -134,9 +134,21 @@ const Reply = <T = ServerRespnsceType>(
         throw new Error(`"${template}" template does not exists!`);
       }
 
-      let html = ejs.render(readFileSync(templatePath).toString(), data);
-      html = html.replace(/(\s\s+)/gi, '');
-      html = html.replace(/(\n+)/gi, '');
+      const include = (template: string, data?: Record<string, unknown>) => {
+        const includePath = path.relative(
+          process.cwd(),
+          path.join(TEMPLATE_DIR, template.concat('.ejs'))
+        );
+        if (!existsSync(templatePath)) {
+          throw new Error(`"${template}" layout does not exists!`);
+        }
+
+        return renderEjs(includePath, data);
+      };
+
+      Object.assign(data as object, { include });
+
+      const html = renderEjs(templatePath, data);
 
       status(ok()).type('text/html');
       write(html);
