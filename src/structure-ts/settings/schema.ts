@@ -10,15 +10,17 @@ import { MIN_PORT_NUMBER } from '../constents';
 const func = Joi.func();
 const str = Joi.string();
 
-const mySqlDataBaseSchema = Joi.object<MySqlDatabaseType>({
-  mode: 'mysql',
-  auth: Joi.object<MySqlDatabaseType['auth']>({
-    host: str.required(),
-    password: str.required(),
-    user: str.required(),
-    database: str.required(),
-  }),
-});
+const mySqlDataBaseSchema = Joi.alternatives(
+  Joi.object<MySqlDatabaseType>({
+    mode: 'mysql',
+    auth: Joi.object<MySqlDatabaseType['auth']>({
+      host: str.required(),
+      password: str.required(),
+      user: str.required(),
+      database: str.required(),
+    }),
+  })
+);
 
 const DATABASE = Joi.object<DatabaseType>({
   config: Joi.alternatives(mySqlDataBaseSchema).required(),
@@ -31,7 +33,8 @@ const settingsSchema = Joi.object<SettingsType>({
   // ADMIN_PANEL_URL: str.required(),
   NOT_FOUND_CONTROLLER: func.required(),
   ERROR_CONTROLLER: func.required(),
-  DATABASE: DATABASE.required(),
+  TEMPLATE_DIR: Joi.string().default('templates'),
+  DATABASE: Joi.alternatives(Joi.boolean().valid(false), DATABASE).required(),
 });
 
 export { settingsSchema };

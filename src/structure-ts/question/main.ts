@@ -61,8 +61,7 @@ const Question = (request: IncomingMessage): QuestionType => {
   };
 
   const body = async () => {
-    // eslint-disable-next-line
-    if (!requestData.body !== undefined) {
+    if (requestData.body === undefined) {
       const { body, files } = await getTransformedBody(request);
 
       requestData.body = body;

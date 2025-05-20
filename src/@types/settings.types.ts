@@ -9,10 +9,12 @@ type MySqlDatabaseType = {
     database: string;
   };
 };
-type DatabaseType = {
-  onSuccess?: () => void;
-  config: MySqlDatabaseType;
-};
+type DatabaseType =
+  | false
+  | {
+      onSuccess?: () => void;
+      config: MySqlDatabaseType;
+    };
 
 type SettingsType = {
   PORT: number;
@@ -21,6 +23,7 @@ type SettingsType = {
   NOT_FOUND_CONTROLLER?: ControllerType<unknown>;
   ERROR_CONTROLLER?: ErrorControllerType<unknown>;
   DATABASE: DatabaseType;
+  TEMPLATE_DIR?: string;
 };
 
-export type { SettingsType, DatabaseType, MySqlDatabaseType };
+export type { DatabaseType, SettingsType, MySqlDatabaseType };

@@ -38,6 +38,8 @@ type ReplyType<T> = {
   contentType: (type: string) => ReplyType<T>;
   cookie: (name: string, value: string, option?: CookieOptions) => ReplyType<T>;
 
+  render: (template: string, data?: Record<string, unknown>) => void;
+
   send: (body: unknown) => void;
   json: (data: T) => void;
 };

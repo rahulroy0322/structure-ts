@@ -96,6 +96,10 @@ const loadConnection = async () => {
     return db;
   }
   try {
+    if (!DATABASE) {
+      throw new Error('please add database config first');
+    }
+
     db = await mysql.createConnection(DATABASE.config.auth);
     return db;
   } catch (e) {

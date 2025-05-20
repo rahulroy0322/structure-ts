@@ -2,17 +2,18 @@ import type { ControllerType } from '../../../src/@types';
 import { ok } from '../../../src/main';
 
 const index: ControllerType = (question, reply) => {
-
-  reply.status(ok()).json({
-    success: true,
-    data: {
-      message: 'index route is working!',
-    },
+  /*   reply.status(ok()).json({
+      success: true,
+      data: {
+        message: 'index route is working!',
+      },
+    }); */
+  reply.render('app/index', {
+    index: 'index route is working!',
   });
 };
 
 const int: ControllerType = (question, reply) => {
-
   reply.status(ok()).json({
     success: true,
     data: {
@@ -22,7 +23,6 @@ const int: ControllerType = (question, reply) => {
 };
 
 const str: ControllerType = (question, reply) => {
-
   reply.status(ok()).json({
     success: true,
     data: {
@@ -32,7 +32,6 @@ const str: ControllerType = (question, reply) => {
 };
 
 const bool: ControllerType = (question, reply) => {
-
   reply.status(ok()).json({
     success: true,
     data: {
@@ -42,7 +41,6 @@ const bool: ControllerType = (question, reply) => {
 };
 
 const catchAll: ControllerType = (question, reply) => {
-
   reply.status(ok()).json({
     success: true,
     data: {
@@ -52,7 +50,6 @@ const catchAll: ControllerType = (question, reply) => {
 };
 
 const post: ControllerType = (question, reply) => {
-
   reply.status(ok()).json({
     success: true,
     data: {
@@ -61,4 +58,4 @@ const post: ControllerType = (question, reply) => {
   });
 };
 
-export { index, post, str, int, bool,catchAll };
+export { index, post, str, int, bool, catchAll };

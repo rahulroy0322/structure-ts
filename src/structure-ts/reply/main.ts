@@ -1,4 +1,7 @@
+import ejs from 'ejs';
+import { existsSync, readFileSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import path from 'node:path';
 
 import type {
   CookieOptions,
@@ -6,9 +9,14 @@ import type {
   ServerRespnsceType,
 } from '../../@types';
 import { ERROR_EXIT_CODE } from '../constents';
+import { Question } from '../question/main';
+import SETTINGS, { BASE_DIR } from '../settings';
+import { ok } from '../status';
 import { stringify } from '../utils';
-// import { stringify } from "../utils";
 import { setCookie } from './cookie';
+
+const TEMPLATE_DIR = SETTINGS.TEMPLATE_DIR!;
+const ERROR_CONTROLLER = SETTINGS.ERROR_CONTROLLER!;
 
 const Reply = <T = ServerRespnsceType>(
   reply: ServerResponse<IncomingMessage>
@@ -72,11 +80,9 @@ const Reply = <T = ServerRespnsceType>(
     jsonp(data);
   };
 
-  const jsonp = (data: unknown): void => {
-    const body = Buffer.from(stringify(data));
-
+  const write = (body: unknown): void => {
     if (!get('Content-Type')) {
-      type('application/json');
+      type('text/plain');
     }
 
     reply.removeHeader('transfer-encoding');
@@ -87,11 +93,17 @@ const Reply = <T = ServerRespnsceType>(
     reply.end();
   };
 
-  const send = (body: unknown): void => {
-    if ((body !== null || body !== undefined) && typeof body === 'object') {
-      return json(body as T);
+  const jsonp = (data: unknown): void => {
+    const body = Buffer.from(stringify(data));
+
+    if (!get('Content-Type')) {
+      type('application/json');
     }
 
+    write(body);
+  };
+
+  const send = (body: unknown): void => {
     if (Buffer.isBuffer(body)) {
       if (!get('Content-Type')) {
         type('bin');
@@ -111,6 +123,32 @@ const Reply = <T = ServerRespnsceType>(
     return res;
   };
 
+  const render = (template: string, data?: Record<string, unknown>) => {
+    const templatePath = path.relative(
+      process.cwd(),
+      path.join(TEMPLATE_DIR, template.concat('.ejs'))
+    );
+
+    try {
+      if (!existsSync(templatePath)) {
+        throw new Error(`"${template}" template does not exists!`);
+      }
+
+      let html = ejs.render(readFileSync(templatePath).toString(), data);
+      html = html.replace(/(\s\s+)/gi, '');
+      html = html.replace(/(\n+)/gi, '');
+
+      status(ok()).type('text/html');
+      write(html);
+    } catch (e) {
+      if (BASE_DIR === 'src') {
+        console.error(e);
+      }
+      const qns = Question(reply.req);
+      ERROR_CONTROLLER(e, qns, res as ReplyType<unknown>);
+    }
+  };
+
   const res: ReplyType<T> = {
     get,
     set,
@@ -121,6 +159,8 @@ const Reply = <T = ServerRespnsceType>(
     header,
     type,
     contentType,
+
+    render,
 
     cookie,
   } satisfies ReplyType<T>;

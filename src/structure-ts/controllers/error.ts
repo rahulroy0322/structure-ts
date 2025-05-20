@@ -10,7 +10,10 @@ const errorController: ErrorControllerType<ServerRespnsceType> = (
 
   const error =
     e instanceof Error
-      ? e
+      ? {
+          name: e.name,
+          message: e.message,
+        }
       : {
           name: 'Unknown Error',
           message: 'Internal Server Error',

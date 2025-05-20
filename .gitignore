@@ -134,3 +134,6 @@ dist
 
 # output files
 lib
+
+# extra files
+pnpm-workspace.yaml

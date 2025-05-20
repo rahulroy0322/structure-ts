@@ -5,9 +5,12 @@ import { getRequestBody } from '.';
 const getJsonBody = async (
   req: IncomingMessage
 ): Promise<Record<string, unknown>> => {
-  const body = await getRequestBody(req);
-
-  return JSON.parse(body.toString());
+  const body = (await getRequestBody(req)).toString();
+  try {
+    return JSON.parse(body);
+  } catch {
+    return {};
+  }
 };
 
 export { getJsonBody };

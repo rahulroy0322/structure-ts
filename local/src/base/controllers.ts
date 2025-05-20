@@ -14,4 +14,18 @@ const base: ControllerType = async (question, reply) => {
   });
 };
 
-export { base };
+const post: ControllerType = async (question, reply) => {
+  const { body } = await question.body<{
+    email: string;
+    name: string;
+    work?: string;
+  }>();
+
+  if (!body.work) {
+    body.work = undefined;
+  }
+
+  reply.status(ok()).render('base/post', body);
+};
+
+export { base, post };

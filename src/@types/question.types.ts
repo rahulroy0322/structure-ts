@@ -24,9 +24,12 @@ type QuestionType = {
   type: () => string;
   contentType: () => string;
 
-  body: () => Promise<{
-    body: Record<string, unknown>;
-    files: Record<string, unknown>;
+  body: <
+    B extends Record<string, unknown> = Record<string, unknown>,
+    F extends Record<string, unknown> = Record<string, unknown>,
+  >() => Promise<{
+    body: B;
+    files: F;
   }>;
   raw: () => IncomingMessage;
 };
