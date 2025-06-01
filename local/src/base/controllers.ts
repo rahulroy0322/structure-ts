@@ -28,4 +28,8 @@ const post: ControllerType = async (question, reply) => {
   reply.status(ok()).render('base/post', body);
 };
 
-export { base, post };
+const layout: ControllerType = (_question, reply) => {
+  reply.status(ok()).render('base/layout');
+};
+
+export { base, post, layout };

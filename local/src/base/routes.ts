@@ -1,11 +1,11 @@
 import { Router } from '../../../src/structure-ts/router';
-import { base, post } from './controllers';
+import { base, layout, post } from './controllers';
 
 const { routes, route } = Router('test');
 
 route.get('/', base);
 
-route.post('/tt', post, {
+route.post('/includes', post, {
   body: {
     email: {
       type: 'email',
@@ -21,4 +21,5 @@ route.post('/tt', post, {
   },
 });
 
+route.get('/layout', layout);
 export default routes;

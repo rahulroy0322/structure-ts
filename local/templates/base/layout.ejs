@@ -1,0 +1,15 @@
+<%- layout('layouts/main',{title:'layout page '}) %>
+
+<%  block body %>
+<h2>
+  this is body
+</h2>
+<%- include('layouts/layout-include')%>
+<%  block body end %>
+
+
+<%  block script %>
+<script>
+  console.log('this work')
+</script>
+<%  block script end %>

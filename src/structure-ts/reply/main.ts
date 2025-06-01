@@ -6,9 +6,15 @@ import type {
   ServerRespnsceType,
 } from '../../@types';
 import { ERROR_EXIT_CODE } from '../constents';
+import { Question } from '../question';
+import SETTINGS, { BASE_DIR } from '../settings';
+import { ok } from '../status';
 import { stringify } from '../utils';
 import { setCookie } from './cookie';
-import { render as r } from './render';
+import { renderImpl } from './render';
+
+const ERROR_CONTROLLER = SETTINGS.ERROR_CONTROLLER!;
+const TEMPLATE_DIR = SETTINGS.TEMPLATE_DIR!;
 
 const Reply = <T = ServerRespnsceType>(
   reply: ServerResponse<IncomingMessage>
@@ -115,16 +121,18 @@ const Reply = <T = ServerRespnsceType>(
     return res;
   };
 
-  const render = (template: string, data?: Record<string, unknown>) =>
-    r(
-      {
-        write,
-        res,
-        reply,
-      },
-      template,
-      data
-    );
+  const render = (template: string, data?: Record<string, unknown>) => {
+    try {
+      status(ok()).type('text/html');
+      write(renderImpl(TEMPLATE_DIR, template, data));
+    } catch (e) {
+      if (BASE_DIR === 'src') {
+        console.error(e);
+      }
+      const qns = Question(reply.req);
+      ERROR_CONTROLLER(e, qns, res as ReplyType<unknown>);
+    }
+  };
 
   const res: ReplyType<T> = {
     get,
