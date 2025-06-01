@@ -1,19 +1,40 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import type { ReplyType } from '../@types';
+import type {
+  ErrorControllerType,
+  ReplyType,
+  ServerRespnsceType,
+} from '../@types';
 import { Question } from './question/main';
 import { Reply } from './reply';
 import type { Handler } from './router';
 import { badRequest, internalServerError, notFound } from './status';
 
 const handler =
-  <T>(handel: ReturnType<typeof Handler<T>>['handel']) =>
+  <T>(
+    handel: ReturnType<typeof Handler<T>>['handel'],
+    {
+      baseDir,
+      errorController,
+      templateDir,
+    }: {
+      baseDir: string;
+      errorController: ErrorControllerType<ServerRespnsceType>;
+      templateDir: string;
+    }
+  ) =>
   async (
     req: IncomingMessage,
     res: ServerResponse<IncomingMessage>
   ): Promise<void> => {
-    const reply = Reply(res);
     const question = Question(req);
+    const reply = Reply({
+      baseDir,
+      reply: res,
+      errorController,
+      templateDir,
+      question,
+    });
 
     const handlerReply = await handel(question, reply as ReplyType<T>);
 

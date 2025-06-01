@@ -2,23 +2,30 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import type {
   CookieOptions,
+  ErrorControllerType,
+  QuestionType,
   ReplyType,
   ServerRespnsceType,
 } from '../../@types';
 import { ERROR_EXIT_CODE } from '../constents';
-import { Question } from '../question';
-import SETTINGS, { BASE_DIR } from '../settings';
 import { ok } from '../status';
 import { stringify } from '../utils';
 import { setCookie } from './cookie';
 import { renderImpl } from './render';
 
-const ERROR_CONTROLLER = SETTINGS.ERROR_CONTROLLER!;
-const TEMPLATE_DIR = SETTINGS.TEMPLATE_DIR!;
-
-const Reply = <T = ServerRespnsceType>(
-  reply: ServerResponse<IncomingMessage>
-): ReplyType<T> => {
+const Reply = <T = ServerRespnsceType>({
+  baseDir,
+  reply,
+  question,
+  templateDir,
+  errorController,
+}: {
+  baseDir: string;
+  question: QuestionType;
+  errorController: ErrorControllerType<ServerRespnsceType>;
+  templateDir: string;
+  reply: ServerResponse<IncomingMessage>;
+}): ReplyType<T> => {
   // TODO:
   const get = (field: string) => {
     const header = reply.getHeader(field);
@@ -124,13 +131,12 @@ const Reply = <T = ServerRespnsceType>(
   const render = (template: string, data?: Record<string, unknown>) => {
     try {
       status(ok()).type('text/html');
-      write(renderImpl(TEMPLATE_DIR, template, data));
+      write(renderImpl(templateDir, template, data));
     } catch (e) {
-      if (BASE_DIR === 'src') {
+      if (baseDir === 'src') {
         console.error(e);
       }
-      const qns = Question(reply.req);
-      ERROR_CONTROLLER(e, qns, res as ReplyType<unknown>);
+      errorController(e, question, res as ReplyType<unknown>);
     }
   };
 
