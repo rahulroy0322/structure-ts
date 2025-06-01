@@ -34,7 +34,7 @@ const serialize = (
   value: string,
   option?: CookieOptions
 ): string => {
-  const strArray = [`${name}=${value}`];
+  const strArray = [`${name}=${encodeURIComponent(value)}`];
 
   if (!option) {
     return strArray.join('');
@@ -141,9 +141,32 @@ const serialize = (
 
 const isDate = (val: unknown): val is Date => val instanceof Date;
 
+const cookieKey = 'Set-Cookie';
+
+const notPresent = -1;
+
 const setCookie =
   (res: ServerResponse<IncomingMessage>) =>
   (name: string, value: string, option?: CookieOptions) => {
+    if (name.indexOf(' ') !== notPresent) {
+      res.removeHeader('Set-Cookie');
+      throw new TypeError(`name is invalid: ${name}`);
+    }
+
+    const prev = res.getHeader(cookieKey.toLowerCase()) as string | string[];
+
+    let val: string | string[] = value;
+
+    if (prev) {
+      const newVal = serialize(name, value, option);
+      val = Array.isArray(prev) ? prev.concat(newVal) : [prev].concat(newVal);
+    }
+
+    if (Array.isArray(val)) {
+      res.setHeader('Set-Cookie', val.map(String));
+      return;
+    }
+
     res.setHeader('Set-Cookie', serialize(name, value, option));
   };
 

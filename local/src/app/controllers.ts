@@ -2,15 +2,13 @@ import type { ControllerType } from '../../../src/@types';
 import { ok } from '../../../src/main';
 
 const index: ControllerType = (question, reply) => {
-  /*   reply.status(ok()).json({
-      success: true,
-      data: {
-        message: 'index route is working!',
-      },
-    }); */
-  reply.render('app/index', {
-    index: 'index route is working!',
-  });
+  reply
+    .cookie('name', 'val')
+    .cookie('other', 'other value')
+    .cookie('another', 'another value')
+    .render('app/index', {
+      index: 'index route is working!',
+    });
 };
 
 const int: ControllerType = (question, reply) => {
