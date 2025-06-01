@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'node:http';
 import { parse } from 'node:url';
 
-const STR_REGEXP = /^([a-zA-z][a-zA-Z0-9]+)$/;
+const STR_REGEXP = /^([a-zA-z][a-zA-Z0-9]*)$/;
 const INT_REGEXP = /^([0-9]+)$/gi;
 const BOOL_REGEXP = /^(true|false)$/gi;
 
@@ -42,7 +42,9 @@ const getQuery = (req: IncomingMessage) => {
 
   for (const item of arr) {
     const [key, _val] = item.split('=');
-
+    if (!key) {
+      continue;
+    }
     const val = getValue(_val);
 
     if (val === null) {
