@@ -3,7 +3,7 @@ const decode = (str: string) => {
   const last = 1;
 
   if (str.endsWith(';')) {
-    return str.substring(start, str.length - last);
+    return decodeURIComponent(str.substring(start, str.length - last));
   }
   return str;
 };

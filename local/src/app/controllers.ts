@@ -11,6 +11,13 @@ const index: ControllerType = (question, reply) => {
     });
 };
 
+const cookie: ControllerType = (question, reply) => {
+  reply.status(ok()).json({
+    success: true,
+    data: question.cookies() || {},
+  });
+};
+
 const int: ControllerType = (question, reply) => {
   reply.status(ok()).json({
     success: true,
@@ -56,4 +63,4 @@ const post: ControllerType = (question, reply) => {
   });
 };
 
-export { index, post, str, int, bool, catchAll };
+export { index, post, str, int, bool, catchAll, cookie };
