@@ -17,4 +17,16 @@ describe('#cookie', () => {
       name: 'val',
     });
   });
+
+  it('should get multiple cookie', () => {
+    const cookies = parseCookie(
+      'name=val; other=other%20value; another=another%20value'
+    );
+
+    assert.deepEqual(cookies, {
+      name: 'val',
+      other: 'other value',
+      another: 'another value',
+    });
+  });
 });

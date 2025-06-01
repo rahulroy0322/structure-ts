@@ -5,7 +5,7 @@ const decode = (str: string) => {
   if (str.endsWith(';')) {
     return decodeURIComponent(str.substring(start, str.length - last));
   }
-  return str;
+  return decodeURIComponent(str);
 };
 
 const parseCookie = (cookie: string) => {

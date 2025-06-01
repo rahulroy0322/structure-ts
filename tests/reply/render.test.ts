@@ -38,7 +38,7 @@ describe('#renderImpl/include', () => {
   it('should extands a basic layout', () => {
     assert.equal(
       renderImpl(TEMPLATE_DIR, 'layout'),
-      `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>layout page</title></head><body><nav></nav><h2>this is body</h2><h3>this is include content</h3><h3>this is level-2 content</h3><footer></footer><script>console.log('this work')</script></body></html>`
+      `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>layout page</title></head><body><nav></nav><h2>this is body</h2><h3>this is include content</h3><h3>this is level-2 content</h3>;<footer></footer><script>console.log('this work')</script></body></html>`
     );
   });
 });
