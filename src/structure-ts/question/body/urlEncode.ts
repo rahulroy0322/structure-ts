@@ -10,7 +10,7 @@ const getUrlEncodedBody = async (
 
   return Object.entries(parse(body.toString())).reduce(
     (acc, [key, val]) => {
-      acc[key.trim()] = val;
+      acc[key.trim()] = typeof val === 'string' ? val.trim() : val;
       return acc;
     },
     {} as Record<string, unknown>

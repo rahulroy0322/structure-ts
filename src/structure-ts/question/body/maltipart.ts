@@ -2,10 +2,10 @@ import type { IncomingMessage } from 'node:http';
 
 import { getRequestBody } from '.';
 
-const getBoundary = (contentType: string): string => {
+const getBoundary = (contentType?: string): string => {
   const boundaryMatch = 1;
 
-  const match = contentType.match(/boundary=(.+)$/);
+  const match = contentType?.match(/boundary=(.+)$/);
   if (match) {
     return `--${match[boundaryMatch]}`;
   }
@@ -14,7 +14,6 @@ const getBoundary = (contentType: string): string => {
 
 const splitBody = (body: Buffer, boundary: string): Buffer[] => {
   const untill = -1;
-  const trailing = 2;
 
   const boundaryBuffer = Buffer.from(boundary);
   const parts: Buffer[] = [];
@@ -22,7 +21,8 @@ const splitBody = (body: Buffer, boundary: string): Buffer[] => {
   let end = body.indexOf(boundaryBuffer, start);
 
   while (end !== untill) {
-    parts.push(body.slice(start, end - trailing)); // Remove trailing \r\n
+    parts.push(body.slice(start, end));
+
     start = end + boundaryBuffer.length;
     end = body.indexOf(boundaryBuffer, start);
   }
@@ -66,9 +66,10 @@ const parseContentDisposition = (
 };
 
 const getMaltiPartBody = async (req: IncomingMessage) => {
-  const contentType = req.headers['content-type']!;
+  const contentType = req.headers['content-type'];
 
   const boundary = getBoundary(contentType);
+
   const body = await getRequestBody(req);
   const parts = splitBody(body, boundary);
 
@@ -76,7 +77,6 @@ const getMaltiPartBody = async (req: IncomingMessage) => {
   const files: Record<string, { filename: string; data: Buffer }> = {};
 
   parts.forEach((part) => {
-    // Todo
     const { headers, body } = parsePart(part);
     const disposition = headers['content-disposition'];
     if (disposition) {
@@ -84,7 +84,7 @@ const getMaltiPartBody = async (req: IncomingMessage) => {
       if (filename) {
         files[name] = { filename, data: body };
       } else {
-        fields[name] = body.toString('utf-8');
+        fields[name] = body.toString('utf-8').trim();
       }
     }
   });
