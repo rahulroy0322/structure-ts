@@ -60,7 +60,13 @@ const Question = (request: IncomingMessage): QuestionType => {
     return _path;
   };
 
-  const body = async () => {
+  const body = async <
+    B extends Record<string, unknown> = Record<string, unknown>,
+    F extends Record<string, unknown> = Record<string, unknown>,
+  >(): Promise<{
+    body: B;
+    files: F;
+  }> => {
     if (requestData.body === undefined) {
       const { body, files } = await getTransformedBody(request);
 
@@ -69,8 +75,8 @@ const Question = (request: IncomingMessage): QuestionType => {
     }
 
     return {
-      body: requestData.body,
-      files: requestData.files,
+      body: requestData.body as B,
+      files: requestData.files as F,
     };
   };
 
