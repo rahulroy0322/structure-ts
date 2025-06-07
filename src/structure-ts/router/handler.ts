@@ -44,12 +44,13 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
   ): ControllerReturnType | boolean => {
     const urlIndex = 0;
     const methodIndex = 2;
+    method = method.toLowerCase() as MethodsType;
 
     for (const route of dynamic) {
       if (!route[urlIndex].test(url)) {
         continue;
       }
-      if (route[methodIndex] !== method) {
+      if (route[methodIndex].toLowerCase() !== method) {
         continue;
       }
       const [regexp, keys, , controller, { body }] = route;
