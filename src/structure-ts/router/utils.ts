@@ -61,7 +61,7 @@ const getRegexpFromUrl = (url: string) => {
           translator: (value) => String(value),
         };
       default:
-        console.error(`invalid type "${type}" for url"${url}"`);
+        console.error(`invalid type "${type}" for url "${url}"`);
         process.exit(ERROR_EXIT_CODE);
     }
   };
@@ -139,7 +139,7 @@ const getCleanBaseUrl = (baseUrl: string) => {
   const start = 0;
   const last = 1;
 
-  if (!baseUrl.endsWith('/')) {
+  if (baseUrl.endsWith('/')) {
     baseUrl = baseUrl.substring(start, baseUrl.length - last);
   }
   if (baseUrl.startsWith('/')) {
