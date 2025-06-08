@@ -130,8 +130,9 @@ const Reply = <T = ServerRespnsceType>({
 
   const render = (template: string, data?: Record<string, unknown>) => {
     try {
+      const html = renderImpl(templateDir, template, data);
       status(ok()).type('text/html');
-      write(renderImpl(templateDir, template, data));
+      write(html);
     } catch (e) {
       if (baseDir === 'src') {
         console.error(e);
@@ -156,6 +157,9 @@ const Reply = <T = ServerRespnsceType>({
     cookie,
   } satisfies ReplyType<T>;
 
+  Object.assign(res, {
+    raw: reply,
+  });
   return res;
 };
 
