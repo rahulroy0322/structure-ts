@@ -4,7 +4,6 @@ import path from 'node:path';
 
 import { ReadOnlyRouterRoutesType, RouterRoutesType } from '../../@types';
 import { ERROR_EXIT_CODE } from '../constents';
-import SETTINGS, { BASE_DIR } from '../settings';
 import { checkRoute } from './routes';
 
 const REQUIRED_FILES = [
@@ -13,19 +12,17 @@ const REQUIRED_FILES = [
   // 'services.ts',
 ] as const;
 
-const { APPS } = SETTINGS;
-
-const checkApps = async <T>() => {
+const checkApps = async <T>(baseDir: string, apps: string[]) => {
   // let routes = {} as ReadOnlyRouterRoutesType<T>;
 
   const routes = await Promise.all(
-    APPS.map(async (app) => {
+    apps.map(async (app) => {
       try {
-        const files = await getAppAllFiles(app);
+        const files = await getAppAllFiles(baseDir, app);
 
         checkRequiredFiles(app, files);
 
-        const route = await checkSchemaFiles<T>(app);
+        const route = await checkSchemaFiles<T>(baseDir, app);
 
         return route;
       } catch (err) {
@@ -57,8 +54,8 @@ const checkApps = async <T>() => {
   );
 };
 
-const checkSchemaFiles = async <T>(app: string) => {
-  const routes = await checkRoute(app);
+const checkSchemaFiles = async <T>(baseDir: string, app: string) => {
+  const routes = await checkRoute(baseDir, app);
 
   return routes as ReadOnlyRouterRoutesType<T>;
 };
@@ -70,8 +67,8 @@ const checkRequiredFiles = (app: string, files: string[]) =>
     }
   });
 
-const getAppAllFiles = async (app: string) => {
-  const appPath = path.join(BASE_DIR, app);
+const getAppAllFiles = async (baseDir: string, app: string) => {
+  const appPath = path.join(baseDir, app);
 
   if (!fs.existsSync(appPath)) {
     throw new Error(`app "${app}" does not exists!`);

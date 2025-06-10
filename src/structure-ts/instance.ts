@@ -14,6 +14,18 @@ const getServerInstance = (
     reply: ServerResponse<IncomingMessage>
   ) => void
   /* eslint-enable no-unused-vars */
-): Server => http.createServer(options, handler);
+): Server => {
+  const server = http.createServer(options, handler);
+
+  if (options.requestTimeout) {
+    server.setTimeout(options.requestTimeout);
+  }
+
+  if (options.keepAliveTimeout) {
+    server.keepAliveTimeout = options.keepAliveTimeout;
+  }
+
+  return server;
+};
 
 export { getServerInstance };

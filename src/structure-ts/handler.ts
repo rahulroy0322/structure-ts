@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import type {
+  ControllerType,
   ErrorControllerType,
   ReplyType,
   ServerRespnsceType,
@@ -8,7 +9,7 @@ import type {
 import { Question } from './question/main';
 import { Reply } from './reply';
 import type { Handler } from './router';
-import { badRequest, internalServerError, notFound } from './status';
+import { badRequest } from './status';
 
 const handler =
   <T>(
@@ -16,10 +17,12 @@ const handler =
     {
       baseDir,
       errorController,
+      notFoundController,
       templateDir,
     }: {
       baseDir: string;
       errorController: ErrorControllerType<ServerRespnsceType>;
+      notFoundController: ControllerType<ServerRespnsceType>;
       templateDir: string;
     }
   ) =>
@@ -43,46 +46,24 @@ const handler =
     }
 
     if (handlerReply.required) {
-      reply.status(badRequest()).json({
-        success: false,
-        error: {
+      reply.status(badRequest());
+      errorController(
+        {
           name: 'validation failed!',
           message: handlerReply.required,
         },
-      });
+        question,
+        reply
+      );
       return;
     }
-
-    const route = question.path();
 
     if (handlerReply.notFound) {
-      reply.status(notFound()).json({
-        success: false,
-        route,
-        error: {
-          name: 'NOT Found!',
-          message: `the route "${route}" does not found!`,
-        },
-      });
+      notFoundController(question, reply);
       return;
     }
 
-    const e = handlerReply.error;
-
-    const error =
-      e instanceof Error
-        ? e
-        : {
-            name: 'Unknown Error',
-            message: 'Internal Server Error',
-          };
-
-    // ! TODO check for server Error Handler
-    reply.status(internalServerError()).json({
-      success: false,
-      route,
-      error,
-    });
+    errorController(handlerReply.error, question, reply);
   };
 
 export { handler };

@@ -1,52 +1,56 @@
 import type {
+  ControllerType,
   ErrorControllerType,
+  HandlerReturnType,
+  QuestionType,
+  ReplyType,
   ServerOptionsType,
   ServerRespnsceType,
 } from '../@types';
-import { main } from '../db/main';
-import { checkApps } from './app';
-import { DEFAULT_OPTIONS } from './config';
-import { ERROR_EXIT_CODE, SUCCESS_EXIT_CODE } from './constents';
 import { handler } from './handler';
 import { getServerInstance } from './instance';
-import { Handler } from './router';
-import SETTINGS, { BASE_DIR } from './settings';
 
-const baseDir = BASE_DIR;
-const errorController =
-  SETTINGS.ERROR_CONTROLLER! as ErrorControllerType<ServerRespnsceType>;
-const templateDir = SETTINGS.TEMPLATE_DIR!;
+const StructureImpl = <T = ServerRespnsceType>(
+  {
+    onClose,
+    port,
+    handel,
 
-const { PORT } = SETTINGS;
+    baseDir,
+    errorController,
+    notFoundController,
+    templateDir,
+  }: {
+    // eslint-disable-next-line no-unused-vars
+    onClose: (e: Error | undefined) => void;
+    port: number;
+    handel: (
+      // eslint-disable-next-line no-unused-vars
+      qestion: QuestionType,
+      // eslint-disable-next-line no-unused-vars
+      reply: ReplyType<T>
+    ) => Promise<HandlerReturnType>;
 
-const Structure = async <T = ServerRespnsceType>(
-  opts: ServerOptionsType = DEFAULT_OPTIONS
+    baseDir: string;
+    errorController: ErrorControllerType<ServerRespnsceType>;
+    notFoundController: ControllerType<ServerRespnsceType>;
+    templateDir: string;
+  },
+  serverOpts: ServerOptionsType
 ) => {
-  await main();
-  const routes = await checkApps<T>();
-
-  const { handel } = Handler<T>(routes);
-
   let isListening = false;
 
   // eslint-disable-next-line no-unused-vars
   const listen = (cb?: (port: number) => void) => {
     const server = getServerInstance(
-      opts,
+      serverOpts,
       handler(handel, {
         templateDir,
         errorController,
+        notFoundController,
         baseDir,
       })
     );
-
-    if (opts.requestTimeout) {
-      server.setTimeout(opts.requestTimeout);
-    }
-
-    if (opts.keepAliveTimeout) {
-      server.keepAliveTimeout = opts.keepAliveTimeout;
-    }
 
     const close = () => {
       server.closeAllConnections();
@@ -59,8 +63,8 @@ const Structure = async <T = ServerRespnsceType>(
     }
 
     isListening = true;
-    server.listen(PORT);
-    cb?.(PORT);
+    server.listen(port);
+    cb?.(port);
     return close;
   };
 
@@ -69,13 +73,4 @@ const Structure = async <T = ServerRespnsceType>(
   };
 };
 
-const onClose = (e: Error | undefined) => {
-  if (e) {
-    //TODO: Debug for error
-    process.exit(ERROR_EXIT_CODE);
-  }
-  process.exit(SUCCESS_EXIT_CODE);
-};
-
-export { Structure };
-export default Structure;
+export default StructureImpl;

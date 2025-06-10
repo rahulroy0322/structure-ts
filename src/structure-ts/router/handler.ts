@@ -2,6 +2,7 @@ import type { ObjectSchema } from 'joi';
 
 import type {
   ControllerType,
+  HandlerReturnType,
   MethodsType,
   QuestionType,
   ReadOnlyRouterRoutesType,
@@ -10,17 +11,6 @@ import type {
 import { getCleanResponseUrl, getParams } from './utils';
 
 const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
-  type HandlerReturnType =
-    | {
-        success: true;
-      }
-    | {
-        success: false;
-        error?: unknown;
-        notFound?: boolean;
-        required?: string;
-      };
-
   type ControllerReturnType = {
     controller: ControllerType<T>;
     body: ObjectSchema | null;

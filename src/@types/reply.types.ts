@@ -32,6 +32,7 @@ type ServerRespnsceType = SuccessRespnsceType | ErrorRespnsceType;
 type ReplyType<T> = {
   get: (field: string) => string | number | string[] | undefined;
   set: (field: string, val: unknown) => ReplyType<T>;
+  code: () => number;
   status: (code: number) => ReplyType<T>;
   header: (field: string, val: unknown) => ReplyType<T>;
   type: (type: string) => ReplyType<T>;
