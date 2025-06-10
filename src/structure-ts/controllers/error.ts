@@ -19,7 +19,11 @@ const errorController: ErrorControllerType<ServerRespnsceType> = (
           message: 'Internal Server Error',
         };
 
-  reply.status(internalServerError()).json({
+  if (reply.code().toString().startsWith('2')) {
+    reply.status(internalServerError());
+  }
+
+  reply.json({
     success: false,
     route,
     error,

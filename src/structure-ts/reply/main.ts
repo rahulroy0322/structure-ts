@@ -61,6 +61,8 @@ const Reply = <T = ServerRespnsceType>({
   };
   const contentType = type;
 
+  const code = () => reply.statusCode;
+
   const status = (code: number): ReplyType<T> => {
     const statusCodeStart = 100;
     const statusCodeEnd = 999;
@@ -146,6 +148,8 @@ const Reply = <T = ServerRespnsceType>({
     set,
     json,
     send,
+
+    code,
     status,
 
     header,
