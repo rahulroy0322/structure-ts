@@ -11,3 +11,5 @@ node_modules
 .husky
 
 lib
+
+**/*.ejs
