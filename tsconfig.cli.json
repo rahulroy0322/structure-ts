@@ -1,0 +1,11 @@
+{
+  "extends":["./tsconfig.base.json"],
+  "compilerOptions": {
+    "target": "ES6",
+    "rootDir": "./cli",
+    "declaration": false,
+    "sourceMap": false,
+    "outDir": "./bin",
+  },
+  "include": ["cli/**/*.ts"],
+}

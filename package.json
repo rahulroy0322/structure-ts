@@ -1,15 +1,21 @@
 {
   "name": "structure-ts",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "description": "A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
+  "bin": {
+    "st": "bin/index.js",
+    "structure-ts": "bin/index.js"
+  },
   "scripts": {
     "build": "tsc -b",
+    "build:cli": "tsc -p tsconfig.cli.json",
     "commitlint": "commitlint --edit",
     "formate": "prettier ./{src,tests}/**/* --check",
     "formate:fix": "prettier ./{src,tests}/**/* -w",
     "dev": "cd local && tsx --watch src/main.ts",
+    "dev:cli": "tsx --tsconfig tsconfig.cli.json cli/main.ts",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "prepare": "husky",

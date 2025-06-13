@@ -19,12 +19,14 @@ const notFoundController =
   SETTINGS.NOT_FOUND_CONTROLLER as ControllerType<ServerRespnsceType>;
 const templateDir = SETTINGS.TEMPLATE_DIR!;
 
-const { PORT, APPS } = SETTINGS;
+const { PORT, APPS, DATABASE } = SETTINGS;
 
 const Structure = async <T = ServerRespnsceType>(
   opts: ServerOptionsType = DEFAULT_OPTIONS
 ) => {
-  await main();
+  if (DATABASE) {
+    await main();
+  }
   const routes = await checkApps<T>(baseDir, APPS);
 
   const { handel } = Handler<T>(routes);
