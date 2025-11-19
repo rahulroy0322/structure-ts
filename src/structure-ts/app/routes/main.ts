@@ -1,33 +1,33 @@
-import path from 'node:path';
+import path from 'node:path'
 
-import type { ReadOnlyRouterRoutesType } from '../../../@types';
-import { ERROR_EXIT_CODE } from '../../constents';
-import { routeSchema } from './schema';
+import type { ReadOnlyRouterRoutesType } from '../../../@types'
+import { BASE_DIR } from '../../settings/main'
+import { routeSchema } from './schema'
 
-const checkRoute = async <T>(baseDir: string, app: string) => {
-  const route = path
-    .relative(__dirname, `${baseDir}/${app}/routes`)
-    .replace(/\\/gi, '/');
+const ERROR_EXIT_CODE = 1
 
-  const { default: routes } = await import(route);
+const checkRoute = async <T>(app: string) => {
+  const { default: routes } = await import(
+    path.relative(__dirname, path.join(BASE_DIR, app, 'routes'))
+  )
 
   const { error, warning } = routeSchema.validate(routes, {
     abortEarly: false,
     allowUnknown: true,
     stripUnknown: true,
-  });
+  })
 
   if (error) {
-    console.error(`invalid app "${app}"!`);
-    console.error(error);
-    process.exit(ERROR_EXIT_CODE);
+    console.error(`invalid app "${app}"!`)
+    console.error(error)
+    process.exit(ERROR_EXIT_CODE)
   }
 
   if (warning) {
-    console.warn(warning);
+    console.warn(warning)
   }
 
-  return routes as ReadOnlyRouterRoutesType<T>;
-};
+  return routes as ReadOnlyRouterRoutesType<T>
+}
 
-export { checkRoute };
+export { checkRoute }

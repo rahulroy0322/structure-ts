@@ -4,19 +4,19 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/main.js",
+    "start": "NODE_ENV=prod node dist/main.js",
     "build": "tsc -b",
-    "dev": "tsx --watch src/main.ts"
+    "dev": "NODE_ENV=dev tsx --watch src/main.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": { 
-    "structure-ts": "0.0.0"  
+  "dependencies": {
+    "structure-ts": "0.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
-    "tsx": "^4.20.0",
-    "typescript": "^5.8.3"
+    "@types/node": "^24.10.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   }
 }

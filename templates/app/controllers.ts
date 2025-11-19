@@ -1,4 +1,4 @@
-import { type ControllerType, ok } from 'structure-ts';
+import { type ControllerType, ok } from 'structure-ts'
 
 const controller: ControllerType = (question, reply) => {
   reply.status(ok()).json({
@@ -6,7 +6,7 @@ const controller: ControllerType = (question, reply) => {
     data: {
       message: 'working',
     },
-  });
-};
+  })
+}
 
-export { controller };
+export { controller }

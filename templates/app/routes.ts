@@ -1,9 +1,9 @@
-import { Router } from 'structure-ts';
+import { Router } from 'structure-ts'
 
-import { controller } from './controllers';
+import { controller } from './controllers'
 
-const { routes, route } = Router();
+const { routes, route } = Router()
 
-route.get('/', controller);
+route.get('/', controller)
 
-export default routes;
+export default routes

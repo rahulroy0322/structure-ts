@@ -1,63 +1,57 @@
-import type { SettingsType } from '../../@types';
-import { ERROR_EXIT_CODE } from '../constents';
-import { errorController, notFoundController } from '../controllers';
-import { settingsSchema } from './schema';
+import path from 'node:path'
 
-const getSetting = () => {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { default: s } = require(`${BASE_DIR}/settings`);
+import type { SettingsType } from '../../@types'
+import { errorController } from '../controllers/error'
+import { notFoundController } from '../controllers/not-found'
 
-    const setting = s as SettingsType;
+const APP_PATH = process.cwd()
 
-    if (!setting.NOT_FOUND_CONTROLLER) {
-      setting.NOT_FOUND_CONTROLLER = notFoundController;
+const ENV = process.env.ENV || 'dev'
+const IS_DEV = ENV === 'dev'
+
+const BASE_DIR = path.join(APP_PATH, IS_DEV ? 'src' : 'dist')
+const settingsPath = path.join(BASE_DIR, 'settings')
+
+// const data = getSetting();
+
+// if (!data.success) {
+//   console.error('setting not found!');
+//   process.exit(ERROR_EXIT_CODE);
+// }
+
+// const {
+//   error,
+//   value: SETTINGS,
+//   warning,
+// } = settingsSchema.validate(data.setting);
+
+// if (error) {
+//   console.error('invalid setting!');
+//   console.error(error);
+//   process.exit(ERROR_EXIT_CODE);
+// }
+
+// if (warning) {
+//   console.warn(warning);
+// }
+
+let SETTINGS: null | Required<SettingsType> = null
+
+const loadSettings = async () => {
+  if (!SETTINGS) {
+    // todo validate
+    SETTINGS = (await import(settingsPath)).default as Required<SettingsType>
+
+    if (!SETTINGS.ERROR_CONTROLLER) {
+      SETTINGS.ERROR_CONTROLLER = errorController
     }
 
-    if (!setting.ERROR_CONTROLLER) {
-      setting.ERROR_CONTROLLER = errorController;
+    if (!SETTINGS.NOT_FOUND_CONTROLLER) {
+      SETTINGS.NOT_FOUND_CONTROLLER = notFoundController
     }
-
-    return {
-      success: true,
-      setting,
-    };
-  } catch {
-    return {
-      success: false,
-    };
   }
-};
 
-const APP_PATH = process.cwd();
-
-const ENV = process.env.NODE_ENV || 'dev';
-const IS_PROD = ENV === 'prod';
-const BASE_DIR = `${APP_PATH}/${IS_PROD ? 'dist' : 'src'}`;
-
-const data = getSetting();
-
-if (!data.success) {
-  console.error('setting not found!');
-  process.exit(ERROR_EXIT_CODE);
+  return SETTINGS
 }
 
-const {
-  error,
-  value: SETTINGS,
-  warning,
-} = settingsSchema.validate(data.setting);
-
-if (error) {
-  console.error('invalid setting!');
-  console.error(error);
-  process.exit(ERROR_EXIT_CODE);
-}
-
-if (warning) {
-  console.warn(warning);
-}
-
-export { ENV, IS_PROD, BASE_DIR, APP_PATH };
-
-export default SETTINGS as SettingsType;
+export { IS_DEV, BASE_DIR, APP_PATH, SETTINGS, loadSettings }

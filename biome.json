@@ -1,0 +1,139 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "src/**/*",
+      "cli/**/*",
+      "templates/**/*",
+      "biome.json",
+      "package.json"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": true
+      },
+      "performance": {
+        "recommended": true
+      },
+      "style": {
+        "recommended": true
+      },
+      "nursery": {
+        "recommended": true
+      },
+      "security": {
+        "recommended": true,
+        "noGlobalEval": "error"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "error",
+        "noClassAssign": "error",
+        "noConfusingLabels": "error",
+        "noConsole": {
+          "options": {
+            "allow": [
+              "error",
+              "warn"
+            ]
+          },
+          "level": "error"
+        },
+        "noConstEnum": "error",
+        "noDoubleEquals": "error",
+        "noDuplicateAtImportRules": "error",
+        "noDuplicateCase": "error",
+        "noDuplicateElseIf": "error",
+        "noImplicitAnyLet": "error",
+        "noUnassignedVariables": "error",
+        "noUnknownAtRules": "off",
+        "noVar": "error",
+        "recommended": false,
+        "useAwait": "off"
+      },
+      "complexity": {
+        "recommended": true,
+        "useArrowFunction": "error",
+        "useIndexOf": "error"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noUnusedFunctionParameters": "error",
+        "noUnusedImports": "error",
+        "noUnusedLabels": "error",
+        "noUnusedVariables": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "attributePosition": "multiline",
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "bracketSpacing": true,
+      "enabled": true,
+      "expand": "always",
+      "indentStyle": "space",
+      "trailingCommas": "none"
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "cli/**/*"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "templates/**/*"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          },
+          "correctness": {
+            "noUnusedFunctionParameters": "off"
+          }
+        }
+      }
+    }
+  ],
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on",
+        "recommended": true,
+        "useSortedAttributes": "on",
+        "useSortedProperties": "on"
+      }
+    }
+  }
+}

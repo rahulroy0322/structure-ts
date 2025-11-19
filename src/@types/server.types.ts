@@ -1,7 +1,7 @@
 type ServerOptionsType = Partial<{
-  keepAlive: boolean;
-  requestTimeout: number;
-  keepAliveTimeout: number;
-}>;
+  keepAlive: boolean
+  requestTimeout: number
+  keepAliveTimeout: number
+}>
 
-export type { ServerOptionsType };
+export type { ServerOptionsType }

@@ -1,18 +1,18 @@
-import Joi from 'joi';
+import Joi from 'joi'
 
-import { VALID_TYPES } from '../../constents';
+import { VALID_TYPES } from '../../constants/router-schema'
 
 const methods = Joi.string()
   .valid('get', 'post', 'patch', 'put', 'delete', 'options', 'head', 'connect')
-  .required();
+  .required()
 
-const func = Joi.function().required();
+const func = Joi.function().required()
 
 const keyValSchema = Joi.object({
   kind: Joi.string().valid('param').required(),
   key: Joi.string().required(),
   translator: func,
-});
+})
 
 const bodySchema = Joi.alternatives(
   Joi.object()
@@ -27,7 +27,7 @@ const bodySchema = Joi.alternatives(
     )
     .required(),
   Joi.allow(null).required()
-).required();
+).required()
 
 const dynamicRoutes = Joi.array().items(
   Joi.array().ordered(
@@ -39,7 +39,7 @@ const dynamicRoutes = Joi.array().items(
       body: bodySchema,
     }).required()
   )
-);
+)
 
 const routesSchema = Joi.object().pattern(
   Joi.string(),
@@ -61,11 +61,11 @@ const routesSchema = Joi.object().pattern(
       body: bodySchema,
     }
   )
-);
+)
 
 const routeSchema = Joi.object({
   main: routesSchema.required(),
   dynamic: dynamicRoutes.required(),
-});
+})
 
-export { routeSchema };
+export { routeSchema }

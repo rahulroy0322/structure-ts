@@ -1,12 +1,12 @@
-import type { ErrorControllerType, ServerRespnsceType } from '../../@types';
-import { internalServerError } from '../status';
+import type { ErrorControllerType, ServerRespnsceType } from '../../@types'
+import { internalServerError } from '../status/main'
 
 const errorController: ErrorControllerType<ServerRespnsceType> = (
   e,
   question,
   reply
 ) => {
-  const route = question.path();
+  const route = question.path()
 
   const error =
     e instanceof Error
@@ -17,17 +17,17 @@ const errorController: ErrorControllerType<ServerRespnsceType> = (
       : {
           name: 'Unknown Error',
           message: 'Internal Server Error',
-        };
+        }
 
   if (reply.code().toString().startsWith('2')) {
-    reply.status(internalServerError());
+    reply.status(internalServerError())
   }
 
   reply.json({
     success: false,
     route,
     error,
-  });
-};
+  })
+}
 
-export { errorController };
+export { errorController }

@@ -1,3 +1,3 @@
-const stringify = (data: unknown): string => JSON.stringify(data);
+const stringify = (data: unknown): string => JSON.stringify(data)
 
-export { stringify };
+export { stringify }

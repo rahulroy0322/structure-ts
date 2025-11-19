@@ -1,12 +1,12 @@
 type HandlerReturnType =
   | {
-      success: true;
+      success: true
     }
   | {
-      success: false;
-      error?: unknown;
-      notFound?: boolean;
-      required?: string;
-    };
+      success: false
+      error?: unknown
+      notFound?: boolean
+      required?: string
+    }
 
-export type { HandlerReturnType };
+export type { HandlerReturnType }

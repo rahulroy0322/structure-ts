@@ -1,82 +1,79 @@
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
+import { existsSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
+import path from 'node:path'
 
-import { ReadOnlyRouterRoutesType, RouterRoutesType } from '../../@types';
-import { ERROR_EXIT_CODE } from '../constents';
-import { checkRoute } from './routes';
+import type { ReadOnlyRouterRoutesType, RouterRoutesType } from '../../@types'
+import { BASE_DIR, SETTINGS } from '../settings/main'
+import { checkRoute } from './routes/main'
 
-const REQUIRED_FILES = [
-  'routes',
-  'controllers',
-  // 'services.ts',
-] as const;
+const REQUIRED_FILES = ['routes', 'controllers'] as const
 
-const checkApps = async <T>(baseDir: string, apps: string[]) => {
-  // let routes = {} as ReadOnlyRouterRoutesType<T>;
+const checkRequiredFiles = (app: string, files: string[]) =>
+  REQUIRED_FILES.forEach((file) => {
+    if (!files.includes(file)) {
+      throw new Error(`"${file}" file does not exists at "${app}" app!`)
+    }
+  })
 
-  const routes = await Promise.all(
-    apps.map(async (app) => {
-      try {
-        const files = await getAppAllFiles(baseDir, app);
+const getAppAllFiles = async (app: string) => {
+  const appPath = path.join(BASE_DIR, app)
 
-        checkRequiredFiles(app, files);
+  if (!existsSync(appPath)) {
+    throw new Error(`app "${app}" does not exists!`)
+  }
 
-        const route = await checkSchemaFiles<T>(baseDir, app);
+  return (await readdir(appPath)).map((file) =>
+    file.replace('.ts', '').replace('.js', '')
+  )
+}
 
-        return route;
-      } catch (err) {
-        console.error(err);
-        process.exit(ERROR_EXIT_CODE);
-      }
-    })
-  );
+const checkApps = async () => {
+  if (!SETTINGS) {
+    console.error('please run the project properly -> "checkApps" is called')
 
-  return routes.reduce(
+    process.exit(1)
+  }
+
+  const { APPS } = SETTINGS
+
+  const routes: ReadOnlyRouterRoutesType<unknown> = (
+    await Promise.all(
+      APPS.map(async (app) => {
+        try {
+          checkRequiredFiles(app, await getAppAllFiles(app))
+
+          const routes = await checkRoute(app)
+          return routes
+        } catch (err) {
+          console.error(err)
+          process.exit(1)
+        }
+      })
+    )
+  ).reduce(
     (acc, curr) => {
       if (curr.main) {
         acc.main = {
           ...acc.main,
           ...curr.main,
-        };
+        }
       }
 
       if (curr.dynamic) {
-        (acc.dynamic as RouterRoutesType<T>['dynamic']).push(...curr.dynamic);
+        ;(acc.dynamic as RouterRoutesType<unknown>['dynamic']).push(
+          ...curr.dynamic
+        )
       }
 
-      return acc;
+      return acc
     },
     {
-      main: {},
       dynamic: [],
-    } as RouterRoutesType<T>
-  );
-};
-
-const checkSchemaFiles = async <T>(baseDir: string, app: string) => {
-  const routes = await checkRoute(baseDir, app);
-
-  return routes as ReadOnlyRouterRoutesType<T>;
-};
-
-const checkRequiredFiles = (app: string, files: string[]) =>
-  REQUIRED_FILES.forEach((file) => {
-    if (!files.includes(file)) {
-      throw new Error(`"${file}" file does not exists at "${app}" app!`);
+      main: {},
     }
-  });
+  )
 
-const getAppAllFiles = async (baseDir: string, app: string) => {
-  const appPath = path.join(baseDir, app);
+  return routes
+}
 
-  if (!fs.existsSync(appPath)) {
-    throw new Error(`app "${app}" does not exists!`);
-  }
-
-  return (await fsp.readdir(appPath)).map((file) =>
-    file.replace('.ts', '').replace('.js', '')
-  );
-};
-
-export { checkApps };
+export { checkApps }

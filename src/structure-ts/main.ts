@@ -1,76 +1,99 @@
 import type {
-  ControllerType,
-  ErrorControllerType,
   HandlerReturnType,
   QuestionType,
   ReplyType,
   ServerOptionsType,
-  ServerRespnsceType,
-} from '../@types';
-import { handler } from './handler';
-import { getServerInstance } from './instance';
+} from '../@types'
+import { checkApps } from './app/main'
+import { handler } from './handler'
+import { getServerInstance } from './instance'
+import { Handler } from './router/handler'
+import { BASE_DIR, loadSettings, SETTINGS } from './settings/main'
 
-const StructureImpl = <T = ServerRespnsceType>(
+const StructureImpl = (
+  options: ServerOptionsType = {
+    keepAlive: false,
+  },
   {
-    onClose,
     port,
-    handel,
-
-    baseDir,
-    errorController,
-    notFoundController,
     templateDir,
+    handel,
   }: {
-    // eslint-disable-next-line no-unused-vars
-    onClose: (e: Error | undefined) => void;
-    port: number;
+    port: number
     handel: (
       // eslint-disable-next-line no-unused-vars
       qestion: QuestionType,
       // eslint-disable-next-line no-unused-vars
-      reply: ReplyType<T>
-    ) => Promise<HandlerReturnType>;
+      reply: ReplyType<unknown>
+    ) => Promise<HandlerReturnType>
 
-    baseDir: string;
-    errorController: ErrorControllerType<ServerRespnsceType>;
-    notFoundController: ControllerType<ServerRespnsceType>;
-    templateDir: string;
-  },
-  serverOpts: ServerOptionsType
+    templateDir: string
+  }
 ) => {
-  let isListening = false;
+  if (!SETTINGS) {
+    console.error(`some thingwent wrong...`, 'StructureImpl')
 
-  // eslint-disable-next-line no-unused-vars
+    process.exit(1)
+  }
+
+  let isListening = false
+
+  const server = getServerInstance(
+    options,
+    handler(handel, {
+      templateDir,
+      errorController: SETTINGS.ERROR_CONTROLLER as any,
+      notFoundController: SETTINGS.NOT_FOUND_CONTROLLER as any,
+
+      // TODO! remove this
+      baseDir: BASE_DIR,
+    })
+  )
+
+  const close = () => {
+    server.close()
+  }
+
   const listen = (cb?: (port: number) => void) => {
-    const server = getServerInstance(
-      serverOpts,
-      handler(handel, {
-        templateDir,
-        errorController,
-        notFoundController,
-        baseDir,
-      })
-    );
-
-    const close = () => {
-      server.closeAllConnections();
-      server.close(onClose);
-    };
-
     if (isListening) {
-      console.error('App is Already listening');
-      close();
+      console.error('App is Already listening')
+      return {
+        close,
+      }
     }
 
-    isListening = true;
-    server.listen(port);
-    cb?.(port);
-    return close;
-  };
+    isListening = true
+    server.listen(port)
+    cb?.(port)
+    return {
+      close,
+    }
+  }
 
   return {
     listen,
-  };
-};
+  }
+}
 
-export default StructureImpl;
+const Structure = async (options: ServerOptionsType) => {
+  const { PORT } = await loadSettings()
+
+  const port = PORT
+
+  const routes = await checkApps()
+
+  const { handel } = Handler(routes)
+
+  return StructureImpl(options, {
+    port,
+    templateDir: '',
+    handel,
+  })
+}
+
+export { Structure }
+
+export * from './router/main'
+export * from './status/main'
+
+export default Structure

@@ -2,9 +2,9 @@ import http, {
   type IncomingMessage,
   type Server,
   type ServerResponse,
-} from 'node:http';
+} from 'node:http'
 
-import type { ServerOptionsType } from '../@types';
+import type { ServerOptionsType } from '../@types'
 
 const getServerInstance = (
   options: ServerOptionsType,
@@ -15,17 +15,17 @@ const getServerInstance = (
   ) => void
   /* eslint-enable no-unused-vars */
 ): Server => {
-  const server = http.createServer(options, handler);
+  const server = http.createServer(options, handler)
 
   if (options.requestTimeout) {
-    server.setTimeout(options.requestTimeout);
+    server.setTimeout(options.requestTimeout)
   }
 
   if (options.keepAliveTimeout) {
-    server.keepAliveTimeout = options.keepAliveTimeout;
+    server.keepAliveTimeout = options.keepAliveTimeout
   }
 
-  return server;
-};
+  return server
+}
 
-export { getServerInstance };
+export { getServerInstance }

@@ -1,5 +1,5 @@
-import Joi from 'joi';
-import { METHODS } from 'node:http';
+import { METHODS } from 'node:http'
+import Joi from 'joi'
 
 import type {
   ControllerOptionType,
@@ -9,42 +9,43 @@ import type {
   RouterMethodeType,
   RouterRoutesType,
   ServerRespnsceType,
-} from '../../@types';
-import { getCleanPath, getRegexpFromUrl } from './utils';
+} from '../../@types'
+import { getCleanPath, getRegexpFromUrl } from './utils'
 
-const methods = METHODS.map((method) => method.toLowerCase()) as MethodsType[];
+const methods = METHODS.map((method) => method.toLowerCase()) as MethodsType[]
 
-const DELIMITER = '<';
-const CATCH_ALL = '*';
+const DELIMITER = '<'
+const CATCH_ALL = '*'
 
 const getType = (type: ControllerOptionType['body'][string]['type']) => {
   switch (type) {
     case 'string':
-      return Joi.string();
+      return Joi.string()
     case 'email':
-      return Joi.string().email();
+      return Joi.string().email()
     case 'number':
-      return Joi.number();
+      return Joi.number()
     default:
-      throw new TypeError(`unknown type "${type}"`);
+      throw new TypeError(`unknown type "${type}"`)
   }
-};
+}
 
 const getBodySchema = (option: ControllerOptionType['body']) => {
-  const _schema = {} as Record<string, ReturnType<typeof getType>>;
+  const _schema = {} as Record<string, ReturnType<typeof getType>>
   for (const op in option) {
-    const value = option[op]!;
-    const type = getType(value.type);
-    _schema[op] = value.required ? type.required() : type;
+    // biome-ignore lint/style/noNonNullAssertion: it will exists
+    const value = option[op]!
+    const type = getType(value.type)
+    _schema[op] = value.required ? type.required() : type
   }
-  return Joi.object(_schema).required();
-};
+  return Joi.object(_schema).required()
+}
 
 const Router = <T = ServerRespnsceType>(baseUrl = '') => {
   const routes = {
     main: {},
     dynamic: [],
-  } as RouterRoutesType<T>;
+  } as RouterRoutesType<T>
 
   const route: RouterMethodeType<T> = {
     get: (path, handler, options) => _route(path, 'get', handler, options),
@@ -58,7 +59,7 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
       _route(path, 'options', handler, options),
     connect: (path, handler, options) =>
       _route(path, 'connect', handler, options),
-  };
+  }
 
   const _route = (
     path: string,
@@ -66,34 +67,35 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
     controller: ControllerType<T>,
     options?: ControllerOptionType
   ) => {
-    const notPresent = -1;
+    const notPresent = -1
 
-    const bodySchema = options?.body ? getBodySchema(options.body) : null;
+    const bodySchema = options?.body ? getBodySchema(options.body) : null
 
     if (!methods.includes(methode)) {
-      console.error('Methode Not Allowed!');
-      process.exit();
+      console.error('Methode Not Allowed!')
+      process.exit()
     }
 
-    path = getCleanPath(baseUrl, path);
+    path = getCleanPath(baseUrl, path)
 
     if (
       path.indexOf(DELIMITER) === notPresent &&
       path.indexOf(CATCH_ALL) === notPresent
     ) {
       if (!routes.main[path]) {
-        routes.main[path] = {};
+        routes.main[path] = {}
       }
 
+      // biome-ignore lint/style/noNonNullAssertion: it will exists
       routes.main[path]![methode] = {
         controller,
         body: bodySchema,
-      };
+      }
 
-      return;
+      return
     }
 
-    const { regexp, keys } = getRegexpFromUrl(path);
+    const { regexp, keys } = getRegexpFromUrl(path)
 
     // [RegExp, KeyValType[], MethodsType, ControllerType<T>]
     routes.dynamic.push([
@@ -104,14 +106,14 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
       {
         body: bodySchema,
       },
-    ]);
-  };
+    ])
+  }
 
   return {
     route,
     routes: routes as ReadOnlyRouterRoutesType<T>,
     ...route,
-  };
-};
+  }
+}
 
-export { Router };
+export { Router }

@@ -1,16 +1,24 @@
-import type { DatabaseType, SettingsType } from 'structure-ts';
+import type { DatabaseType, SettingsType } from 'structure-ts'
 
-const PORT = 2000;
+const PORT = 3000
 
-const APPS = [];
+const APPS: SettingsType['APPS'] = []
 
-const DATABASE: DatabaseType = false;
+const DATABASE: DatabaseType = {
+  config: {
+    engine: 'sqlite',
+    path: './sqlite.db',
+  },
+  onSuccess: () => {
+    console.log('database connected successfully')
+  },
+}
 
-const TEMPLATE_DIR = 'templates';
+const TEMPLATE_DIR = 'templates'
 
 export default {
   PORT,
   APPS,
   DATABASE,
   TEMPLATE_DIR,
-} satisfies SettingsType;
+} satisfies SettingsType

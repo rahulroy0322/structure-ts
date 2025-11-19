@@ -1,7 +1,8 @@
-import { ObjectSchema } from 'joi';
+import type { ObjectSchema } from 'joi'
 
-import type { QuestionType, ReplyType, ServerRespnsceType } from '.';
-import type { VALID_TYPES } from '../structure-ts/constents';
+import type { QuestionType, ReplyType, ServerRespnsceType } from '.'
+
+type ValidTypesType = 'email' | 'string' | 'number'
 
 type MethodsType =
   | 'get'
@@ -11,19 +12,19 @@ type MethodsType =
   | 'delete'
   | 'options'
   | 'head'
-  | 'connect';
+  | 'connect'
 
 /* eslint-disable no-unused-vars */
 type ControllerType<ReplyT = ServerRespnsceType> = (
   question: QuestionType,
   reply: ReplyType<ReplyT>
-) => void | Promise<void>;
+) => void | Promise<void>
 
 type ErrorControllerType<ReplyT> = (
   error: unknown,
   question: QuestionType,
   reply: ReplyType<ReplyT>
-) => void;
+) => void
 /* eslint-enable no-unused-vars */
 
 type RoutesType<T> = Record<
@@ -32,19 +33,19 @@ type RoutesType<T> = Record<
     Record<
       MethodsType,
       {
-        controller: ControllerType<T>;
-        body: ObjectSchema | null;
+        controller: ControllerType<T>
+        body: ObjectSchema | null
       }
     >
   >
->;
+>
 
 type KeyValType = {
-  kind: 'param';
-  key: string;
+  kind: 'param'
+  key: string
   // eslint-disable-next-line no-unused-vars
-  translator: (value: string) => number | boolean | string;
-};
+  translator: (value: string) => number | boolean | string
+}
 
 type DynamicRoutesType<T> = [
   RegExp,
@@ -52,20 +53,20 @@ type DynamicRoutesType<T> = [
   MethodsType,
   ControllerType<T>,
   {
-    body: ObjectSchema | null;
+    body: ObjectSchema | null
   },
-];
+]
 
 type ControllerOptionType = {
   body: Record<
     string,
     {
-      type: (typeof VALID_TYPES)[number];
+      type: ValidTypesType
     } & {
-      required?: boolean;
+      required?: boolean
     }
-  >;
-};
+  >
+}
 
 /* eslint-disable no-unused-vars */
 type RouterMethodeType<T> = {
@@ -73,53 +74,53 @@ type RouterMethodeType<T> = {
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   post: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   put: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   patch: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   delete: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   options: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   head: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
+  ) => void
   connect: (
     path: string,
     handler: ControllerType<T>,
     options?: ControllerOptionType
-  ) => void;
-};
+  ) => void
+}
 /* eslint-enable no-unused-vars */
 
 type RouterRoutesType<T = ServerRespnsceType> = {
-  main: RoutesType<T>;
-  dynamic: DynamicRoutesType<T>[];
-};
+  main: RoutesType<T>
+  dynamic: DynamicRoutesType<T>[]
+}
 type ReadOnlyRouterRoutesType<T> = {
-  main: RoutesType<T>;
-  dynamic: readonly DynamicRoutesType<T>[];
-};
+  main: RoutesType<T>
+  dynamic: readonly DynamicRoutesType<T>[]
+}
 
 export type {
   MethodsType,
@@ -132,4 +133,5 @@ export type {
   ReadOnlyRouterRoutesType,
   ErrorControllerType,
   ControllerOptionType,
-};
+  ValidTypesType,
+}

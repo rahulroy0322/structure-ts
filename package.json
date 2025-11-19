@@ -12,23 +12,20 @@
     "build": "tsc -b",
     "build:cli": "tsc -p tsconfig.cli.json",
     "commitlint": "commitlint --edit",
-    "formate": "prettier ./{src,tests}/**/* --check",
-    "formate:fix": "prettier ./{src,tests}/**/* -w",
+    "check": "biome check",
+    "check:fix": "biome check --write",
     "dev": "cd local && tsx --watch src/main.ts",
     "dev:cli": "tsx --tsconfig tsconfig.cli.json cli/main.ts",
-    "lint": "eslint ./src",
-    "lint:fix": "eslint --fix ./src",
     "prepare": "husky",
     "test": "tsx --test tests/**/**/*.test.ts tests/**/*.test.ts",
     "test:w": "tsx --watch --test tests/**/**/*.test.ts tests/**/*.test.ts"
   },
   "lint-staged": {
-    "*.ts": [
-      "prettier -w",
-      "eslint --fix"
+    "*.{ts,tsx,json}": [
+      "biome check --write"
     ],
-    "*.json": [
-      "prettier -w"
+    "*": [
+      "biome check --write"
     ]
   },
   "repository": {
@@ -65,6 +62,7 @@
     "uid": "^2.0.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.6",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@commitlint/types": "^19.8.0",
@@ -72,6 +70,7 @@
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/ejs": "^3.1.5",
     "@types/node": "^22.13.13",
+    "chalk": "^5.6.2",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "10.1.1",
     "globals": "^16.0.0",

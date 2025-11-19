@@ -1,8 +1,9 @@
-import './db/main';
-import Structure from './structure-ts';
+// import './db/main';
+// import Structure from './structure-ts';
 
-export * from './structure-ts';
-export * from './@types';
-export * from './db';
+export * from './@types'
+export * from './model/main'
+export * from './structure-ts/main'
+// export * from './db';
 
-export default Structure;
+// export default Structure;

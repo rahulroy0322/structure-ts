@@ -1,15 +1,15 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http'
 
 import type {
   ControllerType,
   ErrorControllerType,
   ReplyType,
   ServerRespnsceType,
-} from '../@types';
-import { Question } from './question/main';
-import { Reply } from './reply';
-import type { Handler } from './router';
-import { badRequest } from './status';
+} from '../@types'
+import { Question } from './question/main'
+import { Reply } from './reply/main'
+import type { Handler } from './router/handler'
+import { badRequest } from './status/main'
 
 const handler =
   <T>(
@@ -20,33 +20,33 @@ const handler =
       notFoundController,
       templateDir,
     }: {
-      baseDir: string;
-      errorController: ErrorControllerType<ServerRespnsceType>;
-      notFoundController: ControllerType<ServerRespnsceType>;
-      templateDir: string;
+      baseDir: string
+      errorController: ErrorControllerType<ServerRespnsceType>
+      notFoundController: ControllerType<ServerRespnsceType>
+      templateDir: string
     }
   ) =>
   async (
     req: IncomingMessage,
     res: ServerResponse<IncomingMessage>
   ): Promise<void> => {
-    const question = Question(req);
+    const question = Question(req)
     const reply = Reply({
       baseDir,
       reply: res,
       errorController,
       templateDir,
       question,
-    });
+    })
 
-    const handlerReply = await handel(question, reply as ReplyType<T>);
+    const handlerReply = await handel(question, reply as ReplyType<T>)
 
     if (handlerReply.success) {
-      return;
+      return
     }
 
     if (handlerReply.required) {
-      reply.status(badRequest());
+      reply.status(badRequest())
       errorController(
         {
           name: 'validation failed!',
@@ -54,16 +54,16 @@ const handler =
         },
         question,
         reply
-      );
-      return;
+      )
+      return
     }
 
     if (handlerReply.notFound) {
-      notFoundController(question, reply);
-      return;
+      notFoundController(question, reply)
+      return
     }
 
-    errorController(handlerReply.error, question, reply);
-  };
+    errorController(handlerReply.error, question, reply)
+  }
 
-export { handler };
+export { handler }

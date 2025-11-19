@@ -1,64 +1,65 @@
-import type { IncomingMessage } from 'node:http';
-import { parse } from 'node:url';
+import type { IncomingMessage } from 'node:http'
+import { parse } from 'node:url'
 
-const STR_REGEXP = /^([a-zA-z][a-zA-Z0-9]*)$/;
-const INT_REGEXP = /^([0-9]+)$/gi;
-const BOOL_REGEXP = /^(true|false)$/gi;
+const STR_REGEXP = /^([a-zA-z][a-zA-Z0-9]*)$/
+const INT_REGEXP = /^([0-9]+)$/gi
+const BOOL_REGEXP = /^(true|false)$/gi
 
 const getValue = (val?: string) => {
   if (!val) {
-    return true;
+    return true
   }
 
   if (BOOL_REGEXP.test(val)) {
-    return val.toLowerCase() === 'true';
+    return val.toLowerCase() === 'true'
   }
   if (INT_REGEXP.test(val)) {
-    return Number(val);
+    return Number(val)
   }
   if (STR_REGEXP.test(val)) {
-    return String(val);
+    return String(val)
   }
 
-  return null;
-};
+  return null
+}
 
 const getQuery = (req: IncomingMessage) => {
-  const _path = req.url;
+  const _path = req.url
 
   if (!_path) {
-    return {};
+    return {}
   }
 
-  const { query } = parse(_path);
+  const { query } = parse(_path)
 
   if (!query) {
-    return {};
+    return {}
   }
 
-  const _query = {} as Record<string, number | string | boolean>;
+  const _query = {} as Record<string, number | string | boolean>
 
-  const arr = query.split('&');
+  const arr = query.split('&')
 
   for (const item of arr) {
-    const [key, _val] = item.split('=');
+    const [key, _val] = item.split('=')
     if (!key) {
-      continue;
+      continue
     }
-    const val = getValue(_val);
+    const val = getValue(_val)
 
     if (val === null) {
       //! invalid value "${_val}" for key "${key}"
-      console.error(`invalid value "${_val}" for key "${key}"`);
-      _query[key!] = true;
+      console.error(`invalid value "${_val}" for key "${key}"`)
+      // biome-ignore lint/style/noNonNullAssertion: it will be
+      _query[key!] = true
 
-      continue;
+      continue
     }
-
-    _query[key!] = val;
+    // biome-ignore lint/style/noNonNullAssertion: it will be
+    _query[key!] = val
   }
 
-  return _query;
-};
+  return _query
+}
 
-export { getQuery };
+export { getQuery }

@@ -1,6 +1,6 @@
 #! /usr/bin/env node
-import { init } from './main';
+import { init } from './main'
 
 init().finally(() => {
-  process.exit(0);
-});
+  process.exit(0)
+})

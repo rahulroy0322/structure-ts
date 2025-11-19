@@ -1,4 +1,4 @@
-import type { ObjectSchema } from 'joi';
+import type { ObjectSchema } from 'joi'
 
 import type {
   ControllerType,
@@ -7,43 +7,43 @@ import type {
   QuestionType,
   ReadOnlyRouterRoutesType,
   ReplyType,
-} from '../../@types';
-import { getCleanResponseUrl, getParams } from './utils';
+} from '../../@types'
+import { getCleanResponseUrl, getParams } from './utils'
 
 const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
   type ControllerReturnType = {
-    controller: ControllerType<T>;
-    body: ObjectSchema | null;
-  };
+    controller: ControllerType<T>
+    body: ObjectSchema | null
+  }
 
   const getControllerForUrl = (
     url: string,
     method: MethodsType
   ): ControllerReturnType | false => {
     if (!routes[url]) {
-      return false;
+      return false
     }
-    const route = routes[url];
+    const route = routes[url]
 
-    return route[method] || false;
-  };
+    return route[method] || false
+  }
 
   const getControllerForDynamicUrl = (
     url: string,
     method: MethodsType
   ): ControllerReturnType | boolean => {
-    const urlIndex = 0;
-    const methodIndex = 2;
-    method = method.toLowerCase() as MethodsType;
+    const urlIndex = 0
+    const methodIndex = 2
+    method = method.toLowerCase() as MethodsType
 
     for (const route of dynamic) {
       if (!route[urlIndex].test(url)) {
-        continue;
+        continue
       }
       if (route[methodIndex].toLowerCase() !== method) {
-        continue;
+        continue
       }
-      const [regexp, keys, , controller, { body }] = route;
+      const [regexp, keys, , controller, { body }] = route
 
       const params = getParams(
         {
@@ -51,85 +51,85 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
           keys,
         },
         url
-      );
+      )
 
-      return params === false ? true : { controller, body };
+      return params === false ? true : { controller, body }
     }
 
-    return false;
-  };
+    return false
+  }
 
   const getController = (url: string, method: MethodsType) => {
-    const controller = getControllerForUrl(url, method);
+    const controller = getControllerForUrl(url, method)
 
     if ((controller as ControllerReturnType)?.controller) {
-      return controller as ControllerReturnType;
+      return controller as ControllerReturnType
     }
-    const dynamicController = getControllerForDynamicUrl(url, method);
+    const dynamicController = getControllerForDynamicUrl(url, method)
 
     if ((dynamicController as ControllerReturnType)?.controller) {
-      return dynamicController as ControllerReturnType;
+      return dynamicController as ControllerReturnType
     }
 
     if (dynamicController === true) {
-      throw new Error('something went wrong');
+      throw new Error('something went wrong')
     }
 
-    return false;
-  };
+    return false
+  }
 
   const handleImpl = async (
     question: QuestionType,
     reply: ReplyType<T>
   ): Promise<HandlerReturnType> => {
-    const method = question.method();
+    const method = question.method()
 
-    const url = getCleanResponseUrl(question.url() || '/');
+    const url = getCleanResponseUrl(question.url() || '/')
 
     try {
-      const res = getController(url, method);
+      const res = getController(url, method)
 
       if (res === false) {
         return {
           success: false,
           notFound: true,
-        };
+        }
       }
 
-      const { body, controller } = res;
+      const { body, controller } = res
 
       if (body) {
-        const { body: _body } = await question.body();
-        const { error } = body.validate(_body);
+        const { body: _body } = await question.body()
+        const { error } = body.validate(_body)
         if (error) {
           return {
             success: false,
             required: error.details.map((value) => value.message).join('\n'),
-          };
+          }
         }
       }
 
-      controller(question, reply);
+      controller(question, reply)
 
       return {
         success: true,
-      };
+      }
     } catch (error) {
       return {
         success: false,
         error,
-      };
+      }
     }
-  };
+  }
 
   const handel = async (
     qestion: QuestionType,
     reply: ReplyType<T>
-  ): Promise<HandlerReturnType> => await handleImpl(qestion, reply);
+  ): Promise<HandlerReturnType> => await handleImpl(qestion, reply)
 
   return {
     handel,
-  };
-};
+  }
+}
 
-export { Handler };
+export { Handler }

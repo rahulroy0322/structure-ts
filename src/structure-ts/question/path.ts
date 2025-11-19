@@ -1,5 +1,5 @@
-import { parse } from 'node:url';
+import { parse } from 'node:url'
 
-const parsePath = (path: string) => parse(path);
+const parsePath = (path: string) => parse(path)
 
-export { parsePath };
+export { parsePath }
