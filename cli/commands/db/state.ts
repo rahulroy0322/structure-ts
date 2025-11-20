@@ -4,8 +4,8 @@ import type {
   ColumnSchemaType,
   IndexSchemaType,
   StateType,
-} from '../../../@types/migrations.types'
-import type { ModelType } from '../../../@types/model.types'
+} from '../../@types/migrations.types'
+import type { ModelType } from '../../@types/model.types'
 
 const loadManeger = async (MANEGER_FILE: string): Promise<StateType> => {
   if (existsSync(MANEGER_FILE)) {

@@ -1,5 +1,6 @@
 import { error } from '../utils'
 import { create } from './create/main'
+import { migrate } from './db/migrate/main'
 import { migration } from './db/migrations/main'
 import { showHelp } from './help'
 
@@ -7,6 +8,7 @@ const commands = {
   create,
   help: showHelp,
   'db:migration': migration,
+  'db:migrate': migrate,
 }
 
 const cwd = process.cwd()
