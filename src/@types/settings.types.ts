@@ -1,4 +1,4 @@
-import type { DbConfigType } from './db.config.types'
+import type { DbConfigType } from './database/config.types'
 import type { ControllerType, ErrorControllerType } from './router.types'
 
 type DatabaseType =

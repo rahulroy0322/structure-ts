@@ -1,6 +1,6 @@
 {
   "name": "structure-ts",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -9,16 +9,44 @@
     "structure-ts": "bin/index.js"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "npm run build:src && npm run build:cli",
+    "build:src": "tsc -b",
     "build:cli": "tsc -p tsconfig.cli.json",
-    "commitlint": "commitlint --edit",
     "check": "biome check",
     "check:fix": "biome check --write",
+    "commitlint": "commitlint --edit",
     "dev": "cd local && tsx --watch src/main.ts",
     "dev:cli": "tsx --tsconfig tsconfig.cli.json cli/main.ts",
     "prepare": "husky",
     "test": "tsx --test tests/**/**/*.test.ts tests/**/*.test.ts",
     "test:w": "tsx --watch --test tests/**/**/*.test.ts tests/**/*.test.ts"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "templates",
+    "LICENSE",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "better-sqlite3": "12.*",
+    "mongodb": "7.*",
+    "mysql2": "3.*",
+    "pg": "8.*"
+  },
+  "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    },
+    "mongodb": {
+      "optional": true
+    },
+    "mysql2": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    }
   },
   "lint-staged": {
     "*.{ts,tsx,json}": [
@@ -55,10 +83,9 @@
     "app"
   ],
   "dependencies": {
+    "chalk": "^5.6.2",
     "ejs": "^3.1.10",
     "joi": "^17.13.3",
-    "mysql2": "^3.14.0",
-    "sql": "^0.78.0",
     "uid": "^2.0.2"
   },
   "devDependencies": {
@@ -66,19 +93,15 @@
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@commitlint/types": "^19.8.0",
-    "@eslint/js": "^9.23.0",
-    "@trivago/prettier-plugin-sort-imports": "5.2.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/ejs": "^3.1.5",
     "@types/node": "^22.13.13",
-    "chalk": "^5.6.2",
-    "eslint": "^9.23.0",
-    "eslint-config-prettier": "10.1.1",
-    "globals": "^16.0.0",
+    "@types/pg": "^8.15.6",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
-    "prettier": "3.5.3",
+    "mongodb": "^7.0.0",
+    "mysql2": "^3.15.3",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2",
-    "typescript-eslint": "^8.28.0"
+    "typescript": "^5.8.2"
   }
 }
