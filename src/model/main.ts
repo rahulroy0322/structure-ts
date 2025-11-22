@@ -17,6 +17,7 @@ import type {
   UpdateType,
 } from '../@types/model/update.types'
 import type { SchemaType } from '../@types/model/utils.types'
+import { db } from '../database/main'
 
 const getIdSchema = () =>
   ({
@@ -45,16 +46,23 @@ const getFinalSchema = (options: Parameters<ModelType>[2] = {}) => {
   }
 }
 
-const Query = <const S extends SchemaType>(): ModelReturnType<S> => {
-  // ? create
-  const create: CreateType<S> = async () => {
-    return []
+const Query = <const S extends SchemaType>(
+  table: string
+): ModelReturnType<S> => {
+  const getDb = () => {
+    if (!db) {
+      throw new Error(`please connect to db first!`)
+    }
+    return db
   }
 
+  // ? create
+  const create: CreateType<S> = (data, projection) =>
+    getDb().create(table, data as any, projection) as any
+
   // ? find
-  const find: FindType<S> = async () => {
-    return []
-  }
+  const find: FindType<S> = (filter, projection, options) =>
+    getDb().find(table, filter as any, projection, options) as any
 
   const findOne: FindOneType<S> = async (filter, projection) =>
     (
@@ -72,9 +80,14 @@ const Query = <const S extends SchemaType>(): ModelReturnType<S> => {
     )
 
   //? update
-  const update: UpdateType<S> = async () => {
-    return []
-  }
+  const update: UpdateType<S> = (filter, data, projection, options) =>
+    getDb().update(
+      table,
+      filter as any,
+      data as any,
+      projection,
+      options
+    ) as any
 
   const updateOne: UpdateOneType<S> = async (filter, data, projection) =>
     (
@@ -93,9 +106,8 @@ const Query = <const S extends SchemaType>(): ModelReturnType<S> => {
     )
 
   //? destroy
-  const destroy: DestroyType<S> = async () => {
-    return []
-  }
+  const destroy: DestroyType<S> = (filter, options) =>
+    getDb().destroy(table, filter as any, options) as any
 
   const destroyOne: DestroyOneType<S> = async (filter) =>
     (
@@ -141,7 +153,7 @@ const Model = (<const S extends Record<keyof S, FieldSchemaType<S[keyof S]>>>(
   }
   schema = { ...schema, ...getFinalSchema(options) }
 
-  const res = Query<S>()
+  const res = Query<S>(table)
 
   Object.assign(res, {
     schema,
