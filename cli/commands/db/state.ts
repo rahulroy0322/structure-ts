@@ -1,10 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import type {
-  ColumnSchemaType,
-  IndexSchemaType,
-  StateType,
-} from '../../@types/migrations.types'
+import type { StateType, TableSchemaType } from '../../@types/migrations.types'
 import type { ModelType } from '../../@types/model.types'
 
 const loadManeger = async (MANEGER_FILE: string): Promise<StateType> => {
@@ -26,28 +22,17 @@ const getNewState = (
 ): StateType => {
   const tables = models.map(({ schema, table }) =>
     Object.entries(schema).reduce(
-      (acc, [key, { type, unique, ...props }]) => {
+      (acc, [key, value]) => {
         acc.columns.push({
           key,
-          type,
-          ...props,
+          ...value,
         } as any)
-
-        if (unique || type === 'pk') {
-          acc.indexes.push({
-            key,
-            name: `idx-${table}:${key}`,
-            unique: true,
-            pk: type === 'pk',
-          })
-        }
 
         return acc
       },
       {
         table,
-        columns: [] as ColumnSchemaType[],
-        indexes: [] as IndexSchemaType[],
+        columns: [] as TableSchemaType['columns'],
       }
     )
   )

@@ -1,6 +1,8 @@
 import type { StateType } from '../../../@types/migrations.types'
 import { generateAlterTableSQL, generateCreateTableSQL } from './table'
 
+const breakpoint = '-- > statement-breakpoint'
+
 const getSql = (currentState: StateType, newState: StateType) => {
   const sqls = [`-- Migration start '${newState.at}'`]
 
@@ -19,17 +21,17 @@ const getSql = (currentState: StateType, newState: StateType) => {
     sqls.push(generateCreateTableSQL(table))
     // eslint-disable-next-line no-magic-numbers
     if (index !== newTables.length - 1) {
-      sqls.push('--> statement-breakpoint')
+      sqls.push(breakpoint)
     }
   })
 
-  sqls.push('--> statement-breakpoint')
+  sqls.push(breakpoint)
   // Generate SQL for dropped tables
   droppedTables.map((table) => {
     sqls.push(`DROP TABLE IF EXISTS \`${table.table}\`;`)
     sqls.push('\n')
   })
-  sqls.push('--> statement-breakpoint')
+  sqls.push(breakpoint)
 
   // Detect altered tables (simplified)
   newState.tables.map((newTable) => {
@@ -38,10 +40,19 @@ const getSql = (currentState: StateType, newState: StateType) => {
       sqls.push(generateAlterTableSQL(oldTable, newTable))
     }
   })
-  sqls.push('--> statement-breakpoint')
+  sqls.push(breakpoint)
 
   sqls.push(`-- Migration end '${newState.at}'`)
-  return sqls.join('\n')
+  return (
+    sqls
+      .join('\n')
+      // just to ensure no multi line brake point
+      .replace(new RegExp(`${breakpoint}\n${breakpoint}`, 'igm'), breakpoint)
+      .replace(new RegExp(`${breakpoint}\n${breakpoint}`, 'igm'), breakpoint)
+      .replace(new RegExp(`${breakpoint}\n${breakpoint}`, 'igm'), breakpoint)
+      .replace(new RegExp(`${breakpoint}\n${breakpoint}`, 'igm'), breakpoint)
+      .replace(new RegExp(`${breakpoint}\n${breakpoint}`, 'igm'), breakpoint)
+  )
 }
 
 export { getSql }

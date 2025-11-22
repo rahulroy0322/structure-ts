@@ -21,20 +21,13 @@ type ColumnSchemaType = Prettify<
     // required?: boolean;
     // default?: unknown;
     // values?: unknown[];
+    length?: number
   } & FieldSchemaType<any>
 >
-
-type IndexSchemaType = {
-  name: string
-  key: string
-  unique: boolean
-  pk: boolean
-}
 
 type TableSchemaType = {
   table: string
   columns: ColumnSchemaType[]
-  indexes: IndexSchemaType[]
 }
 
 type StateType = {
@@ -47,7 +40,6 @@ export type {
   CommandType,
   StateType,
   TableSchemaType,
-  IndexSchemaType,
   ColumnSchemaType,
   MigrationFieldType,
 }

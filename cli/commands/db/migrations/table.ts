@@ -3,7 +3,7 @@ import type {
   ColumnSchemaType,
   TableSchemaType,
 } from '../../../@types/migrations.types'
-import type { EnumSchemaType } from '../../../@types/model/schema.types'
+import type { EnumSchemaType, PkType } from '../../../@types/model/schema.types'
 import { error } from '../../logger'
 
 const defaultType = (value: unknown) => {
@@ -20,19 +20,30 @@ const defaultType = (value: unknown) => {
 const getSqlType = (field: ColumnSchemaType): string => {
   switch (field.type as ColumnSchemaType['type'] & 'pk') {
     case 'pk':
+      return 'CHAR(50) PRIMARY KEY'
     case 'string':
-    case 'email':
+    case 'email': {
+      if (field.unique || field.default || field.required) {
+        return `VARCHAR(${field.length || 200})`
+      }
       return 'TEXT'
+    }
     case 'enum': {
       const { values } = field as EnumSchemaType<any>
 
-      return `TEXT CHECK(status IN (${values?.map(defaultType)}))`
+      const check = `CHECK(${field.key} IN (${values?.map(defaultType)}))`
+
+      if (field.default) {
+        return `VARCHAR(${field.length || 200}) ${check}`
+      }
+
+      return `TEXT ${check}`
     }
 
     case 'number':
       return 'INT'
     case 'bool':
-      return `CHAR(1) CHECK(status IN (${[true, false].map(defaultType)}))`
+      return `CHAR(1) CHECK(${field.key} IN (${[true, false].map(defaultType)}))`
     case 'timestamp':
       return 'TIMESTAMP'
     default:
@@ -47,36 +58,35 @@ const generateColumnDefinition = (col: ColumnSchemaType) => {
 
   sqls.push(`${getSqlType(col)}`)
 
+  if (col.unique) {
+    if ((col.type as PkType['type']) !== 'pk') {
+      sqls.push(`UNIQUE`)
+    }
+  }
+
   if (col.required) {
     sqls.push('NOT NULL')
   }
+
   if (col.default) {
     if (typeof col.default !== 'function') {
-      sqls.push(`DEFAULT ${defaultType(col.default)}`)
+      if (col.type === 'timestamp' && col.default === 'now') {
+        sqls.push(`DEFAULT CURRENT_TIMESTAMP`)
+      } else {
+        sqls.push(`DEFAULT ${defaultType(col.default)}`)
+      }
     }
   }
+
   return sqls.join(' ')
 }
 
-const generateCreateTableSQL = ({
-  table,
-  columns,
-  indexes,
-}: TableSchemaType) => {
+const generateCreateTableSQL = ({ table, columns }: TableSchemaType) => {
   const sqls = [`CREATE TABLE \`${table}\` (`]
 
   const cols = columns.map((col) => generateColumnDefinition(col))
 
-  const _indexes = indexes.map((index) =>
-    [
-      'CONSTRAINT',
-      `\`${index.name}\``,
-      index.pk ? 'PRIMARY KEY' : index.unique ? 'UNIQUE' : 'INDEX',
-      `(\`${index.key}\`)`,
-    ].join(' ')
-  )
-
-  sqls.push([...cols, ..._indexes].join(',\n '))
+  sqls.push(cols.join(',\n '))
 
   sqls.push(');')
 
@@ -114,7 +124,6 @@ const generateAlterTableSQL = (
           'TABLE',
           `\`${newTable.table}\``,
           'ADD',
-          'COLUMN',
           generateColumnDefinition(newColumn),
           ';',
         ].join(' ')
@@ -149,88 +158,6 @@ const generateAlterTableSQL = (
           generateColumnDefinition(modifiedColumn),
           ';',
         ].join(' ')
-      )
-      .join('\n')
-  )
-
-  // Generate ALTER TABLE statements for new indexs
-  const newIndexs = newTable.indexes.filter(
-    (i) => !oldTable.indexes.find((ind) => ind.key === i.key)
-  )
-
-  sqls.push(
-    newIndexs
-      .map((newIndex) =>
-        [
-          'ALTER',
-          'TABLE',
-          `\`${newTable.table}\``,
-          'ADD',
-          'CONSTRAINT',
-          `\`${newIndex.name}\``,
-          newIndex.pk ? 'PRIMARY KEY' : newIndex.unique ? 'UNIQUE' : 'INDEX',
-          `(\`${newIndex.key}\`);`,
-        ].join(' ')
-      )
-      .join('\n')
-  )
-
-  // Generate ALTER TABLE statements for droped indexs
-  const droppedIndexs = oldTable.indexes.filter(
-    (i) => !newTable.indexes.find((ind) => ind.key === i.key)
-  )
-
-  sqls.push(
-    droppedIndexs
-      .map((dIndex) =>
-        [
-          'ALTER',
-          'TABLE',
-          `\`${newTable.table}\``,
-          'DROP',
-          'CONSTRAINT',
-          `\`${dIndex.name}\`;`,
-        ].join(' ')
-      )
-      .join('\n')
-  )
-
-  // todo Generate ALTER TABLE statements for modified indexs
-
-  const modifiedIndexs = newTable.indexes.filter((newIndex) => {
-    const oldIndex = oldTable.indexes.find((i) => i.key === newIndex.key)
-
-    if (!oldIndex) {
-      return false
-    }
-
-    return newIndex.pk !== oldIndex.pk || newIndex.unique !== oldIndex.unique
-  })
-
-  sqls.push(
-    modifiedIndexs
-      .map((index) =>
-        [
-          [
-            'ALTER',
-            'TABLE',
-            `\`${newTable.table}\``,
-            'DROP',
-            'CONSTRAINT',
-            `\`${index.name}\`;`,
-          ].join(' '),
-          [
-            'ALTER',
-            'TABLE',
-            `\`${newTable.table}\``,
-            'ADD',
-            'CONSTRAINT',
-            `\`${index.name}\``,
-            index.pk ? 'PRIMARY KEY' : index.unique ? 'UNIQUE' : 'INDEX',
-            `(\`${index.key}\`);`,
-          ].join(' '),
-          '--> statement-breakpoint',
-        ].join('\n')
       )
       .join('\n')
   )
