@@ -2,6 +2,7 @@ import chalk from 'chalk'
 import type { Pool } from 'mysql2/promise'
 import type { MySQLConfigType } from '../../@types/db.config.types'
 import type { DatabaseAdapterType } from '../../@types/migration/db.types'
+import { error } from '../../commands/logger'
 
 const MySqlAdapter = (
   config: Omit<MySQLConfigType, 'engine'>
@@ -25,7 +26,7 @@ const MySqlAdapter = (
         })
       }
 
-      await pool.connect()
+      // await pool.connect()
     } catch (e) {
       if (
         (e as Error).message.startsWith("Cannot find module 'mysql2/promise'")
@@ -45,12 +46,12 @@ const MySqlAdapter = (
     pool = null
   }
 
-  const checkConn = () => {
-    if (!pool) {
-      // TODO! proper error!
-      throw new Error('please connect db first')
-    }
-  }
+  // const checkConn = () => {
+  //   if (!pool) {
+  //     // TODO! proper error!
+  //     throw new Error('please connect db first')
+  //   }
+  // }
 
   // const run = async (sql: string, params: unknown[] = [], internal = false) => {
   //   if (!pool) {
@@ -99,19 +100,25 @@ const MySqlAdapter = (
   // }
 
   //! TODO properly cxheck it
-  const exec: DatabaseAdapterType['exec'] = (sql: string) => {
-    checkConn()
+  // const exec: DatabaseAdapterType['exec'] = (sql: string) => {
+  //   checkConn()
 
-    // biome-ignore lint/style/noNonNullAssertion: checked up
-    return pool!.execute(sql)
+  //   // biome-ignore lint/style/noNonNullAssertion: checked up
+  //   return pool!.execute(sql)
+  // }
+  // const query: DatabaseAdapterType['query'] = (sql: string) => {
+  //   checkConn()
+
+  //   // biome-ignore lint/style/noNonNullAssertion: checked up
+  //   return pool!.query(sql)
+  // }
+
+  const exec = async () => {
+    error('corrently not ableable please try to use other one')
+    error(`we are trying hard to add support for ${chalk.magenta`mysql`}`)
+    process.exit(1)
   }
-  const query: DatabaseAdapterType['query'] = (sql: string) => {
-    checkConn()
-
-    // biome-ignore lint/style/noNonNullAssertion: checked up
-    return pool!.query(sql)
-  }
-
+  const query = exec
   return {
     connect,
     disconnect,
