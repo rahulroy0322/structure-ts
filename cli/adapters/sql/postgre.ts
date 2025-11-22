@@ -39,7 +39,8 @@ const PostGreAdapter = (
 
   const disconnect: DatabaseAdapterType['disconnect'] = async () => {
     if (pool) {
-      await pool.end()
+      // ! todo
+      pool.end()
     }
     pool = null
   }
@@ -50,37 +51,22 @@ const PostGreAdapter = (
       throw new Error('please connect db first')
     }
   }
-  //   const run = async (
-  //     sql: string,
-  //     params: unknown[] | undefined = undefined
-  //   ) => {
-  //     if (!pool) {
-  //       // TODO! proper error!
-  //       throw new Error('please connect db first')
-  //     }
 
-  //     if (params?.length) {
-  //       params = params?.map((value) =>
-  //         typeof value === 'boolean' ? (value ? '1' : '0') : value
-  //       )
-  //     }
-
-  //     return (await pool.query(sql, params)).rows
-  //   }
+  const formatSql = (sql: string) => sql.replace(/`/gi, '')
 
   //! TODO properly cxheck it
   const exec: DatabaseAdapterType['exec'] = async (sql) => {
     checkConn()
 
     // biome-ignore lint/style/noNonNullAssertion: checked up
-    return (await pool!.query(sql)).rows
+    return (await pool!.query(formatSql(sql))).rows
   }
 
   const query: DatabaseAdapterType['query'] = async (sql) => {
     checkConn()
 
     // biome-ignore lint/style/noNonNullAssertion: checked up
-    return (await pool!.query(sql)).rows
+    return (await pool!.query(formatSql(sql))).rows
   }
 
   return {

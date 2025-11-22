@@ -1,7 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import chalk from 'chalk'
 import type { DatabaseAdapterType } from '../../../@types/migration/db.types'
 import { connectToDb } from '../../../adapters/main'
+import { info } from '../../logger'
 import { getMigrationAndSqlPath } from '../dir'
 import { loadManeger } from '../state'
 import { getSettings } from '../utils'
@@ -25,10 +27,14 @@ const getMigrations = async (db: DatabaseAdapterType, table: string) => {
 
     return []
   } catch (e) {
+    const _e = e as Error | null
     if (
-      (e as Error).message
+      _e?.message
         .toLowerCase()
-        .includes(`no such table: ${table}`.toLowerCase())
+        .includes(`no such table: ${table}`.toLowerCase()) ||
+      _e?.message
+        .toLowerCase()
+        .includes(`relation "${table}" does not exist`.toLowerCase())
     ) {
       // ! TODO
       console.log('E:', e)
@@ -72,7 +78,6 @@ const migrate = async (_commands: string[], cwd: string) => {
 
   await db.connect()
 
-  MIGRATION.TABLE = 'table'
   const dbMigrations = (await getMigrations(db, MIGRATION.TABLE)) as {
     name: string
   }[]
@@ -86,18 +91,30 @@ const migrate = async (_commands: string[], cwd: string) => {
     dbMigrations.at(0)?.name || undefined
   )
 
-  for await (const migration of letestMigretions) {
-    await Promise.all([
-      db.exec(
-        (await readFile(path.join(SQL_DIR, `${migration}.sql`))).toString()
-      ),
-      db.exec(
-        `INSERT INTO \`${MIGRATION.TABLE}\`(name) VALUES('${migration}');`
-      ),
-    ])
+  if (!letestMigretions.length) {
+    info(chalk.magenta`nothing to be migrate`)
+    process.exit(0)
+  }
+
+  try {
+    for await (const migration of letestMigretions) {
+      await Promise.all([
+        db.exec(
+          (await readFile(path.join(SQL_DIR, `${migration}.sql`))).toString()
+        ),
+        db.exec(
+          `INSERT INTO \`${MIGRATION.TABLE}\`(name) VALUES('${migration}');`
+        ),
+      ])
+    }
+    info(`all migrations applied succesfully`)
+  } catch (e) {
+    console.log(chalk.red`some thhing thappen wrong!`)
+    console.error(e)
   }
 
   await db.disconnect()
+  process.exit(0)
 }
 
 export { migrate }

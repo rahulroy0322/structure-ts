@@ -1,5 +1,6 @@
 import type { DbConfigType } from '../@types/db.config.types'
 import type { DatabaseAdapterType } from '../@types/migration/db.types'
+import { PostGreAdapter } from './sql/postgre'
 import { SQLiteAdapter } from './sql/sqlite'
 import { todo } from './utils'
 
@@ -9,8 +10,8 @@ const getAdapter = (config: DbConfigType): DatabaseAdapterType => {
       return SQLiteAdapter(config)
     // case 'mysql':
     //   return MySqlAdapter(config)
-    // case 'postgre':
-    //   return PostGreAdapter(config)
+    case 'postgre':
+      return PostGreAdapter(config)
     // case 'mongo':
     //   return MongoAdapter(config)
     default:
