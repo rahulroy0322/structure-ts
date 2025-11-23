@@ -22,21 +22,8 @@ const renderImpl = (
   template: string,
   data?: Record<string, unknown>
 ) => {
-  const checkEjsFile = (template: string, templateType: string) => {
-    const templatePath = path.relative(
-      process.cwd(),
-      path.join(dir, template.concat('.ejs'))
-    )
-
-    if (!existsSync(templatePath)) {
-      throw new Error(`"${template}" ${templateType} file does not exists!`)
-    }
-
-    return readFileSync(templatePath).toString()
-  }
-
   const layout = (template: string, data?: Record<string, unknown>) => {
-    let fileString = checkEjsFile(template, 'layout')
+    let fileString = getEjsFile(dir, template, 'layout')
 
     const blocks = fileString
       .match(new RegExp(layoutRegex, 'ig'))
@@ -48,6 +35,12 @@ const renderImpl = (
     })
 
     return renderEjs(fileString, data)
+  }
+
+  const include = (template: string, data?: Record<string, unknown>) => {
+    const includeContent = getEjsFile(dir, template, 'include')
+
+    return renderEjs(includeContent, data)
   }
 
   const renderEjs = (
@@ -62,54 +55,21 @@ const renderImpl = (
     return ejs.render(fileContent, data)
   }
 
-  const include = (template: string, data?: Record<string, unknown>) => {
-    const includeContent = checkEjsFile(template, 'include')
+  let fileData = getEjsFile(dir, template, 'template')
 
-    return renderEjs(includeContent, data)
-  }
-
-  let fileString = checkEjsFile(template, 'template')
-
-  const blocks = fileString
-    .match(new RegExp(blockRegex, 'ig'))
-    ?.map((match) => {
-      const tag = match
-        .match(blockStartRegex)
-        ?.at(FIRST_TAG)
-        ?.split(' ')
-        .at(TAG_NAME)
-      let content = match.match(contentRegexp)?.at(FIRST_CONTENT)
-
-      if (content) {
-        const firstMatch = 0
-        const endLength =
-          content.match(contentBlockEndRegexp)?.at(firstMatch)?.length ||
-          CONTENT_END
-        content = content.substring(CONTENT_START, content.length - endLength)
-      }
-
-      return {
-        tag,
-        content,
-      }
-    }) as
-    | {
-        tag: string
-        content: string
-      }[]
-    | undefined
+  const blocks = getBlocks(fileData)
 
   if (blocks) {
-    fileString = fileString.replace(new RegExp(blockRegex, 'g'), '')
+    fileData = fileData.replace(new RegExp(blockRegex, 'g'), '')
   }
 
-  let html = renderEjs(fileString, data)
+  let html = renderEjs(fileData, data)
 
   blocks?.map(
     ({ tag, content }) => (html = html.replace(`<!--${tag}-->`, content || ''))
   )
 
-  return minifyHtml(renderEjs(html))
+  return minifyHtml(renderEjs(html, data))
 }
 
 const minifyHtml = (html: string) => {
@@ -118,6 +78,54 @@ const minifyHtml = (html: string) => {
   html = html.replace(/<!--.*?-->/gi, '')
 
   return html
+}
+
+const getEjsFile = (
+  templateDir: string,
+  template: string,
+  templateType: string
+) => {
+  const templatePath = path.relative(
+    process.cwd(),
+    path.join(templateDir, template.concat('.ejs'))
+  )
+
+  if (!existsSync(templatePath)) {
+    throw new Error(`"${template}" ${templateType} file does not exists!`)
+  }
+
+  return readFileSync(templatePath).toString()
+}
+
+const getBlocks = (fileData: string) => {
+  const blocks = fileData.match(new RegExp(blockRegex, 'ig'))?.map((match) => {
+    const tag = match
+      .match(blockStartRegex)
+      ?.at(FIRST_TAG)
+      ?.split(' ')
+      .at(TAG_NAME)
+    let content = match.match(contentRegexp)?.at(FIRST_CONTENT)
+
+    if (content) {
+      const firstMatch = 0
+      const endLength =
+        content.match(contentBlockEndRegexp)?.at(firstMatch)?.length ||
+        CONTENT_END
+      content = content.substring(CONTENT_START, content.length - endLength)
+    }
+
+    return {
+      tag,
+      content,
+    }
+  }) as
+    | {
+        tag: string
+        content: string
+      }[]
+    | undefined
+
+  return blocks
 }
 
 export { renderImpl }

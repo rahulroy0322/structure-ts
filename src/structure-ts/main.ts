@@ -76,7 +76,7 @@ const StructureImpl = (
 }
 
 const Structure = async (options: ServerOptionsType) => {
-  const { PORT } = await loadSettings()
+  const { PORT, TEMPLATE_DIR = 'templates' } = await loadSettings()
 
   const port = PORT
 
@@ -86,7 +86,7 @@ const Structure = async (options: ServerOptionsType) => {
 
   return StructureImpl(options, {
     port,
-    templateDir: '',
+    templateDir: TEMPLATE_DIR,
     handel,
   })
 }
