@@ -1,6 +1,6 @@
 {
   "name": "structure-ts",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
