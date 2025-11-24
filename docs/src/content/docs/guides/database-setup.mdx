@@ -1,0 +1,814 @@
+---
+title: Database Setup
+description: Configure database connections in structure-ts
+---
+
+{/* # Database Setup */}
+
+This guide walks you through configuring database connections in Structure-Ts, from choosing a database to testing your connection.
+
+#### Upcomming
+
+{/* ## Overview
+
+structure-ts supports multiple database systems:
+- **SQLite** - File-based, zero-configuration
+- **PostgreSQL** - Robust, production-ready
+- **MySQL** - Popular, widely supported
+- **MariaDB** - MySQL fork with extra features
+- **MongoDB** - NoSQL document database
+
+## Choosing a Database
+
+### SQLite - Best for Development
+
+**Perfect for:**
+- Learning and prototyping
+- Development environment
+- Small applications
+- Single-user apps
+
+**Pros:**
+- No server setup required
+- Just a file on your computer
+- Instant start
+- Great for beginners
+
+**Cons:**
+- Limited concurrent writes
+- Not ideal for production at scale
+- Fewer features than PostgreSQL
+
+**When to use:** Getting started, prototypes, development
+
+### PostgreSQL - Best for Production
+
+**Perfect for:**
+- Production applications
+- Complex queries
+- Large datasets
+- Team projects
+
+**Pros:**
+- Extremely reliable
+- Feature-rich
+- Excellent performance
+- Great community
+
+**Cons:**
+- Requires server setup
+- More complex than SQLite
+
+**When to use:** Serious applications, production environments
+
+### MySQL/MariaDB - Popular Alternative
+
+**Perfect for:**
+- Web applications
+- WordPress-style projects
+- Shared hosting
+
+**Pros:**
+- Widely supported
+- Familiar to many developers
+- Good hosting options
+
+**Cons:**
+- Less feature-rich than PostgreSQL
+- Some licensing considerations (MySQL)
+
+**When to use:** Traditional web hosting, familiar with MySQL
+
+### MongoDB - NoSQL Option
+
+**Perfect for:**
+- Flexible schemas
+- Document-based data
+- Rapid iteration
+
+**Pros:**
+- Schema flexibility
+- JSON-like documents
+- Horizontal scaling
+
+**Cons:**
+- Different paradigm (NoSQL)
+- Less structured
+
+**When to use:** Dynamic schemas, document storage
+
+## No Database Configuration
+
+If you don't need a database:
+
+```typescript
+// src/settings.ts
+const DATABASE: DatabaseType = false;
+```
+
+**Use cases:**
+- Pure API proxy
+- Static file server
+- External database via API
+- Microservices that don't store data
+
+Your app starts faster without database overhead.
+
+## SQLite Configuration
+
+### Basic Setup
+
+```typescript
+// src/settings.ts
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const DATABASE: DatabaseType = {
+  type: 'sqlite',
+  database: 'database.sqlite',
+};
+
+export default {
+  PORT: 2000,
+  APPS: [],
+  DATABASE,
+  TEMPLATE_DIR: 'templates',
+} satisfies SettingsType;
+```
+
+### What Happens
+
+1. Creates `database.sqlite` file in your project root
+2. Stores all data in this single file
+3. No server or credentials needed
+
+### File Location Options
+
+```typescript
+// Root directory (default)
+database: 'database.sqlite'
+
+// Specific directory
+database: './data/app.db'
+
+// Inside src
+database: './src/database.sqlite'
+```
+
+### In-Memory Database (Testing)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'sqlite',
+  database: ':memory:',
+};
+```
+
+**Use case:** Unit tests - database resets after each test run.
+
+### Complete SQLite Example
+
+```typescript
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const PORT = 2000;
+const APPS = ['users', 'blog'];
+
+const DATABASE: DatabaseType = {
+  type: 'sqlite',
+  database: 'database.sqlite',
+};
+
+const TEMPLATE_DIR = 'templates';
+
+export default {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+```
+
+## PostgreSQL Configuration
+
+### Installation
+
+**macOS (Homebrew):**
+```bash
+brew install postgresql
+brew services start postgresql
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+```
+
+**Windows:**
+Download from [postgresql.org](https://www.postgresql.org/download/windows/)
+
+### Create Database
+
+```bash
+# Login as postgres user
+sudo -u postgres psql
+
+# Inside psql:
+CREATE DATABASE myapp_db;
+CREATE USER myapp_user WITH PASSWORD 'secure_password';
+GRANT ALL PRIVILEGES ON DATABASE myapp_db TO myapp_user;
+\q
+```
+
+### Basic Configuration
+
+```typescript
+// src/settings.ts
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'myapp_user',
+  password: 'secure_password',
+  database: 'myapp_db',
+};
+```
+
+### Using Environment Variables (Recommended)
+
+Create `.env` file:
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=myapp_user
+DB_PASSWORD=secure_password
+DB_NAME=myapp_db
+```
+
+Update settings:
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  username: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'myapp_db',
+};
+```
+
+**Don't forget:** Add `.env` to `.gitignore`!
+
+```gitignore
+# .gitignore
+.env
+.env.local
+.env.production
+```
+
+### SSL Connection (Production)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: 5432,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: {
+    rejectUnauthorized: false,  // For self-signed certificates
+  },
+};
+```
+
+### Connection Pooling
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'myapp_user',
+  password: 'secure_password',
+  database: 'myapp_db',
+  extra: {
+    max: 10,        // Maximum connections
+    min: 2,         // Minimum connections
+    idleTimeoutMillis: 30000,
+  },
+};
+```
+
+## MySQL Configuration
+
+### Installation
+
+**macOS (Homebrew):**
+```bash
+brew install mysql
+brew services start mysql
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install mysql-server
+sudo systemctl start mysql
+```
+
+**Windows:**
+Download from [mysql.com](https://dev.mysql.com/downloads/installer/)
+
+### Create Database
+
+```bash
+# Login to MySQL
+mysql -u root -p
+
+# Inside MySQL:
+CREATE DATABASE myapp_db;
+CREATE USER 'myapp_user'@'localhost' IDENTIFIED BY 'secure_password';
+GRANT ALL PRIVILEGES ON myapp_db.* TO 'myapp_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+### Configuration
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mysql',
+  host: 'localhost',
+  port: 3306,
+  username: 'myapp_user',
+  password: 'secure_password',
+  database: 'myapp_db',
+};
+```
+
+### With Environment Variables
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mysql',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '3306'),
+  username: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'myapp_db',
+};
+```
+
+## MongoDB Configuration
+
+### Installation
+
+**macOS (Homebrew):**
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install mongodb
+sudo systemctl start mongodb
+```
+
+**Windows:**
+Download from [mongodb.com](https://www.mongodb.com/try/download/community)
+
+### Configuration
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mongodb',
+  host: 'localhost',
+  port: 27017,
+  database: 'myapp_db',
+};
+```
+
+### With Authentication
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mongodb',
+  host: 'localhost',
+  port: 27017,
+  username: 'myapp_user',
+  password: 'secure_password',
+  database: 'myapp_db',
+  authSource: 'admin',
+};
+```
+
+### MongoDB Atlas (Cloud)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mongodb',
+  url: process.env.MONGODB_URI,
+};
+```
+
+`.env`:
+```env
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/myapp_db
+```
+
+## Environment-Specific Configuration
+
+### Development vs Production
+
+```typescript
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+const DATABASE: DatabaseType = isDevelopment
+  ? {
+      // Development: Use SQLite
+      type: 'sqlite',
+      database: 'dev.sqlite',
+    }
+  : {
+      // Production: Use PostgreSQL
+      type: 'postgres',
+      host: process.env.DB_HOST || '',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      username: process.env.DB_USER || '',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || '',
+      ssl: true,
+    };
+```
+
+### Multiple Environments
+
+```typescript
+const environment = process.env.NODE_ENV || 'development';
+
+const databaseConfig = {
+  development: {
+    type: 'sqlite' as const,
+    database: 'dev.sqlite',
+  },
+  
+  staging: {
+    type: 'postgres' as const,
+    host: 'staging-db.example.com',
+    port: 5432,
+    username: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
+    database: 'myapp_staging',
+    ssl: true,
+  },
+  
+  production: {
+    type: 'postgres' as const,
+    host: process.env.DB_HOST || '',
+    port: 5432,
+    username: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
+    database: 'myapp_production',
+    ssl: true,
+    extra: {
+      max: 20,
+      min: 5,
+    },
+  },
+};
+
+const DATABASE: DatabaseType = 
+  databaseConfig[environment as keyof typeof databaseConfig];
+```
+
+## Advanced Options
+
+### Logging SQL Queries
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'myapp_user',
+  password: 'password',
+  database: 'myapp_db',
+  logging: true,  // Log all SQL queries to console
+};
+```
+
+**Use for:** Debugging, development
+
+**Don't use in:** Production (performance impact)
+
+### Synchronize Schema (Dangerous!)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  // ... other config
+  synchronize: true,  // ⚠️ Auto-sync schema with models
+};
+```
+
+**⚠️ Warning:** 
+- Never use in production!
+- Can cause data loss
+- Use migrations instead
+
+**Only for:** Quick prototyping, development
+
+### Connection Timeout
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  // ... other config
+  connectTimeoutMS: 10000,  // 10 seconds
+};
+```
+
+### Charset (MySQL)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mysql',
+  // ... other config
+  charset: 'utf8mb4',  // Support emojis and international characters
+};
+```
+
+## Testing Your Connection
+
+### Start Your Server
+
+```bash
+npm run dev
+```
+
+### Check Console Output
+
+**Success:**
+```
+[structure-ts] Database connected successfully
+[structure-ts] Server running on http://localhost:2000
+```
+
+**Failure:**
+```
+[structure-ts] Database connection failed: <error message>
+```
+
+### Test with a Simple Query
+
+Create a test controller:
+
+```typescript
+// In any controller
+const testDb: ControllerType = async (request, reply) => {
+  try {
+    // Attempt a simple query
+    const result = await Database.query('SELECT 1');
+    
+    reply.status(ok()).json({
+      success: true,
+      message: 'Database connection working!',
+      result,
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Database connection failed',
+      details: error.message,
+    });
+  }
+};
+```
+
+Visit: `http://localhost:2000/test-db`
+
+## Troubleshooting
+
+### "Connection Refused" Error
+
+**Causes:**
+- Database server not running
+- Wrong host/port
+- Firewall blocking connection
+
+**Solutions:**
+```bash
+# Check if PostgreSQL is running
+brew services list  # macOS
+sudo systemctl status postgresql  # Linux
+
+# Start the service
+brew services start postgresql  # macOS
+sudo systemctl start postgresql  # Linux
+
+# Check port is listening
+sudo lsof -i :5432  # PostgreSQL
+sudo lsof -i :3306  # MySQL
+```
+
+### "Authentication Failed" Error
+
+**Causes:**
+- Wrong username/password
+- User doesn't have permissions
+- Wrong authentication method
+
+**Solutions:**
+```bash
+# PostgreSQL: Reset password
+sudo -u postgres psql
+ALTER USER myapp_user WITH PASSWORD 'new_password';
+
+# MySQL: Reset password
+mysql -u root -p
+ALTER USER 'myapp_user'@'localhost' IDENTIFIED BY 'new_password';
+```
+
+### "Database Does Not Exist" Error
+
+**Solution:** Create the database manually:
+
+```bash
+# PostgreSQL
+sudo -u postgres psql
+CREATE DATABASE myapp_db;
+
+# MySQL
+mysql -u root -p
+CREATE DATABASE myapp_db;
+```
+
+### "Too Many Connections" Error
+
+**Solution:** Increase connection limit or reduce pool size:
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  // ... other config
+  extra: {
+    max: 5,  // Reduce from default
+  },
+};
+```
+
+### SSL Certificate Issues
+
+**Solution:** Allow self-signed certificates:
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  // ... other config
+  ssl: {
+    rejectUnauthorized: false,
+  },
+};
+```
+
+### Connection Timeout
+
+**Solution:** Increase timeout:
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  // ... other config
+  connectTimeoutMS: 30000,  // 30 seconds
+};
+```
+
+## Best Practices
+
+### 1. Never Commit Credentials
+
+❌ **Don't:**
+```typescript
+password: 'my_secret_password',  // In version control!
+```
+
+✅ **Do:**
+```typescript
+password: process.env.DB_PASSWORD || '',
+```
+
+### 2. Use Different Databases per Environment
+
+```
+development → SQLite or local PostgreSQL
+staging → Staging PostgreSQL server
+production → Production PostgreSQL server
+```
+
+### 3. Set Connection Limits
+
+```typescript
+extra: {
+  max: 10,  // Production
+  min: 2,
+}
+```
+
+Don't exceed your database's connection limit!
+
+### 4. Enable SSL in Production
+
+```typescript
+ssl: process.env.NODE_ENV === 'production',
+```
+
+### 5. Use Migrations, Not Synchronize
+
+```typescript
+synchronize: false,  // Always false in production
+```
+
+Let migrations handle schema changes.
+
+### 6. Monitor Connections
+
+Add logging in development:
+
+```typescript
+logging: process.env.NODE_ENV !== 'production',
+```
+
+### 7. Handle Connection Errors Gracefully
+
+```typescript
+try {
+  await database.connect();
+} catch (error) {
+  console.error('Database connection failed:', error);
+  process.exit(1);
+}
+```
+
+## Cloud Database Providers
+
+### Heroku Postgres
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  url: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+};
+```
+
+### Railway
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: process.env.PGHOST,
+  port: parseInt(process.env.PGPORT || '5432'),
+  username: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+};
+```
+
+### PlanetScale (MySQL)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mysql',
+  host: process.env.DATABASE_HOST,
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE,
+  ssl: {
+    rejectUnauthorized: true,
+  },
+};
+```
+
+## Next Steps
+
+Now that your database is configured:
+
+- **[Models](/guides/models/)** - Define your data structure
+- **[Migrations](/guides/migrations/)** - Create schema migrations
+- **[Running Migrations](/guides/migrate/)** - Apply migrations to database
+
+--- */}
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

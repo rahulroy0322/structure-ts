@@ -1,0 +1,737 @@
+---
+title: Creating Migrations
+description: Learn how to create database migrations in structure-ts
+---
+
+{/* # Creating Migrations */}
+
+Migrations are version control for your database schema. This guide explains how to create migrations that track changes to your database structure.
+
+#### Upcomming
+
+{/* ## What are Migrations?
+
+**Migrations** are files that define changes to your database schema:
+- Creating tables
+- Adding/removing columns
+- Changing column types
+- Adding indexes
+- Modifying constraints
+
+Think of migrations as Git commits for your database structure.
+
+## Why Use Migrations?
+
+### Without Migrations
+
+```typescript
+// Change your model
+@Entity('users')
+export class User {
+  @Column()
+  newField: string;  // Added this
+}
+```
+
+**Problem:** Database doesn't know about the new field!
+
+### With Migrations
+
+1. Change your model
+2. Create migration
+3. Run migration
+4. Database updated ✓
+
+**Benefits:**
+- Track schema changes over time
+- Share changes with team
+- Apply changes consistently across environments
+- Rollback changes if needed
+
+## When to Create Migrations
+
+Create a migration when you:
+- ✅ Create a new model
+- ✅ Add/remove fields from models
+- ✅ Change field types or constraints
+- ✅ Add indexes or relationships
+- ✅ Rename tables or columns
+
+Don't need migrations for:
+- ❌ Changing controller logic
+- ❌ Updating routes
+- ❌ Modifying business logic
+
+## Creating Your First Migration
+
+### Step 1: Create a Model
+
+```typescript
+// src/users/models.ts
+import { Entity, Column, PrimaryGeneratedColumn } from 'structure-ts';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+  
+  @Column({ unique: true })
+  email: string;
+  
+  @Column()
+  password: string;
+}
+```
+
+### Step 2: Generate Migration
+
+Run the CLI command:
+
+```bash
+st create migration CreateUsersTable
+```
+
+or
+
+```bash
+structure-ts create migration CreateUsersTable
+```
+
+**Output:**
+```
+✓ Migration created: src/users/migrations/1234567890-CreateUsersTable.ts
+```
+
+### Step 3: Review the Migration
+
+Open the generated file:
+
+```typescript
+// src/users/migrations/1234567890-CreateUsersTable.ts
+import { MigrationInterface, QueryRunner, Table } from 'structure-ts';
+
+export class CreateUsersTable1234567890 implements MigrationInterface {
+  
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.createTable(
+      new Table({
+        name: 'users',
+        columns: [
+          {
+            name: 'id',
+            type: 'int',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'increment',
+          },
+          {
+            name: 'name',
+            type: 'varchar',
+          },
+          {
+            name: 'email',
+            type: 'varchar',
+            isUnique: true,
+          },
+          {
+            name: 'password',
+            type: 'varchar',
+          },
+        ],
+      })
+    );
+  }
+  
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropTable('users');
+  }
+}
+```
+
+## Migration Anatomy
+
+### File Name Structure
+
+```
+1234567890-CreateUsersTable.ts
+│          │
+│          └─ Description (human-readable)
+└─ Timestamp (ensures order)
+```
+
+**Timestamp:** Ensures migrations run in correct order
+
+**Description:** Describes what the migration does
+
+### Migration Class
+
+```typescript
+export class CreateUsersTable1234567890 implements MigrationInterface {
+  // Must implement up() and down()
+}
+```
+
+### up() Method
+
+Applies the migration (moving forward):
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  // Create tables, add columns, etc.
+}
+```
+
+### down() Method
+
+Reverts the migration (rolling back):
+
+```typescript
+public async down(queryRunner: QueryRunner): Promise<void> {
+  // Undo what up() did
+}
+```
+
+**Important:** Always implement both methods!
+
+## Common Migration Operations
+
+### Creating a Table
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.createTable(
+    new Table({
+      name: 'posts',
+      columns: [
+        {
+          name: 'id',
+          type: 'int',
+          isPrimary: true,
+          isGenerated: true,
+          generationStrategy: 'increment',
+        },
+        {
+          name: 'title',
+          type: 'varchar',
+          length: '255',
+        },
+        {
+          name: 'content',
+          type: 'text',
+        },
+        {
+          name: 'published',
+          type: 'boolean',
+          default: false,
+        },
+        {
+          name: 'created_at',
+          type: 'timestamp',
+          default: 'CURRENT_TIMESTAMP',
+        },
+      ],
+    })
+  );
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropTable('posts');
+}
+```
+
+### Adding a Column
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.addColumn(
+    'users',
+    new TableColumn({
+      name: 'phone',
+      type: 'varchar',
+      length: '20',
+      isNullable: true,
+    })
+  );
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropColumn('users', 'phone');
+}
+```
+
+### Removing a Column
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropColumn('users', 'old_field');
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.addColumn(
+    'users',
+    new TableColumn({
+      name: 'old_field',
+      type: 'varchar',
+    })
+  );
+}
+```
+
+### Changing Column Type
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.changeColumn(
+    'users',
+    'age',
+    new TableColumn({
+      name: 'age',
+      type: 'int',  // Changed from varchar to int
+    })
+  );
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.changeColumn(
+    'users',
+    'age',
+    new TableColumn({
+      name: 'age',
+      type: 'varchar',  // Revert back
+    })
+  );
+}
+```
+
+### Renaming a Column
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.renameColumn('users', 'old_name', 'new_name');
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.renameColumn('users', 'new_name', 'old_name');
+}
+```
+
+### Adding an Index
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.createIndex(
+    'users',
+    new TableIndex({
+      name: 'IDX_USERS_EMAIL',
+      columnNames: ['email'],
+    })
+  );
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropIndex('users', 'IDX_USERS_EMAIL');
+}
+```
+
+### Adding a Foreign Key
+
+```typescript
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.createForeignKey(
+    'posts',
+    new TableForeignKey({
+      name: 'FK_POSTS_USER',
+      columnNames: ['user_id'],
+      referencedTableName: 'users',
+      referencedColumnNames: ['id'],
+      onDelete: 'CASCADE',
+    })
+  );
+}
+
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropForeignKey('posts', 'FK_POSTS_USER');
+}
+```
+
+## Auto-Generated Migrations
+
+structure-ts can automatically generate migrations by comparing your models to the database.
+
+### Generate from Models
+
+```bash
+st create migration --auto
+```
+
+or
+
+```bash
+structure-ts create migration AddPhoneToUsers --auto
+```
+
+**What happens:**
+1. Compares your models to current database schema
+2. Detects differences
+3. Generates migration with necessary changes
+
+**Example output:**
+```
+Detected changes:
+  - Added column 'phone' to 'users' table
+  - Added index on 'email' column
+
+✓ Migration created: src/users/migrations/1234567891-AddPhoneToUsers.ts
+```
+
+### When Auto-Generation Works Well
+
+- ✅ Adding new columns
+- ✅ Removing columns
+- ✅ Adding new tables
+- ✅ Changing column types
+
+### When to Write Manually
+
+- ❌ Complex data transformations
+- ❌ Multi-step changes
+- ❌ Renaming (detected as drop + add)
+- ❌ Custom SQL needed
+
+## Migration Naming Conventions
+
+### Good Names
+
+```bash
+st create migration CreateUsersTable
+st create migration AddEmailToUsers
+st create migration RemoveOldFieldFromPosts
+st create migration AddIndexToUserEmail
+st create migration CreatePostsTable
+```
+
+**Pattern:** `Verb + What + Where`
+
+### Bad Names
+
+```bash
+st create migration Migration1        # Not descriptive
+st create migration Update             # Too vague
+st create migration FixStuff           # What stuff?
+st create migration users              # Missing action
+```
+
+### Be Descriptive
+
+Someone should understand what the migration does just from the name.
+
+## Complex Migration Example
+
+### Scenario: Add User Profiles
+
+**Step 1: Update Model**
+
+```typescript
+// src/users/models.ts
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+  
+  @Column()
+  email: string;
+  
+  @Column()
+  password: string;
+  
+  // New fields
+  @Column({ nullable: true })
+  bio: string | null;
+  
+  @Column({ nullable: true })
+  avatar_url: string | null;
+  
+  @Column({ default: false })
+  is_verified: boolean;
+}
+```
+
+**Step 2: Create Migration**
+
+```bash
+st create migration AddUserProfileFields
+```
+
+**Step 3: Generated Migration**
+
+```typescript
+export class AddUserProfileFields1234567890 implements MigrationInterface {
+  
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'bio',
+        type: 'text',
+        isNullable: true,
+      })
+    );
+    
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'avatar_url',
+        type: 'varchar',
+        isNullable: true,
+      })
+    );
+    
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'is_verified',
+        type: 'boolean',
+        default: false,
+      })
+    );
+  }
+  
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropColumn('users', 'is_verified');
+    await queryRunner.dropColumn('users', 'avatar_url');
+    await queryRunner.dropColumn('users', 'bio');
+  }
+}
+```
+
+## Data Migrations
+
+Sometimes you need to migrate data, not just schema.
+
+### Example: Setting Default Values
+
+```typescript
+export class SetDefaultUserRoles1234567890 implements MigrationInterface {
+  
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Add column
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'role',
+        type: 'varchar',
+        default: "'user'",
+      })
+    );
+    
+    // Update existing rows
+    await queryRunner.query(
+      "UPDATE users SET role = 'user' WHERE role IS NULL"
+    );
+  }
+  
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropColumn('users', 'role');
+  }
+}
+```
+
+### Example: Data Transformation
+
+```typescript
+export class SplitUserName1234567890 implements MigrationInterface {
+  
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Add new columns
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'first_name',
+        type: 'varchar',
+      })
+    );
+    
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'last_name',
+        type: 'varchar',
+      })
+    );
+    
+    // Split existing name field
+    await queryRunner.query(`
+      UPDATE users 
+      SET first_name = SUBSTRING_INDEX(name, ' ', 1),
+          last_name = SUBSTRING_INDEX(name, ' ', -1)
+    `);
+    
+    // Drop old column
+    await queryRunner.dropColumn('users', 'name');
+  }
+  
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Add old column back
+    await queryRunner.addColumn(
+      'users',
+      new TableColumn({
+        name: 'name',
+        type: 'varchar',
+      })
+    );
+    
+    // Combine names
+    await queryRunner.query(`
+      UPDATE users 
+      SET name = CONCAT(first_name, ' ', last_name)
+    `);
+    
+    // Drop new columns
+    await queryRunner.dropColumn('users', 'last_name');
+    await queryRunner.dropColumn('users', 'first_name');
+  }
+}
+```
+
+## Best Practices
+
+### 1. Always Implement down()
+
+```typescript
+// ❌ Bad
+public async down(queryRunner: QueryRunner): Promise<void> {
+  // Empty - can't rollback!
+}
+
+// ✅ Good
+public async down(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropTable('users');
+}
+```
+
+### 2. One Logical Change Per Migration
+
+```typescript
+// ❌ Bad - too many unrelated changes
+CreateUsersAndPostsAndCommentsAndEverything
+
+// ✅ Good - focused changes
+CreateUsersTable
+CreatePostsTable
+CreateCommentsTable
+```
+
+### 3. Test Rollbacks
+
+```bash
+# Run migration
+st migrate
+
+# Roll back
+st migrate:rollback
+
+# Run again
+st migrate
+```
+
+Ensure `down()` properly undoes `up()`.
+
+### 4. Don't Modify Existing Migrations
+
+Once a migration runs in production, don't change it!
+
+```typescript
+// ❌ Bad - changing migration that already ran
+// src/migrations/123-Old.ts (modified)
+
+// ✅ Good - create new migration
+// src/migrations/124-FixPreviousMigration.ts
+```
+
+### 5. Use Descriptive Names
+
+```bash
+# Good
+AddIndexToUserEmail
+RemoveUnusedPostsTable
+ChangeUserAgeToInteger
+
+# Bad
+Migration1
+Fix
+Update
+```
+
+### 6. Handle Existing Data
+
+When changing column types or constraints, handle existing data:
+
+```typescript
+// Adding NOT NULL constraint
+public async up(queryRunner: QueryRunner): Promise<void> {
+  // First, set default for existing rows
+  await queryRunner.query(
+    "UPDATE users SET email = 'noemail@example.com' WHERE email IS NULL"
+  );
+  
+  // Then add NOT NULL constraint
+  await queryRunner.changeColumn(
+    'users',
+    'email',
+    new TableColumn({
+      name: 'email',
+      type: 'varchar',
+      isNullable: false,
+    })
+  );
+}
+```
+
+## Troubleshooting
+
+### "Migration already exists"
+
+**Cause:** File with same name exists
+
+**Solution:** Use unique, descriptive names or delete old migration
+
+### "Table already exists"
+
+**Cause:** Migration ran before or table created manually
+
+**Solution:** 
+- Check migration history
+- Drop table manually if needed
+- Skip migration if already applied
+
+### Syntax Errors in Migration
+
+**Cause:** Typo or incorrect API usage
+
+**Solution:** Review migration syntax, check documentation
+
+### Migration Won't Roll Back
+
+**Cause:** `down()` method has errors
+
+**Solution:** Fix `down()` implementation, test rollback
+
+## Next Steps
+
+Now that you've created migrations:
+
+- **[Running Migrations](/guides/migrate/)** - Apply migrations to database
+- **[Models](/guides/models/)** - Understand model-migration relationship
+- **[Database Setup](/guides/database-setup/)** - Database configuration */}
+
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

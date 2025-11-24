@@ -1,0 +1,358 @@
+---
+title: Installation
+description: How to install Structure-Ts and get started
+---
+import { Code ,FileTree} from '@astrojs/starlight/components';
+
+# Installation
+
+This guide walks you through installing Structure-Ts and verifying your setup. Let's get you up and running!
+
+## Prerequisites
+
+Before installing Structure-Ts, ensure you have:
+
+**Node.js**
+- **Minimum version**: Node.js 16.x or higher
+- **Recommended**: Node.js 18.x or later
+- Check your version: `node --version`
+- [Download Node.js](https://nodejs.org/) if needed
+
+**Package Manager**
+- **npm** (comes with Node.js) or
+- **pnpm** (recommended for faster installs)
+- **yarn** also works
+
+**TypeScript Knowledge**
+- Basic understanding of TypeScript
+- Familiarity with types and interfaces
+- Understanding of async/await
+
+**Optional but Helpful**
+- Experience with Express or similar frameworks
+- Familiarity with Django's architecture
+- Basic database knowledge
+
+## Installation Methods
+
+### Method 1: Global Installation (Recommended)
+
+Installing globally gives you access to the `st` command anywhere on your system.
+
+**Using npm:**
+```bash
+npm install -g structure-ts
+```
+
+**Using pnpm:**
+```bash
+pnpm add -g structure-ts
+```
+
+**Using yarn:**
+```bash
+yarn global add structure-ts
+```
+
+This installs the structure-ts CLI globally, allowing you to run commands like `st create project` from any directory.
+
+{/* ### Method 2: Using npx (No Installation Required)
+
+If you don't want to install globally, use `npx` to run commands directly:
+
+```bash
+npx structure-ts create project my-app
+```
+
+This downloads structure-ts temporarily, creates your project, and cleans up automatically.
+
+**Pros**: No global installation needed  
+**Cons**: Slower (downloads each time), requires internet connection */}
+
+## Verify Installation
+
+After installing, verify structure-ts is accessible:
+
+```bash
+st --version
+```
+
+or
+
+```bash
+structure-ts --version
+```
+
+You should see the current version number, like `0.1.0`.
+
+If you see "command not found," check the [Troubleshooting](#troubleshooting) section below.
+
+## Your First Project
+
+Once installed, create your first project:
+
+```bash
+st create project my-first-app
+```
+
+This command:
+1. Creates a new directory called `my-first-app`
+2. Sets up the project structure
+3. Generates configuration files
+4. Creates initial source files
+
+You'll see output like:
+
+```
+✓ Creating project directory...
+✓ Generating package.json...
+✓ Setting up TypeScript configuration...
+✓ Creating source files...
+✓ Project created successfully!
+
+Next steps:
+  cd my-first-app
+  npm install
+  npm run dev
+```
+
+## Install Dependencies
+
+Navigate to your project and install dependencies:
+
+```bash
+cd my-first-app
+pnpm i # or npm install
+```
+
+This installs all required packages including:
+- TypeScript compiler
+- structure-ts runtime
+- Development tools
+
+## Start Development Server
+
+Run your application in development mode:
+
+```bash
+pnpm dev # or npm run dev
+```
+
+You should see:
+
+```
+server running on port : 2000
+```
+
+Open your browser and visit `http://localhost:2000`. You should see a welcome message!
+
+## Project Structure
+
+After installation, your project looks like this:
+
+
+<FileTree>
+- my-first-app/
+   - node_modules/         # Installed dependencies
+   - src/                  # Your application code
+      - app.ts            # App setup
+      - main.ts           # Entry point
+      - settings.ts       # Configuration
+   - package.json          # Dependencies and scripts
+   - tsconfig.json         # TypeScript configuration
+</FileTree>
+
+**Key Files Explained:**
+
+**`package.json`**  
+Defines your project dependencies and scripts. Contains commands like `npm run dev` and `npm run build`.
+
+**`tsconfig.json`**  
+Configures how TypeScript compiles your code. Pre-configured with optimal settings.
+
+**`src/app.ts`**  
+Sets up your Structure-Ts application. Registers apps and configures the server.
+
+**`src/main.ts`**  
+The entry point. Imports your app configuration and starts the server.
+
+**`src/settings.ts`**  
+Central configuration for port, database, apps, and templates. [Learn more about settings](/guides/settings-configuration/).
+
+## Available Scripts
+
+Your project comes with several npm scripts:
+
+**Development:**
+```bash
+pnpm dev # or npm run dev
+```
+Runs the application in development mode with hot reloading.
+
+**Build:**
+```bash
+pnpm build # or npm run build
+```
+Compiles TypeScript to JavaScript for production.
+
+**Start:**
+```bash
+npm start # prefer because pnpm is over kill for prod
+```
+Runs the compiled production build.
+
+## Troubleshooting
+
+### Command Not Found
+
+If `st` or `structure-ts` isn't recognized:
+
+**On Linux/macOS:**
+
+1. Check npm global bin path:
+   ```bash
+   npm config get prefix
+   ```
+
+2. Ensure this path is in your `$PATH`. Add to `~/.bashrc` or `~/.zshrc`:
+   ```bash
+   export PATH="$PATH:$(npm config get prefix)/bin"
+   ```
+
+3. Reload your shell:
+   ```bash
+   source ~/.bashrc  # or ~/.zshrc
+   ```
+
+**On Windows:**
+
+1. Check global installation directory:
+   ```bash
+   npm config get prefix
+   ```
+
+2. Add this path to your system's PATH environment variable:
+   - Search for "Environment Variables" in Start menu
+   - Edit "Path" under System Variables
+   - Add the npm prefix path
+
+**Alternative**: Use the full path:
+```bash
+npx structure-ts create project my-app
+```
+
+### Permission Errors (Linux/macOS)
+
+If you get `EACCES` permission errors:
+
+**Option 1: Fix npm permissions (recommended)**
+```bash
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Then reinstall:
+```bash
+npm install -g structure-ts
+```
+
+**Option 2: Use sudo (not recommended)**
+```bash
+sudo npm install -g structure-ts
+```
+
+### Port Already in Use
+
+If port 2000 is busy, change it in `src/settings.ts`:
+
+<Code
+code={
+   `const PORT = 3000; // Use any available port`
+}
+  title={'src/settings.ts'}
+lang="ts"
+mark={['3000']}
+/>
+
+### TypeScript Errors
+
+Ensure you have compatible TypeScript version:
+
+```bash
+npm install -D typescript@latest
+```
+
+### Module Not Found
+
+If imports fail, regenerate dependencies:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Slow Installation
+
+If npm install is slow:
+
+**Use pnpm (faster):**
+```bash
+npm install -g pnpm
+pnpm install
+```
+
+**Or enable npm cache:**
+```bash
+npm config set cache ~/.npm-cache --global
+```
+
+## Updating structure-ts
+
+To update to the latest version:
+
+**Global installation:**
+```bash
+npm update -g structure-ts
+```
+
+**Check for updates:**
+```bash
+npm outdated -g structure-ts
+```
+
+**Install specific version:**
+```bash
+npm install -g structure-ts@0.2.0
+```
+
+## Uninstalling
+
+To remove structure-ts:
+
+**Global uninstallation:**
+```bash
+npm uninstall -g structure-ts
+```
+
+**Remove projects** (be careful!):
+```bash
+rm -rf my-first-app
+```
+
+## Next Steps
+
+Installation complete! Here's what to do next:
+
+1. **[Quick Start Guide](/getting-started/quick-start/)** - Build your first endpoint
+2. **[Creating Apps](/guides/creating-apps/)** - Learn the app architecture
+3. **[Settings Configuration](/guides/settings-configuration/)** - Configure your project
+
+Need help? Check [GitHub Issues](https://github.com/rahulroy0322/structure-ts/issues) or [Discussions](https://github.com/rahulroy0322/structure-ts/discussions).
+
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

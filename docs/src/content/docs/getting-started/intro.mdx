@@ -1,0 +1,260 @@
+---
+title: Introduction
+description: Why Structure-Ts exists and what problems it solves
+---
+import { Code } from '@astrojs/starlight/components';
+
+# Introduction
+
+Welcome to `Structure-Ts`! This page explains why this framework exists, what problems it solves, and whether it's the right choice for your project.
+
+## The Problem
+
+Building web applications with TypeScript often involves one of two extremes:
+
+**Option 1: Minimal Frameworks (Express, Fastify)**
+- Extremely flexible but lack `structure`
+- Every project starts from `scratch`
+- No `guidance` on `organizing` code as it grows
+- Team members implement `patterns differently`
+- Result: `Inconsistent codebases` that are hard to maintain
+
+**Option 2: Heavy Frameworks (NestJS)**
+- Highly structured but `complex`
+- Steep learning curve with `decorators` everywhere
+- `Overkill` for small to medium projects
+- Heavy `dependency` on Angular-like patterns
+- Result: `Slow development` for simple applications
+
+**The Gap**: There's a missing middle ground—a framework that provides structure without overwhelming complexity.
+
+## The Solution
+
+**Structure-Ts** fills this gap by bringing Django's proven architecture to TypeScript:
+
+- **Just enough structure** to keep code organized
+- **Simple conventions** that make sense
+- **Automatic configuration** for common tasks
+- **Modular architecture** that scales with your project
+- **Developer-friendly** without sacrificing power
+
+Think of it as `"Django for TypeScript"` or `"Express with structure built-in."`
+
+## Philosophy
+
+Structure-Ts is built on three core beliefs:
+
+### 1. Convention over Configuration
+
+You shouldn't spend hours configuring your framework before writing a single line of business logic. Structure-Ts provides sensible defaults that work for **`90%`** of use cases.
+
+<Code 
+code={
+  `
+// Just add your app to APPS Array
+
+const APPS: SettingsType['APPS'] = [
+  'users' // That's it! Routes are auto-registered
+]
+  `
+}
+ lang="ts"
+  title={'src/settings.ts'}
+ mark={[`'users'`]} />
+
+Need custom configuration? `Override` only what you need—nothing more.
+
+### 2. App-Based Architecture
+
+Large applications are easier to manage when divided into focused modules. Each "app" in Structure-Ts handles one domain:
+
+```
+my-project/
+└── src/
+    ├── users/        # Everything user-related
+    ├── blog/         # Everything blog-related
+    └── api/          # Everything API-related
+```
+
+Apps are:
+- **Self-contained**: Own routes, controllers, models
+- **Reusable**: Move apps between projects
+- **Testable**: Test apps independently
+- **Scalable**: Add new apps without touching existing code
+
+This pattern is proven—Django has used it successfully for nearly `Two decades`.
+
+### 3. Developer Experience First
+
+Every decision prioritizes making developers productive and happy:
+
+- **TypeScript native**: Full type safety out of the box
+- **Clear error messages**: Know exactly what went wrong
+- **Minimal boilerplate**: Write logic, not configuration
+- **Automatic tools**: CLI handles repetitive tasks
+- **Familiar patterns**: Concepts from Django and Express
+
+## Who Is This For?
+
+Structure-Ts is ideal for:
+
+**Django Developers Moving to TypeScript**
+- Familiar app-based architecture
+- Similar patterns for models, views (controllers), and routing
+- Migrations work the same way
+
+**TypeScript Developers Wanting Structure**
+- Tired of reinventing project organization
+- Want guidance without NestJS complexity
+- Need structure that doesn't get in the way
+
+**Teams Building Maintainable Applications**
+- Need consistency across team members
+- Want new developers to onboard quickly
+- Value convention over tribal knowledge
+
+**Startups and MVPs**
+- Ship features rapidly
+- Maintain code quality as you scale
+- Iterate without technical debt
+
+## Who Should Look Elsewhere?
+
+Structure-Ts might not be the best fit if you:
+
+
+- **Need ultra-high performance**: For extreme performance requirements, consider Fastify or raw Node.js
+- **Prefer minimal frameworks**: Stick with Express or Fastify
+
+{/* - **Need ultra-high performance**: For extreme performance requirements, consider Fastify or raw Node.js
+- **Want microservices architecture**: Consider NestJS or multiple small services
+- **Prefer minimal frameworks**: Stick with Express or Fastify
+- **Need enterprise features**: Consider NestJS with its extensive ecosystem */}
+
+Be honest with yourself about your needs—choosing the right tool matters more than using the **`"coolest"`** one.
+
+## What You'll Learn
+
+This documentation will teach you to:
+
+1. **Set up projects** quickly with the CLI
+2. **Create modular apps** that organize your code
+3. **Build APIs** with controllers and routing
+4. **Manage databases** with models and migrations
+5. **Render templates** for server-side applications
+6. **Structure code** that scales from prototype to production
+
+## Learning Path
+
+We recommend following this order:
+
+1. **[Installation](/getting-started/installation/)** - Set up Structure-Ts
+2. **[Quick Start](/getting-started/quick-start/)** - Build your first app
+3. **[Creating Apps](/guides/creating-apps/)** - Understand app architecture
+4. **[Settings Configuration](/guides/settings-configuration/)** - Configure your project
+5. **[Routing](/guides/routing/)** - Define URL patterns
+6. **[Controllers](/guides/controllers/)** - Handle requests
+7. **[Models](/guides/models/)** - Work with databases
+8. **[Migrations](/guides/migrations/)** - Manage schema changes
+
+Take your time—each concept builds on the previous one.
+
+## What Makes Structure-Ts Different?
+
+**Compared to Express:**
+- Built-in structure and conventions
+- Automatic route registration
+- ORM and migrations included
+- App-based code organization
+
+**Compared to Fastify:**
+- Higher-level abstractions
+- Focus on rapid development
+- Integrated template rendering
+- Database management built-in
+
+**Compared to NestJS:**
+- Simpler learning curve
+- Less boilerplate and decorators
+- Lightweight and faster to set up
+- Perfect for small to medium projects
+
+**Compared to Django:**
+- TypeScript with static typing
+- Modern JavaScript ecosystem
+- Async/await by default
+- JSON APIs are first-class
+
+## Core Features
+
+Structure-Ts provides:
+
+✅ **CLI Tools** - Generate projects, apps, and migrations  
+✅ **Automatic Routing** - Register routes from apps  
+✅ **Type Safety** - Full TypeScript support  
+✅ **ORM Integration** - Models and database management  
+✅ **Migrations** - Version control for your schema  
+✅ **Template Rendering** - Server-side HTML with EJS  
+✅ **Controller Pattern** - Clean request/response handling  
+✅ **Settings Management** - Centralized configuration  
+
+## Example: Complete Feature in 5 Minutes
+
+Let's see how quickly you can build a working feature:
+
+```typescript
+// 1. Create app (1 minute)
+st create app blog
+
+// 2. Add to settings.ts (30 seconds)
+const APPS = ['blog'];
+
+// 3. Create controller (2 minutes)
+// blog/controllers.ts
+export const listPosts: ControllerType = (question, reply) => {
+  const posts = [
+    { id: 1, title: 'Hello World', author: 'Alice' },
+    { id: 2, title: 'TypeScript Tips', author: 'Bob' },
+  ];
+  reply.status(ok()).json({ success: true, data: posts });
+};
+
+// 4. Add route (1 minute)
+// blog/routes.ts
+route.get('/', listPosts);
+
+// Done! Visit http://localhost:2000/blog
+```
+
+Five minutes from idea to working endpoint. That's the Structure-Ts way.
+
+## Current Status
+
+Structure-Ts is actively developed and evolving:
+
+- **Stability**: Early development - expect changes
+- **Production Ready**: Use with caution in production
+- **API Stability**: May have breaking changes between versions
+- **Community**: Growing, welcoming contributors
+
+We're transparent about where we are. Check the [Future Plans](/roadmap/future-plans/) to see what's coming next.
+
+## Getting Help
+
+Stuck? Have questions?
+
+- **Documentation**: You're reading it! Use the search bar
+- **GitHub Issues**: [Report bugs or ask questions](https://github.com/rahulroy0322/structure-ts/issues)
+- **GitHub Discussions**: [Community Q&A](https://github.com/rahulroy0322/structure-ts/discussions)
+
+## Ready to Begin?
+
+Now that you understand what structure-ts is and why it exists, let's get you set up!
+
+➡️ **Next Step**: [Install Structure-Ts](/getting-started/installation/)
+
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small> 

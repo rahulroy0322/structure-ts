@@ -1,0 +1,158 @@
+---
+title: Structure-Ts
+description: A high-level TypeScript web framework inspired by Django
+template: splash
+hero:
+  title: |
+    Build TypeScript web apps
+    <span style="color: var(--sl-color-accent)">the structured way</span>
+  tagline: A high-level web framework inspired by Django, designed for rapid development and clean, organized code.
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Get Started
+      link: /getting-started/intro/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/rahulroy0322/structure-ts
+      icon: external
+      variant: minimal
+---
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import CopyrightNotice from '../../components/CopyrightNotice.astro';
+
+## Why Structure-Ts?
+
+`Structure-Ts` brings Django's elegant architecture to the TypeScript ecosystem. If you love Django's **"batteries included"** philosophy but want TypeScript's type safety, Structure-Ts is built for you.
+
+<CardGrid stagger>
+  <Card title="🚀 Rapid Development" icon="rocket">
+    Get your application running in minutes with sensible defaults and automatic configuration. Focus on building features, not boilerplate.
+  </Card>
+  
+  <Card title="📁 Modular Apps" icon="puzzle">
+    Organize your code into self-contained applications. Each app manages its own routes, controllers, and models—making code reusable and maintainable.
+  </Card>
+  
+  <Card title="🛣️ Automatic Routing"
+   icon="external">
+    Define routes in your apps and let the framework handle registration automatically. No manual route configuration needed.
+  </Card>
+  
+  <Card title="🗄️ Database First" 
+  icon="open-book">
+    Built-in ORM support with migrations makes database management simple. Create models, generate migrations, and evolve your schema with confidence.
+  </Card>
+  
+  <Card title="🎨 Template Rendering" 
+  icon="document">
+    Render dynamic HTML pages using EJS templates. Layouts, partials, and data binding work seamlessly out of the box.
+  </Card>
+  
+  <Card title="⚙️ TypeScript Native" 
+  icon="seti:typescript">
+    Written in TypeScript from the ground up. Enjoy full type safety, autocompletion, and compile-time error checking throughout your application.
+  </Card>
+</CardGrid>
+
+## Quick Example
+
+Create a working API endpoint in seconds:
+
+```typescript
+// users/controllers.ts
+import { type ControllerType, ok } from 'structure-ts';
+
+export const listUsers: ControllerType = (question, reply) => {
+  const users = [
+    { id: 1, name: 'Alice', email: 'alice@example.com' },
+    { id: 2, name: 'Bob', email: 'bob@example.com' },
+  ];
+  
+  reply.status(ok()).json({
+    success: true,
+    data: users,
+  });
+};
+```
+
+```typescript
+// users/routes.ts
+import { Router } from 'structure-ts';
+import { listUsers } from './controllers';
+
+const { routes, route } = Router();
+
+route.get('/', listUsers);
+
+export default routes;
+```
+
+That's it! Your `/` endpoint is ready to serve data.
+
+## Philosophy
+
+Structure-Ts is built on three core principles:
+
+**Convention over Configuration**  
+Sensible defaults let you build applications without endless configuration files. Customize only what you need.
+
+**App-Based Architecture**  
+Organize code into modular apps, each handling a specific domain. Apps are self-contained, reusable, and easy to test.
+
+**Developer Experience First**  
+From TypeScript integration to automatic route registration, every decision prioritizes developer happiness and productivity.
+
+## Comparison with Other Frameworks
+
+| Feature | Structure-Ts | Express | Fastify | NestJS |
+|---------|-------------|---------|---------|--------|
+| Built-in Structure | ✅ | ❌ | ❌ | ✅ |
+| Automatic Routing | ✅ | ❌ | ❌ | ⚠️ |
+| ORM & Migrations | ✅ | ❌ | ❌ | ⚠️ |
+| Learning Curve | Easy | Easy | Easy | Steep |
+| Template Rendering | ✅ | ⚠️ | ⚠️ | ⚠️ |
+| TypeScript First | ✅ | ⚠️ | ⚠️ | ✅ |
+| Lightweight | ✅ | ✅ | ✅ | ❌ |
+
+## Who Should Use Structure-Ts?
+
+- **Django developers** wanting TypeScript's type safety
+- **TypeScript developers** tired of setting up boilerplate
+- **Teams** needing structure without NestJS complexity
+- **Startups** building MVPs quickly with maintainable code
+- **Anyone** who values convention and clean architecture
+
+## Get Started in 2 Minutes
+
+```bash
+# Install structure-ts globally
+pnpm add -g structure-ts 
+# or npm install -g structure-ts
+
+# Create your first project
+st create project my-app
+cd my-app
+
+# Install dependencies and run
+pnpm install
+# or npm install
+
+pnpm dev
+# or npm run dev
+```
+
+Your server is now running at `http://localhost:2000`! 🎉
+
+Ready to dive deeper? [Start with the introduction](/getting-started/introduction/) or jump straight to [installation](/getting-started/installation/).
+
+---
+
+## Community & Support
+
+- **GitHub**: [rahulroy0322/structure-ts](https://github.com/rahulroy0322/structure-ts)
+- **Issues**: [Report bugs or request features](https://github.com/rahulroy0322/structure-ts/issues)
+- **Discussions**: [Join the conversation](https://github.com/rahulroy0322/structure-ts/discussions)
+
+<CopyrightNotice />

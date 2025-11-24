@@ -11,6 +11,7 @@
       "src/**/*",
       "cli/**/*",
       "templates/**/*",
+      "docs/**/*",
       "biome.json",
       "package.json"
     ]

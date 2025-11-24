@@ -1,0 +1,574 @@
+---
+title: Future Plans
+description: Roadmap and upcoming features for structure-ts
+---
+
+{/* # Future Plans */}
+
+This page outlines what's coming next for structure-ts. We're committed to making this framework better with each release while maintaining its simplicity and ease of use.
+## Upcomming
+{/* ## Development Philosophy 
+
+Before diving into specific features, here's what guides our development:
+
+**Keep It Simple**  
+We won't add features that make the framework complex or hard to learn. Every addition must earn its place by solving real problems.
+
+**Community-Driven**  
+Your feedback shapes our roadmap. Features with the most demand get prioritized.
+
+**Backward Compatibility**  
+We'll maintain compatibility whenever possible. Breaking changes only happen in major versions with clear migration guides.
+
+**Quality Over Speed**  
+We'd rather ship polished features late than rushed features on time.
+
+## Short Term (Next 1-3 Months)
+
+These features are actively in development or planned for the next few releases.
+
+### 🚧 Dynamic Route Parameters
+
+**Status:** In Development  
+**Priority:** High
+
+Complete implementation of dynamic routing:
+- Multiple parameters in routes (`/:userId/posts/:postId`)
+- Optional parameters (`/:id?`)
+- Parameter validation and constraints
+- Better error messages for route conflicts
+
+**Why:** Essential for building flexible APIs and applications.
+
+### 🚧 Middleware Support
+
+**Status:** In Development  
+**Priority:** High
+
+Add middleware layer for:
+- Authentication checks
+- Request logging
+- Rate limiting
+- CORS handling
+- Custom middleware
+
+**Example:**
+```typescript
+// Planned API
+route.get('/admin', adminController, [authMiddleware, adminMiddleware]);
+```
+
+**Why:** Common pattern needed for real-world applications.
+
+### 📋 Request Validation
+
+**Status:** Planned  
+**Priority:** High
+
+Built-in validation for:
+- Request body validation
+- Query parameter validation
+- Type coercion
+- Custom validators
+
+**Example:**
+```typescript
+// Planned API
+route.post('/users', createUser, {
+  body: {
+    name: { type: 'string', required: true, minLength: 2 },
+    email: { type: 'email', required: true },
+    age: { type: 'number', min: 18 },
+  },
+});
+```
+
+**Why:** Reduce boilerplate validation code in controllers.
+
+### 📋 File Upload Handling
+
+**Status:** Planned  
+**Priority:** Medium
+
+Native support for:
+- File uploads (single and multiple)
+- File size limits
+- File type validation
+- Streaming large files
+- Integration with cloud storage
+
+**Example:**
+```typescript
+// Planned API
+const uploadAvatar: ControllerType = async (request, reply) => {
+  const file = await request.file('avatar');
+  // Process uploaded file
+};
+```
+
+**Why:** Common requirement for modern web apps.
+
+### 📋 Session Management
+
+**Status:** Planned  
+**Priority:** Medium
+
+Built-in session support:
+- Cookie-based sessions
+- Session storage (memory, Redis, database)
+- Session middleware
+- Flash messages
+
+**Example:**
+```typescript
+// Planned API
+const loginController: ControllerType = (request, reply) => {
+  request.session.userId = user.id;
+  request.session.save();
+};
+```
+
+**Why:** Essential for authentication and stateful apps.
+
+### 📋 Cookie Handling
+
+**Status:** Planned  
+**Priority:** Medium
+
+Improved cookie support:
+- Parse cookies automatically
+- Set secure cookies
+- Cookie signing
+- SameSite configuration
+
+**Example:**
+```typescript
+// Planned API
+reply.setCookie('theme', 'dark', {
+  httpOnly: true,
+  secure: true,
+  maxAge: 86400,
+});
+```
+
+## Medium Term (3-6 Months)
+
+Features planned for upcoming major releases.
+
+### Authentication System
+
+**Status:** Research Phase  
+**Priority:** High
+
+Built-in authentication:
+- Local authentication (username/password)
+- JWT token support
+- OAuth integration (Google, GitHub, etc.)
+- Password hashing
+- Token refresh
+- Role-based access control
+
+**Goal:** Make authentication as simple as Django's auth system.
+
+### Authorization & Permissions
+
+**Status:** Research Phase  
+**Priority:** High
+
+Permission system:
+- Role-based permissions
+- Resource-based permissions
+- Permission decorators
+- Policy-based authorization
+
+**Example:**
+```typescript
+// Planned API
+@RequireAuth()
+@RequirePermission('posts:write')
+const createPost: ControllerType = async (request, reply) => {
+  // Only authenticated users with posts:write permission
+};
+```
+
+### Built-in Testing Utilities
+
+**Status:** Planned  
+**Priority:** High
+
+Testing helpers:
+- Test database setup/teardown
+- Request/response mocking
+- Factory functions for models
+- Integration test helpers
+
+**Example:**
+```typescript
+// Planned API
+import { createTestApp } from 'structure-ts/testing';
+
+const app = await createTestApp();
+const response = await app.inject({
+  method: 'GET',
+  url: '/users',
+});
+```
+
+### CLI Improvements
+
+**Status:** Ongoing  
+**Priority:** Medium
+
+Enhanced CLI commands:
+- Interactive project setup
+- Code generation (controllers, services)
+- Database seeding
+- Environment management
+- Deployment helpers
+
+**Example:**
+```bash
+# Planned commands
+st generate controller users
+st generate model User
+st db:seed
+st deploy
+```
+
+### WebSocket Support
+
+**Status:** Research Phase  
+**Priority:** Medium
+
+Real-time communication:
+- WebSocket connections
+- Room/namespace support
+- Broadcasting
+- Connection management
+
+**Example:**
+```typescript
+// Planned API
+const { socket } = WebSocket();
+
+socket.on('connection', (client) => {
+  client.on('message', (data) => {
+    socket.broadcast(data);
+  });
+});
+```
+
+### API Documentation Generator
+
+**Status:** Planned  
+**Priority:** Medium
+
+Automatic API docs:
+- Generate OpenAPI/Swagger specs
+- Interactive documentation
+- Code examples
+- Response schemas
+
+**Example:**
+```bash
+# Planned command
+st docs:generate
+```
+
+### Performance Optimization
+
+**Status:** Ongoing  
+**Priority:** High
+
+Continuous improvements:
+- Faster startup time
+- Optimized route matching
+- Query optimization hints
+- Caching layer
+- Compression support
+
+## Long Term (6+ Months)
+
+Ambitious features for future major versions.
+
+### Admin Panel
+
+**Status:** Concept Phase  
+**Priority:** High
+
+Django-style admin interface:
+- Auto-generated CRUD interfaces
+- Model management
+- User management
+- Customizable dashboards
+- File manager
+
+**Goal:** Provide a ready-to-use admin panel out of the box.
+
+### GraphQL Support
+
+**Status:** Research Phase  
+**Priority:** Medium
+
+GraphQL integration:
+- Schema generation from models
+- Resolver helpers
+- Subscription support
+- GraphQL playground
+
+**Why:** Modern API alternative to REST.
+
+### Built-in Caching Layer
+
+**Status:** Planned  
+**Priority:** Medium
+
+Caching system:
+- Route-level caching
+- Database query caching
+- Cache invalidation
+- Multiple backends (memory, Redis)
+
+**Example:**
+```typescript
+// Planned API
+route.get('/posts', listPosts, {
+  cache: {
+    ttl: 3600,
+    key: 'posts-list',
+  },
+});
+```
+
+### Task Queue / Background Jobs
+
+**Status:** Research Phase  
+**Priority:** Medium
+
+Background processing:
+- Job queues
+- Scheduled tasks (cron-like)
+- Worker processes
+- Job retry logic
+- Job monitoring
+
+**Example:**
+```typescript
+// Planned API
+queue.add('send-email', {
+  to: 'user@example.com',
+  subject: 'Welcome!',
+});
+```
+
+### Multi-Database Support
+
+**Status:** Concept Phase  
+**Priority:** Low
+
+Multiple database connections:
+- Read/write splitting
+- Multi-tenant databases
+- Cross-database queries
+- Connection pooling per database
+
+### Plugin System
+
+**Status:** Concept Phase  
+**Priority:** Medium
+
+Official plugin architecture:
+- Official plugins
+- Community plugins
+- Plugin hooks
+- Plugin configuration
+
+**Examples:**
+- structure-ts-auth (authentication)
+- structure-ts-admin (admin panel)
+- structure-ts-analytics (analytics)
+- structure-ts-search (full-text search)
+
+### Deployment Tools
+
+**Status:** Planned  
+**Priority:** Medium
+
+Easy deployment:
+- Docker integration
+- One-command deploy to platforms
+- Environment management
+- Health checks
+- Monitoring integration
+
+**Example:**
+```bash
+# Planned commands
+st deploy railway
+st deploy heroku
+st deploy vercel
+```
+
+## Ecosystem Growth
+
+Beyond the core framework:
+
+### Starter Templates
+
+**Status:** Planned
+
+Pre-built templates:
+- Blog template
+- E-commerce template
+- SaaS starter
+- API-only template
+- Fullstack template
+
+### Integration Guides
+
+**Status:** Ongoing
+
+Guides for integrating:
+- Frontend frameworks (React, Vue, etc.)
+- Payment gateways (Stripe, PayPal)
+- Email services (SendGrid, Mailgun)
+- Cloud storage (AWS S3, Cloudflare R2)
+- Analytics (Google Analytics, Plausible)
+
+### Video Tutorials
+
+**Status:** Planned
+
+Video content:
+- Getting started series
+- Building real projects
+- Advanced techniques
+- Best practices
+
+### Community Resources
+
+**Status:** Growing
+
+Foster community:
+- Discord server (planned)
+- Monthly office hours (planned)
+- Community showcase
+- Blog posts and articles
+
+## Feature Requests
+
+Your input shapes our roadmap!
+
+### How to Request Features
+
+1. **Search existing requests**: Check [GitHub Issues](https://github.com/rahulroy0322/structure-ts/issues) first
+2. **Open a discussion**: Share your idea in [Discussions](https://github.com/rahulroy0322/structure-ts/discussions)
+3. **Explain your use case**: Why do you need this feature?
+4. **Suggest implementation**: How would you like it to work?
+
+### What Gets Prioritized
+
+Features are prioritized based on:
+- **Demand**: How many people want it?
+- **Impact**: Does it solve a major pain point?
+- **Simplicity**: Does it fit our philosophy?
+- **Feasibility**: Can we implement it well?
+
+### Feature Voting
+
+Community voting helps us prioritize:
+- 👍 reactions on GitHub issues indicate demand
+- Popular requests move up the roadmap
+- Clear use cases help justify features
+
+## Breaking Changes Policy
+
+We take backward compatibility seriously:
+
+### Version Numbering
+
+We follow semantic versioning:
+- **Major** (v1.0.0 → v2.0.0): Breaking changes allowed
+- **Minor** (v1.0.0 → v1.1.0): New features, no breaking changes
+- **Patch** (v1.0.0 → v1.0.1): Bug fixes only
+
+### Deprecation Process
+
+Before removing features:
+1. **Announce deprecation**: Warning in docs and release notes
+2. **Deprecation period**: At least one major version
+3. **Migration guide**: Clear instructions for updating
+4. **Removal**: Only in next major version
+
+### Migration Guides
+
+For breaking changes:
+- Step-by-step migration instructions
+- Code examples (before/after)
+- Automated migration tools when possible
+- Community support during transition
+
+## Release Schedule
+
+**Patch Releases**: As needed (bug fixes)  
+**Minor Releases**: Monthly (new features)  
+**Major Releases**: Quarterly (breaking changes)
+
+**Note:** Schedule is flexible based on feature readiness and stability.
+
+## How You Can Help
+
+Want to influence the future of structure-ts?
+
+### 1. Use It and Share Feedback
+
+- Build projects with structure-ts
+- Report bugs and pain points
+- Share what works well
+
+### 2. Request Features
+
+- Explain your use cases
+- Vote on existing requests
+- Participate in discussions
+
+### 3. Contribute Code
+
+- Fix bugs
+- Implement features
+- Improve documentation
+- Write tests
+
+See [Contributing](/about/contributing/) for details.
+
+### 4. Spread the Word
+
+- Star the repo ⭐
+- Write blog posts
+- Share on social media
+- Recommend to others
+
+## Stay Updated
+
+Follow development:
+- **GitHub**: Watch the repository
+- **Releases**: Check release notes
+- **Discussions**: Join conversations
+- **This Page**: Roadmap updates regularly
+
+## Current Focus
+
+Right now, we're focused on:
+1. Stabilizing dynamic routing
+2. Adding middleware support
+3. Improving documentation
+4. Growing the community
+
+Thank you for being part of the structure-ts journey! Your feedback and support help make this framework better for everyone.
+
+*/}
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

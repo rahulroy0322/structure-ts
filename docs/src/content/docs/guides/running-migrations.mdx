@@ -1,0 +1,714 @@
+---
+title: Running Migrations
+description: Learn how to run and manage database migrations
+---
+
+{/* # Running Migrations */}
+
+Once you've created migrations, you need to run them to apply changes to your database. This guide covers everything about executing and managing migrations.
+
+#### Upcomming
+
+{/* ## Understanding Migration Execution
+
+### What Happens When You Run Migrations
+
+1. **Check Migration History**
+   - Reads which migrations have already run
+   - Stored in a `migrations` table in your database
+
+2. **Find Pending Migrations**
+   - Compares created migrations with migration history
+   - Identifies which haven't run yet
+
+3. **Run Pending Migrations**
+   - Executes `up()` method of each pending migration
+   - Runs in timestamp order (oldest first)
+   - Records completion in migration history
+
+4. **Update Database**
+   - Your database schema is now updated
+   - Ready to use with your models
+
+## Basic Migration Commands
+
+### Running All Pending Migrations
+
+```bash
+st migrate
+```
+
+or
+
+```bash
+structure-ts migrate
+```
+
+**What it does:**
+- Runs all migrations that haven't been executed yet
+- Runs them in chronological order
+- Stops if any migration fails
+
+**Example output:**
+```
+Running migrations...
+✓ 1234567890-CreateUsersTable.ts
+✓ 1234567891-CreatePostsTable.ts
+✓ 1234567892-AddEmailIndexToUsers.ts
+
+All migrations completed successfully!
+```
+
+### First Time Running Migrations
+
+When you run migrations for the first time:
+
+```bash
+st migrate
+```
+
+**Output:**
+```
+Creating migration table...
+✓ Migration tracking table created
+
+Running migrations...
+✓ 1234567890-CreateUsersTable.ts
+✓ 1234567891-CreatePostsTable.ts
+
+Migrations completed successfully!
+Total: 2 migrations executed
+```
+
+The framework creates a special table to track which migrations have run.
+
+## Migration Status
+
+### Checking Migration Status
+
+```bash
+st migrate:status
+```
+
+**Shows:**
+- Which migrations have run
+- Which migrations are pending
+- Timestamps of execution
+
+**Example output:**
+```
+Migration Status:
+
+✓ Executed Migrations:
+  1234567890-CreateUsersTable.ts (2024-01-15 10:30:22)
+  1234567891-CreatePostsTable.ts (2024-01-15 10:30:23)
+
+⏳ Pending Migrations:
+  1234567892-AddEmailIndexToUsers.ts
+  1234567893-AddUserProfileFields.ts
+
+Total: 2 executed, 2 pending
+```
+
+### Why Check Status?
+
+- Before running migrations in production
+- To see what will be applied
+- When troubleshooting issues
+- To verify migration history
+
+## Rolling Back Migrations
+
+### Rollback Last Migration
+
+```bash
+st migrate:rollback
+```
+
+**What it does:**
+- Runs the `down()` method of the last migration
+- Reverts the most recent change
+- Removes from migration history
+
+**Example:**
+```
+Rolling back...
+✓ Rolled back: 1234567893-AddUserProfileFields.ts
+
+Rollback completed successfully!
+```
+
+### Rollback Multiple Migrations
+
+```bash
+st migrate:rollback --steps=3
+```
+
+Rolls back the last 3 migrations.
+
+### Rollback to Specific Migration
+
+```bash
+st migrate:rollback --to=1234567890
+```
+
+Rolls back all migrations after timestamp `1234567890`.
+
+### When to Rollback
+
+**Good reasons:**
+- Migration broke something
+- Need to fix migration logic
+- Testing migration behavior
+- Development/staging environments
+
+**⚠️ Caution in Production:**
+- Can cause data loss
+- May break running application
+- Always backup first
+- Have a recovery plan
+
+## Advanced Migration Commands
+
+### Fresh Migration (Danger!)
+
+```bash
+st migrate:fresh
+```
+
+**⚠️ WARNING: This is destructive!**
+
+What it does:
+1. Drops all tables
+2. Runs all migrations from scratch
+3. **Deletes all data!**
+
+**Only use:**
+- In development
+- When testing
+- When you want a clean slate
+
+**Never use in production!**
+
+### Reset Migrations
+
+```bash
+st migrate:reset
+```
+
+Similar to `migrate:fresh` but:
+1. Rolls back all migrations
+2. Clears migration history
+3. Runs all migrations again
+
+### Specific Migration File
+
+Run a specific migration (advanced):
+
+```bash
+st migrate:run --file=1234567890-CreateUsersTable.ts
+```
+
+**Use case:** Running a single migration for testing.
+
+## Migration Workflow Examples
+
+### Example 1: Adding a New Feature
+
+**Scenario:** Add user profiles
+
+```bash
+# 1. Create your model changes
+# Edit src/users/models.ts
+
+# 2. Generate migration
+st create migration AddUserProfiles
+
+# 3. Review the generated migration
+# Check src/users/migrations/...
+
+# 4. Run migration
+st migrate
+
+# 5. Verify it worked
+st migrate:status
+```
+
+**Output:**
+```
+Running migrations...
+✓ 1234567894-AddUserProfiles.ts
+
+Migration completed successfully!
+```
+
+### Example 2: Fixing a Mistake
+
+**Scenario:** Migration has a bug
+
+```bash
+# 1. Rollback the broken migration
+st migrate:rollback
+
+# 2. Fix the migration file
+# Edit src/users/migrations/...
+
+# 3. Run it again
+st migrate
+
+# 4. Verify fix
+st migrate:status
+```
+
+### Example 3: Team Collaboration
+
+**Scenario:** Teammate added migrations
+
+```bash
+# 1. Pull latest code
+git pull
+
+# 2. Check what's new
+st migrate:status
+
+# 3. Run new migrations
+st migrate
+
+# 4. Continue development
+```
+
+## Production Deployment
+
+### Safe Production Migration Process
+
+**Step 1: Backup Database**
+```bash
+# PostgreSQL
+pg_dump myapp_db > backup.sql
+
+# MySQL
+mysqldump myapp_db > backup.sql
+```
+
+**Step 2: Check Migration Status**
+```bash
+st migrate:status
+```
+
+Review what will be applied.
+
+**Step 3: Test in Staging**
+```bash
+# In staging environment
+st migrate
+```
+
+Verify everything works.
+
+**Step 4: Schedule Maintenance (if needed)**
+
+For breaking changes:
+- Notify users
+- Put site in maintenance mode
+- Prepare rollback plan
+
+**Step 5: Run Production Migrations**
+```bash
+# In production environment
+st migrate
+```
+
+**Step 6: Verify Application**
+- Check application starts
+- Test critical features
+- Monitor for errors
+
+**Step 7: Keep Backup**
+
+Don't delete backup until confident migrations succeeded.
+
+### Zero-Downtime Migrations
+
+For large production systems:
+
+**Phase 1: Additive Changes**
+```typescript
+// Migration 1: Add new column (nullable)
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.addColumn(
+    'users',
+    new TableColumn({
+      name: 'new_field',
+      type: 'varchar',
+      isNullable: true,  // Important!
+    })
+  );
+}
+```
+
+**Phase 2: Update Application**
+- Deploy new code that uses new column
+- Old code still works (column is nullable)
+
+**Phase 3: Data Migration**
+```typescript
+// Migration 2: Populate new column
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.query(
+    'UPDATE users SET new_field = old_field'
+  );
+}
+```
+
+**Phase 4: Make Required**
+```typescript
+// Migration 3: Make column non-nullable
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.changeColumn(
+    'users',
+    'new_field',
+    new TableColumn({
+      name: 'new_field',
+      type: 'varchar',
+      isNullable: false,
+    })
+  );
+}
+```
+
+**Phase 5: Remove Old Column**
+```typescript
+// Migration 4: Drop old column
+public async up(queryRunner: QueryRunner): Promise<void> {
+  await queryRunner.dropColumn('users', 'old_field');
+}
+```
+
+## Troubleshooting
+
+### "Migration Already Executed"
+
+**Cause:** Trying to run migration that already ran
+
+**Solution:**
+```bash
+# Check status
+st migrate:status
+
+# If showing as executed, it's already done
+# If you need to run it again:
+st migrate:rollback
+st migrate
+```
+
+### "Table Already Exists"
+
+**Cause:** Migration tries to create existing table
+
+**Solutions:**
+
+**Option 1: Drop table manually**
+```sql
+DROP TABLE IF EXISTS users;
+```
+
+**Option 2: Skip migration**
+```bash
+# Mark as executed without running
+st migrate:mark-executed --file=1234567890-CreateUsersTable.ts
+```
+
+**Option 3: Fresh start (development only)**
+```bash
+st migrate:fresh
+```
+
+### "Migration Failed"
+
+**Cause:** Error in migration code
+
+**What happens:**
+- Migration stops
+- Database might be in inconsistent state
+- Marked as failed
+
+**Solution:**
+```bash
+# 1. Check error message
+st migrate  # Read the error
+
+# 2. Fix the migration file
+# Edit the problematic migration
+
+# 3. If needed, manually fix database
+# Use database client to fix issues
+
+# 4. Retry migration
+st migrate
+```
+
+### "Column Does Not Exist" After Migration
+
+**Cause:** Migration ran but application code doesn't match
+
+**Solution:**
+```bash
+# 1. Verify migration ran
+st migrate:status
+
+# 2. Check model matches migration
+# Compare model fields with migration columns
+
+# 3. Restart application
+npm run dev
+```
+
+### Rollback Failed
+
+**Cause:** `down()` method has errors
+
+**Solutions:**
+
+**Option 1: Fix down() method**
+```typescript
+// Fix the down() implementation
+public async down(queryRunner: QueryRunner): Promise<void> {
+  // Correct the rollback logic
+}
+```
+
+**Option 2: Manual rollback**
+```sql
+-- Manually undo migration changes
+DROP TABLE IF EXISTS users;
+```
+
+**Option 3: Mark as rolled back**
+```bash
+st migrate:mark-reverted --file=1234567890-CreateUsersTable.ts
+```
+
+### Migrations Out of Sync
+
+**Scenario:** Different environments have different migrations
+
+**Solution:**
+```bash
+# 1. Check status in each environment
+st migrate:status
+
+# 2. Identify differences
+# Compare migration files and history
+
+# 3. Sync migration files
+# Ensure all environments have same migration files
+
+# 4. Run migrations
+st migrate
+```
+
+## Best Practices
+
+### 1. Always Check Status First
+
+```bash
+# Before running migrations
+st migrate:status
+
+# Then run
+st migrate
+```
+
+### 2. Test Rollbacks in Development
+
+```bash
+# Run migration
+st migrate
+
+# Test rollback
+st migrate:rollback
+
+# Run again
+st migrate
+```
+
+Ensures `down()` works correctly.
+
+### 3. Backup Before Production Migrations
+
+```bash
+# Create backup
+pg_dump myapp_db > backup_$(date +%Y%m%d).sql
+
+# Then migrate
+st migrate
+```
+
+### 4. Run Migrations During Maintenance Windows
+
+For breaking changes, schedule downtime:
+- Late night/early morning
+- Low traffic periods
+- Communicate with users
+
+### 5. Keep Migration History in Version Control
+
+```bash
+git add src/users/migrations/
+git commit -m "Add user profile migrations"
+git push
+```
+
+Everyone on team gets the same migrations.
+
+### 6. Never Modify Executed Migrations
+
+```typescript
+// ❌ Don't change this after it's run in production
+export class CreateUsersTable1234567890 {
+  // ...
+}
+
+// ✅ Create a new migration instead
+export class UpdateUsersTable1234567895 {
+  // ...
+}
+```
+
+### 7. Log Migration Output
+
+```bash
+# Save migration logs
+st migrate 2>&1 | tee migration.log
+
+# Review later if issues
+cat migration.log
+```
+
+### 8. Automate in CI/CD
+
+```yaml
+# .github/workflows/deploy.yml
+- name: Run migrations
+  run: |
+    npm run migrate
+```
+
+Ensures migrations run automatically on deployment.
+
+## Migration History Table
+
+structure-ts tracks migrations in a table:
+
+```sql
+-- migrations table structure
+CREATE TABLE migrations (
+  id INT PRIMARY KEY,
+  timestamp BIGINT,
+  name VARCHAR(255),
+  executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Don't modify this table manually!** Let the framework manage it.
+
+### Viewing Migration History
+
+```sql
+-- PostgreSQL/MySQL
+SELECT * FROM migrations ORDER BY timestamp;
+```
+
+**Output:**
+```
+id | timestamp   | name                      | executed_at
+---+-------------+---------------------------+---------------------
+1  | 1234567890  | CreateUsersTable          | 2024-01-15 10:30:22
+2  | 1234567891  | CreatePostsTable          | 2024-01-15 10:30:23
+3  | 1234567892  | AddEmailIndexToUsers      | 2024-01-16 09:15:10
+```
+
+## Environment-Specific Migrations
+
+### Different Migrations per Environment
+
+Usually **not recommended**, but sometimes necessary:
+
+```typescript
+// src/settings.ts
+const MIGRATION_DIR = process.env.NODE_ENV === 'production'
+  ? './migrations/production'
+  : './migrations/development';
+```
+
+**Better approach:** Use the same migrations everywhere.
+
+### Seeding Data (Development)
+
+```bash
+# Run migrations
+st migrate
+
+# Seed development data
+st db:seed
+```
+
+Keeps real migrations separate from test data.
+
+## Monitoring Migrations
+
+### Add Logging
+
+```typescript
+export class CreateUsersTable1234567890 implements MigrationInterface {
+  
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    console.log('Creating users table...');
+    
+    await queryRunner.createTable(/* ... *);
+    
+    console.log('Users table created successfully!');
+  }
+  
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    console.log('Dropping users table...');
+    
+    await queryRunner.dropTable('users');
+    
+    console.log('Users table dropped!');
+  }
+}
+```
+
+### Track Migration Time
+
+```bash
+# Time how long migrations take
+time st migrate
+```
+
+**Output:**
+```
+Running migrations...
+✓ 1234567890-CreateUsersTable.ts
+
+Migrations completed!
+
+real    0m2.341s
+user    0m0.234s
+sys     0m0.089s
+```
+
+## Next Steps
+
+Now that you can run migrations:
+
+- **[Models](/guides/models/)** - Use your migrated database schema
+- **[Controllers](/guides/controllers/)** - Build features with your database
+- **[Database Setup](/guides/database-setup/)** - Configure advanced database options */}
+
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

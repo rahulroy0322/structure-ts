@@ -1,0 +1,865 @@
+---
+title: Settings Configuration
+description: Complete guide to configuring your Structure-Ts application
+---
+
+{/* # Settings Configuration */}
+
+The `src/settings.ts` file is the central configuration hub for your Structure-Ts application. This guide explains every configuration option in simple, easy-to-understand language.
+
+## Overview
+
+Your settings file controls:
+- Which port your server runs on
+- Which apps are loaded
+- How to connect to databases
+- Where templates are stored
+
+Here's what a typical settings file looks like:
+
+```typescript
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const PORT = 2000;
+const APPS = ['users', 'blog'];
+const DATABASE: DatabaseType = false;
+const TEMPLATE_DIR = 'templates';
+
+export default {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+```
+
+Let's break down each setting in detail.
+
+## PORT - Server Port
+
+### What It Does
+
+The `PORT` setting determines which port number your server listens on.
+
+```typescript
+const PORT = 2000;
+```
+
+### Understanding Ports
+
+Think of ports as doors to your server:
+- Port 80: Standard HTTP (web browsers)
+- Port 443: Standard HTTPS (secure web)
+- Port 3000: Common for Node.js development
+- Port 2000: Structure-Ts default
+
+**Your server URL becomes:** `http://localhost:PORT`
+
+### Common Values
+
+```typescript
+const PORT = 2000;  // Default - good for development
+const PORT = 3000;  // Popular alternative
+const PORT = 8080;  // Common for APIs
+const PORT = 4000;  // Any available port works
+```
+
+### Using Environment Variables
+
+For production, use environment variables:
+
+```typescript
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 2000;
+```
+
+**Why?** Production servers (Heroku, Railway, etc.) assign ports dynamically.
+
+### Example: Dynamic Port Configuration
+
+```typescript
+// Development: Use 2000
+// Production: Use whatever the hosting platform provides
+const PORT = process.env.ENV === 'prod'
+  ? parseInt(process.env.PORT || '8080')
+  : 2000;
+```
+
+### Troubleshooting
+
+**"Port already in use" error?**
+
+Change to a different port:
+```typescript
+const PORT = 3000;  // Try different numbers until one works
+```
+
+Or find and stop the process using that port:
+```bash
+# On macOS/Linux
+lsof -ti:2000 | xargs kill -9
+
+# On Windows
+netstat -ano | findstr :2000
+taskkill /PID <process_id> /F
+```
+
+## APPS - Installed Applications
+
+### What It Does
+
+The `APPS` array lists all the apps your application should load.
+
+```typescript
+const APPS = ['users', 'blog', 'api'];
+```
+
+### How It Works
+
+When your server starts:
+1. Structure-Ts reads this array
+2. Finds each app directory in `src/`
+3. Imports `routes.ts` from each app
+4. Registers all routes automatically
+
+**No manual route configuration needed!**
+
+### Empty Apps (Default)
+
+```typescript
+const APPS = [];  // No apps loaded
+```
+
+Use this when you first create a project. Add apps as you build them.
+
+### Single App
+
+```typescript
+const APPS = ['users'];  // Only users app is loaded
+```
+
+### Multiple Apps
+
+```typescript
+const APPS = [
+  'users',
+  'blog',
+  'api',
+  'admin',
+];
+```
+
+**Order matters!** Apps are loaded in this order. If two apps define the same route, the first one wins.
+
+### Example: Adding a New App
+
+1. Create the app:
+   ```bash
+   st create app payments
+   ```
+
+2. Add to settings:
+   ```typescript
+   const APPS = [
+     'users',
+     'blog',
+     'payments',  // New app added
+   ];
+   ```
+
+3. Restart your server—routes are now active!
+
+### Best Practices
+
+**Keep it organized:**
+```typescript
+const APPS = [
+  // Core functionality
+  'users',
+  'auth',
+  
+  // Features
+  'blog',
+  'shop',
+  
+  // Admin
+  'admin',
+];
+```
+
+**Start small, grow as needed:**
+```typescript
+// Small project
+const APPS = ['api'];
+
+// As it grows
+const APPS = ['users', 'blog', 'api'];
+
+// Larger project
+const APPS = ['users', 'blog', 'api', 'admin', 'notifications'];
+```
+{/* 
+## DATABASE - Database Configuration
+
+### What It Does
+
+The `DATABASE` setting configures your database connection. It can be:
+- `false` to disable database entirely
+- An object with connection details
+
+### Disabling Database
+
+```typescript
+const DATABASE: DatabaseType = false;
+```
+
+**When to use:**
+- API-only applications
+- Static site generators
+- Apps that use external services
+- When you don't need data persistence
+
+**Benefits:** Faster startup, no ORM overhead.
+
+### Basic Database Configuration
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'myuser',
+  password: 'mypassword',
+  database: 'mydb',
+};
+```
+
+### Configuration Properties Explained
+
+Let's break down each property:
+
+**`type`** - Database Type
+
+Which database system you're using:
+
+```typescript
+type: 'postgres'    // PostgreSQL
+type: 'mysql'       // MySQL
+type: 'sqlite'      // SQLite
+type: 'mongodb'     // MongoDB
+type: 'mariadb'     // MariaDB
+```
+
+**`host`** - Database Server Location
+
+Where your database is running:
+
+```typescript
+host: 'localhost'           // Your computer (development)
+host: '192.168.1.100'       // Another computer on network
+host: 'db.example.com'      // Remote server
+host: 'my-db.aws.com'       // Cloud database
+```
+
+**`port`** - Database Port
+
+Which port to connect through:
+
+```typescript
+port: 5432    // PostgreSQL default
+port: 3306    // MySQL/MariaDB default
+port: 27017   // MongoDB default
+```
+
+**`username`** - Database User
+
+The account name to log in with:
+
+```typescript
+username: 'postgres'     // PostgreSQL default user
+username: 'root'         // MySQL default user
+username: 'myapp_user'   // Custom user
+```
+
+**`password`** - Database Password
+
+The password for your database user:
+
+```typescript
+password: 'mypassword'
+password: ''              // Empty password (dev only!)
+password: process.env.DB_PASSWORD  // From environment (best)
+```
+
+**⚠️ Security Warning:** Never commit passwords to version control!
+
+**`database`** - Database Name
+
+Which database to use:
+
+```typescript
+database: 'myapp'
+database: 'myapp_development'
+database: 'myapp_production'
+```
+
+### Database Examples */}
+{/* 
+#### SQLite (Easiest for Beginners)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'sqlite',
+  database: 'database.sqlite',  // File name
+};
+```
+
+**Pros:**
+- No server setup needed
+- Just a file on your computer
+- Perfect for development
+
+**Cons:**
+- Not suitable for large production apps
+- Limited concurrent users
+
+**When to use:** Development, small projects, prototypes
+
+#### PostgreSQL (Recommended for Production)
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'postgres',
+  password: 'your_password',
+  database: 'structure_app',
+};
+```
+
+**Pros:**
+- Powerful and reliable
+- Great for production
+- Excellent community support
+
+**Cons:**
+- Requires server setup
+- More complex than SQLite
+
+**When to use:** Production apps, complex queries, large datasets
+
+#### MySQL
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mysql',
+  host: 'localhost',
+  port: 3306,
+  username: 'root',
+  password: 'your_password',
+  database: 'structure_app',
+};
+```
+
+**Similar to PostgreSQL** but some syntax differences.
+
+#### MongoDB
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'mongodb',
+  host: 'localhost',
+  port: 27017,
+  database: 'structure_app',
+};
+```
+
+**NoSQL database** - stores documents instead of rows.
+
+### Using Environment Variables (Recommended)
+
+**Never hardcode sensitive data!** Use environment variables:
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  username: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'structure_app',
+};
+```
+
+**Create a `.env` file:**
+
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=myapp_user
+DB_PASSWORD=super_secret_password
+DB_NAME=myapp_production
+```
+
+**Add `.env` to `.gitignore`:**
+
+```gitignore
+.env
+.env.local
+.env.production
+```
+
+### Environment-Specific Configuration
+
+```typescript
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+const DATABASE: DatabaseType = isDevelopment
+  ? {
+      // Development: Use SQLite
+      type: 'sqlite',
+      database: 'dev.sqlite',
+    }
+  : {
+      // Production: Use PostgreSQL
+      type: 'postgres',
+      host: process.env.DB_HOST || '',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      username: process.env.DB_USER || '',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || '',
+    };
+```
+
+### Advanced Options
+
+```typescript
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'postgres',
+  password: 'password',
+  database: 'myapp',
+  
+  // Advanced options
+  synchronize: false,        // Don't auto-sync schema (use migrations!)
+  logging: true,             // Log SQL queries
+  ssl: true,                 // Use SSL connection
+  extra: {
+    max: 10,                 // Max connections in pool
+    min: 2,                  // Min connections in pool
+  },
+};
+```
+
+**Important:** Set `synchronize: false` in production! Use migrations instead. */}
+
+{/* ### Troubleshooting Database Connection
+
+**"Connection refused" error:**
+- Check database server is running
+- Verify host and port are correct
+- Check firewall isn't blocking connection
+
+**"Authentication failed" error:**
+- Verify username and password
+- Check user has permission to access database
+- Ensure password doesn't have special characters needing escaping
+
+**"Database does not exist" error:**
+- Create the database manually first:
+  ```sql
+  CREATE DATABASE myapp;
+  ``` */}
+
+## TEMPLATE_DIR - Template Directory
+
+### What It Does
+
+Specifies where your EJS template files are stored.
+
+```typescript
+const TEMPLATE_DIR = 'templates';
+```
+
+### Understanding the Path
+
+The path is relative to your project root:
+
+```typescript
+const TEMPLATE_DIR = 'templates';
+
+// Results in:
+my-project/
+├── templates/        ← Templates go here
+│   ├── home.ejs
+│   └── about.ejs
+├── src/
+└── package.json
+```
+
+### Default Configuration
+
+```typescript
+const TEMPLATE_DIR = 'templates';
+```
+
+This is the default and works for most projects.
+
+### Custom Locations
+
+You can change where templates are stored:
+
+```typescript
+const TEMPLATE_DIR = 'views';  // Common alternative
+
+my-project/
+├── views/            ← Templates here now
+└── src/
+```
+
+```typescript
+const TEMPLATE_DIR = 'src/templates';  // Inside src
+
+my-project/
+└── src/
+    ├── templates/    ← Templates here
+    └── settings.ts
+```
+
+### Nested Structure Example
+
+```typescript
+const TEMPLATE_DIR = 'templates';
+
+// Organize templates in subdirectories:
+templates/
+├── layouts/
+│   └── base.ejs
+├── partials/
+│   ├── header.ejs
+│   └── footer.ejs
+└── pages/
+    ├── home.ejs
+    ├── about.ejs
+    └── contact.ejs
+```
+
+### When to Change It
+
+**Keep default** (`'templates'`) unless:
+- Your team prefers `views` (common in Express)
+- You want templates inside `src` directory
+- You have a specific directory structure requirement
+
+### Using Templates
+
+Once configured, render templates in controllers:
+
+```typescript
+import { render } from 'structure-ts';
+
+const homeController: ControllerType = (request, reply) => {
+  render(reply, 'pages/home', {
+    title: 'Home Page',
+    user: { name: 'Alice' },
+  });
+};
+```
+
+**Note:** Path is relative to `TEMPLATE_DIR`:
+- `TEMPLATE_DIR = 'templates'`
+- Template at: `templates/pages/home.ejs`
+- Use: `'pages/home'`
+
+### If You Don't Use Templates
+
+If you're building a pure API without HTML pages:
+
+```typescript
+const TEMPLATE_DIR = 'templates';  // Keep it, even if unused
+```
+
+It won't hurt to leave it—just don't create template files.
+
+## Complete Configuration Examples
+
+### Example 1: Simple API (No Database, No Templates)
+
+```typescript
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const PORT = 3000;
+const APPS = ['api'];
+const DATABASE: DatabaseType = false;
+const TEMPLATE_DIR = 'templates';
+
+export default {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+```
+
+### Example 2: Full-Stack App with PostgreSQL
+
+#### Upcomming
+
+{/* ```typescript
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 2000;
+
+const APPS = [
+  'users',
+  'blog',
+  'admin',
+];
+
+const DATABASE: DatabaseType = {
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  username: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'myapp_db',
+};
+
+const TEMPLATE_DIR = 'templates';
+
+export default {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+``` */}
+
+### Example 3: Development vs Production
+
+#### Upcomming
+
+{/* 
+```typescript
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const PORT = isProduction 
+  ? parseInt(process.env.PORT || '8080')
+  : 2000;
+
+const APPS = [
+  'users',
+  'blog',
+  'api',
+];
+
+const DATABASE: DatabaseType = isProduction
+  ? {
+      type: 'postgres',
+      host: process.env.DB_HOST || '',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      username: process.env.DB_USER || '',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || '',
+      ssl: true,  // Production uses SSL
+    }
+  : {
+      type: 'sqlite',
+      database: 'development.sqlite',  // Development uses SQLite
+    };
+
+const TEMPLATE_DIR = 'templates';
+
+export default {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+``` */}
+{/* 
+### Example 4: Multiple Environments
+
+```typescript
+import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const environment = process.env.NODE_ENV || 'development';
+
+// Port configuration
+const portConfig = {
+  development: 2000,
+  staging: 3000,
+  production: parseInt(process.env.PORT || '8080'),
+};
+
+const PORT = portConfig[environment as keyof typeof portConfig];
+
+// Apps (same across environments)
+const APPS = ['users', 'blog', 'api'];
+
+// Database configuration per environment
+const databaseConfig = {
+  development: {
+    type: 'sqlite' as const,
+    database: 'dev.sqlite',
+  },
+  staging: {
+    type: 'postgres' as const,
+    host: 'staging-db.example.com',
+    port: 5432,
+    username: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
+    database: 'myapp_staging',
+  },
+  production: {
+    type: 'postgres' as const,
+    host: process.env.DB_HOST || '',
+    port: 5432,
+    username: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
+    database: 'myapp_production',
+    ssl: true,
+  },
+};
+
+const DATABASE: DatabaseType = 
+  databaseConfig[environment as keyof typeof databaseConfig];
+
+const TEMPLATE_DIR = 'templates';
+
+export default {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+``` */}
+
+## Best Practices
+
+### 1. Use Environment Variables for Secrets
+
+❌ **Don't do this:**
+```typescript
+password: 'my_secret_password',  // NEVER commit passwords!
+```
+
+✅ **Do this:**
+```typescript
+password: process.env.DB_PASSWORD || '',
+```
+
+### 2. Set Defaults for Development
+#### Upcomming
+{/* 
+Make development easy with sensible defaults:
+
+```typescript
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 2000;
+const DATABASE: DatabaseType = process.env.DATABASE_URL
+  ? parseConnectionString(process.env.DATABASE_URL)
+  : { type: 'sqlite', database: 'dev.sqlite' };
+``` */}
+
+### 3. Keep Settings Simple
+
+Don't overcomplicate your settings file:
+
+```typescript
+// Good - clear and simple
+const PORT = 2000;
+const APPS = ['users', 'blog'];
+
+// Overkill - too complex
+const PORT = parseInt(
+  process.env.PORT || 
+  process.env.APP_PORT || 
+  process.env.SERVER_PORT || 
+  '2000'
+);
+```
+
+### 4. Document Custom Configuration
+
+Add comments for non-obvious settings:
+
+```typescript
+// Using custom port because 2000 conflicts with another service
+const PORT = 3500;
+
+// Only loading public-facing apps, admin is separate deployment
+const APPS = ['users', 'blog', 'api'];
+```
+
+### 5. Validate Configuration
+#### Upcomming
+{/* Add validation for production:
+
+```typescript
+if (process.env.NODE_ENV === 'production') {
+  if (!process.env.DB_PASSWORD) {
+    throw new Error('DB_PASSWORD must be set in production!');
+  }
+  if (!process.env.DB_HOST) {
+    throw new Error('DB_HOST must be set in production!');
+  }
+}
+``` */}
+
+## Testing Your Configuration
+
+### Check Current Settings
+
+Add a debug script to see your configuration:
+
+```typescript
+// src/settings.ts
+const settings = {
+  PORT,
+  APPS,
+  DATABASE,
+  TEMPLATE_DIR,
+} satisfies SettingsType;
+
+// In development, log settings
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Current settings:', settings);
+}
+
+export default settings;
+```
+
+### Verify Database Connection
+
+Test your database configuration:
+
+```bash
+pnpm dev # or npm run dev
+```
+
+Look for:
+```
+database connected successfully
+server running on port : 200
+```
+
+If you see connection errors, review your database settings.
+
+## Next Steps
+
+Now that you understand configuration:
+
+- **[Routing](/guides/routing/)** - Define URL patterns
+- **[Controllers](/guides/controllers/)** - Handle requests
+- **[Database Setup](/guides/database-setup/)** - Detailed database guide
+- **[Models](/guides/models/)** - Create database models
+
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

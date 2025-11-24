@@ -1,0 +1,409 @@
+---
+title: About the Project
+description: Learn about structure-ts history, philosophy, and goals
+---
+
+{/* # About the Project */}
+
+structure-ts is a TypeScript web framework that brings Django's elegant architecture to the modern JavaScript ecosystem. This page tells the story of why and how it was built.
+## Upcoming
+{/* ## The Story Behind structure-ts 
+
+### The Problem
+
+As developers, we've all been there: starting a new Node.js project and facing the same questions:
+- How should I organize my code?
+- Where do routes go?
+- How do I structure my database?
+- What patterns should I follow?
+
+**Express and Fastify** give you freedom but no structure. Every project becomes a blank canvas, and that freedom turns into decision fatigue. Teams end up with inconsistent codebases where everyone does things differently.
+
+**NestJS** provides structure but brings heavy complexity. Decorators everywhere, dependency injection containers, Angular-like patterns—it's powerful but overwhelming, especially for small to medium projects.
+
+There was a gap: **a framework with Django's elegance but TypeScript's type safety**.
+
+### The Inspiration
+
+Django got it right 18 years ago:
+- **App-based architecture** keeps code organized
+- **Convention over configuration** eliminates decision fatigue
+- **Batteries included** means common tasks just work
+- **Clear patterns** make code predictable and maintainable
+
+Why not bring these principles to TypeScript?
+
+### The Birth of structure-ts
+
+structure-ts started as a personal project to solve a frustration: "Why can't building TypeScript backends be as pleasant as Django?"
+
+The goals were clear:
+1. **Django's architecture** for code organization
+2. **TypeScript's type safety** for reliability
+3. **Minimal boilerplate** for rapid development
+4. **Easy learning curve** for accessibility
+
+## Project Philosophy
+
+### 1. Convention Over Configuration
+
+You shouldn't configure your framework before building your app.
+
+**Express approach:**
+```typescript
+// Configure everything manually
+app.use(bodyParser.json());
+app.use(cors());
+app.use(helmet());
+// ... 50 more lines of setup
+```
+
+**structure-ts approach:**
+```typescript
+// Just add your apps and go
+const APPS = ['users', 'blog'];
+```
+
+Sensible defaults work for 90% of use cases. Override only what you need.
+
+### 2. App-Based Architecture
+
+Large codebases are easier to manage when divided into focused modules.
+
+```
+users/      → Everything user-related
+blog/       → Everything blog-related
+api/        → Everything API-related
+```
+
+Each app is self-contained, reusable, and testable. This pattern scales from small projects to large teams.
+
+### 3. Developer Experience First
+
+Every decision prioritizes developer happiness:
+- **Clear error messages** tell you exactly what went wrong
+- **TypeScript integration** catches bugs at compile-time
+- **Automatic tools** handle repetitive tasks
+- **Minimal magic** keeps behavior predictable
+
+If it's frustrating to use, it needs to change.
+
+### 4. Simplicity Without Sacrificing Power
+
+structure-ts doesn't dumb things down—it removes unnecessary complexity.
+
+You can build:
+- Simple APIs in minutes
+- Complex applications over time
+- Production-ready services
+
+All without fighting the framework.
+
+## What Makes structure-ts Different
+
+### vs Express
+
+**Express:**
+- ✅ Minimal and flexible
+- ❌ No structure or conventions
+- ❌ Every project starts from scratch
+- ❌ No built-in ORM or migrations
+
+**structure-ts:**
+- ✅ Minimal where it matters
+- ✅ Built-in structure and conventions
+- ✅ Start productive immediately
+- ✅ ORM and migrations included
+
+### vs Fastify
+
+**Fastify:**
+- ✅ Fast performance
+- ❌ No structure
+- ❌ Low-level abstractions
+- ❌ Assembly required
+
+**structure-ts:**
+- ✅ Fast enough for most use cases
+- ✅ High-level abstractions
+- ✅ Batteries included
+- ✅ Ready to use
+
+### vs NestJS
+
+**NestJS:**
+- ✅ Well-structured
+- ✅ Enterprise-ready
+- ❌ Steep learning curve
+- ❌ Heavy with decorators and DI
+- ❌ Overkill for small/medium projects
+
+**structure-ts:**
+- ✅ Well-structured
+- ✅ Gentle learning curve
+- ✅ Lightweight
+- ✅ Right-sized for most projects
+
+### vs Django (Python)
+
+**Django:**
+- ✅ Excellent architecture
+- ✅ Mature ecosystem
+- ❌ Python (not JavaScript)
+- ❌ No static typing (by default)
+
+**structure-ts:**
+- ✅ Django-inspired architecture
+- ✅ TypeScript with static typing
+- ✅ JavaScript ecosystem
+- ⚠️ Younger ecosystem (growing)
+
+## Technology Stack
+
+structure-ts is built on solid foundations:
+
+**Core:**
+- **TypeScript** - Type safety and modern JavaScript
+- **Fastify** (or Express) - HTTP server layer
+- **TypeORM** - Database ORM and migrations
+- **EJS** - Template rendering
+
+**Development:**
+- **Node.js** - Runtime environment
+- **CLI tools** - Project and app generation
+
+**Testing:**
+- **Node.js test runner** - Built-in testing (planned)
+
+## Project Status
+
+**Current Version:** 0.x (Early Development)
+
+**Stability:** 
+- ✅ Core functionality working
+- ✅ Safe for side projects
+- ⚠️ Use with caution in production
+- ⚠️ API may change before 1.0
+
+**Production Readiness:**
+- Core features are stable
+- Some features still in development
+- Breaking changes possible in minor versions (until 1.0)
+- Battle-testing needed
+
+**Roadmap to 1.0:**
+- Complete dynamic routing
+- Add middleware support
+- Comprehensive testing
+- Production deployments
+- Community feedback
+
+## Open Source
+
+structure-ts is **free and open source** under the MIT License.
+
+**What this means:**
+- ✅ Use it for free
+- ✅ Modify it however you want
+- ✅ Use it commercially
+- ✅ No strings attached
+
+**View the code:** [github.com/rahulroy0322/structure-ts](https://github.com/rahulroy0322/structure-ts)
+
+## Community
+
+structure-ts is built by developers, for developers.
+
+**Current Community:**
+- Growing user base
+- Active development
+- Welcoming to contributors
+- Open to feedback
+
+**Ways to Connect:**
+- **GitHub Issues** - Bug reports and feature requests
+- **GitHub Discussions** - Questions and ideas
+- **Discord** (planned) - Real-time chat
+- **Twitter** (if available) - Updates and news
+
+## The Team
+
+### Rahul Roy - Creator & Maintainer
+
+structure-ts is created and maintained by Rahul Roy, with contributions from the community.
+
+**Important note:** Rahul is transparent about being a learner. This project grows with him, shaped by real-world use and community feedback. See [Contributing](/about/contributing/) for the full story.
+
+## Acknowledgments
+
+structure-ts stands on the shoulders of giants:
+
+**Inspired by:**
+- **Django** - For proving that structure and simplicity can coexist
+- **Ruby on Rails** - For convention over configuration
+- **Express** - For showing that simple can be powerful
+
+**Built with:**
+- **TypeScript team** - For bringing types to JavaScript
+- **Fastify team** - For a fast, modern HTTP framework
+- **TypeORM team** - For excellent database tooling
+- **The Node.js community** - For the incredible ecosystem
+
+**Special thanks to:**
+- Early adopters providing feedback
+- Contributors improving the codebase
+- Everyone who stars the repo
+- The open source community
+
+## Support the Project
+
+structure-ts is free and will always be free. Here's how you can help:
+
+### Star on GitHub ⭐
+
+Show your support:
+```
+github.com/rahulroy0322/structure-ts
+```
+
+One click, huge encouragement!
+
+### Use It and Share Feedback
+
+- Build projects with structure-ts
+- Report bugs and issues
+- Request features
+- Share what works (and what doesn't)
+
+### Contribute
+
+- Fix bugs
+- Add features
+- Improve documentation
+- Help other users
+
+See [Contributing](/about/contributing/) for details.
+
+### Spread the Word
+
+- Blog about your experience
+- Share on social media
+- Recommend to colleagues
+- Write tutorials
+
+### Sponsor (Future)
+
+Sponsorship options may be added in the future to support:
+- Full-time development
+- Hosting and infrastructure
+- Community resources
+
+## Project Goals
+
+### Short Term
+
+- ✅ Provide stable core functionality
+- ✅ Build comprehensive documentation
+- 🚧 Complete dynamic routing
+- 🚧 Add middleware support
+- 📋 Reach 1.0 stable release
+
+### Medium Term
+
+- Grow the community
+- Expand the ecosystem
+- Improve developer experience
+- Add enterprise features
+- Establish best practices
+
+### Long Term
+
+- Become a go-to TypeScript framework
+- Build thriving ecosystem
+- Support large-scale applications
+- Maintain simplicity despite growth
+
+## Design Principles
+
+These principles guide every decision:
+
+**1. Developers First**  
+If it's annoying or confusing, fix it. Developer experience matters more than clever code.
+
+**2. Simple by Default, Powerful When Needed**  
+Common cases should be trivial. Complex cases should be possible.
+
+**3. Convention Over Configuration**  
+Smart defaults eliminate decisions. Override only when necessary.
+
+**4. Explicit Over Implicit**  
+Code should be obvious. No magic that surprises developers.
+
+**5. Learn Once, Use Everywhere**  
+Patterns should be consistent across the framework.
+
+## Future Vision
+
+Where is structure-ts heading?
+
+**Technical Vision:**
+- Complete, stable 1.0 release
+- Rich plugin ecosystem
+- Production-proven reliability
+- Performance on par with competitors
+- Comprehensive tooling
+
+**Community Vision:**
+- Thriving community of users
+- Active contributor base
+- Real-world success stories
+- Educational resources
+- Welcoming culture
+
+**Impact Vision:**
+- Reduce time to build web apps
+- Make TypeScript backends more accessible
+- Prove structure and simplicity can coexist
+- Inspire other frameworks
+
+## Get Involved
+
+structure-ts is a community project. Your involvement makes it better.
+
+**Start Here:**
+1. Try building something with structure-ts
+2. Share your experience (good or bad)
+3. Report issues or request features
+4. Help others in discussions
+5. Contribute code or docs
+
+Every contribution matters, no matter how small.
+
+## Stay Updated
+
+Follow the project:
+- **GitHub**: [rahulroy0322/structure-ts](https://github.com/rahulroy0322/structure-ts)
+- **Releases**: Watch for new versions
+- **Discussions**: Join conversations
+- **Roadmap**: Check [Future Plans](/roadmap/future-plans/)
+
+## Contact
+
+Questions, feedback, or just want to say hi?
+
+- **GitHub Issues**: Bug reports and features
+- **GitHub Discussions**: General questions
+- **Email**: (if provided)
+- **Twitter**: (if available)
+
+We'd love to hear from you!
+
+---
+
+Thank you for being interested in structure-ts. Whether you're just exploring or building your next project, we're glad you're here. Let's build something great together! 🚀
+ */}
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

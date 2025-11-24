@@ -1,0 +1,513 @@
+---
+title: Dynamic Routes
+description: Advanced routing with dynamic parameters (Work in Progress)
+---
+
+{/* # Dynamic Routes */}
+
+:::caution[Work in Progress]
+Dynamic routing is currently under active development. The features described on this page are being implemented and may change before the final release. Use with caution in production environments.
+:::
+## Upcoming
+{/* ## Overview
+
+Dynamic routes allow you to capture URL segments as parameters, enabling you to build flexible and scalable routing patterns.
+
+## Current Status
+
+**What's Working:**
+- ✅ Basic parameter capture (`:id`)
+- ✅ Single parameters in routes
+- ✅ Accessing parameters in controllers
+
+**Under Development:**
+- 🚧 Multiple parameters in single route
+- 🚧 Optional parameters
+- 🚧 Wildcard routes
+- 🚧 Regular expression constraints
+- 🚧 Parameter validation
+
+**Planned Features:**
+- 📋 Named parameters with types
+- 📋 Parameter transformation
+- 📋 Nested dynamic routes
+- 📋 Query parameter handling improvements
+
+## Basic Dynamic Parameters
+
+### Single Parameter
+
+**Route definition:**
+```typescript
+// src/users/routes.ts
+import { Router } from 'structure-ts';
+import { getUser } from './controllers';
+
+const { routes, route } = Router();
+
+route.get('/:id', getUser);
+
+export default routes;
+```
+
+**Controller:**
+```typescript
+// src/users/controllers.ts
+import { type ControllerType, ok, notFound } from 'structure-ts';
+
+const getUser: ControllerType = (request, reply) => {
+  const { id } = request.params;
+  
+  // Convert to number
+  const userId = parseInt(id);
+  
+  // Fetch user (mock example)
+  const user = users.find(u => u.id === userId);
+  
+  if (!user) {
+    return reply.status(notFound()).json({
+      success: false,
+      error: 'User not found',
+    });
+  }
+  
+  reply.status(ok()).json({
+    success: true,
+    data: user,
+  });
+};
+```
+
+**Example URLs:**
+```
+/users/1      → { id: "1" }
+/users/42     → { id: "42" }
+/users/abc    → { id: "abc" }
+```
+
+### String Parameters
+
+```typescript
+route.get('/:slug', getPost);
+```
+
+**Controller:**
+```typescript
+const getPost: ControllerType = (request, reply) => {
+  const { slug } = request.params;
+  
+  // slug examples: "my-first-post", "getting-started", etc.
+  const post = await Post.findOne({ where: { slug } });
+  
+  if (!post) {
+    return reply.status(notFound()).json({
+      success: false,
+      error: 'Post not found',
+    });
+  }
+  
+  reply.status(ok()).json({
+    success: true,
+    data: post,
+  });
+};
+```
+
+## Multiple Parameters (In Development)
+
+:::note[Under Development]
+This feature is currently being implemented. API may change.
+:::
+
+### Nested Resources
+
+```typescript
+// Planned syntax
+route.get('/:userId/posts/:postId', getUserPost);
+```
+
+**Intended usage:**
+```typescript
+const getUserPost: ControllerType = (request, reply) => {
+  const { userId, postId } = request.params;
+  
+  // Find post belonging to specific user
+  const post = await Post.findOne({
+    where: {
+      id: postId,
+      userId: userId,
+    },
+  });
+  
+  reply.status(ok()).json({ data: post });
+};
+```
+
+**Example URLs:**
+```
+/users/1/posts/5      → { userId: "1", postId: "5" }
+/users/42/posts/123   → { userId: "42", postId: "123" }
+```
+
+### Complex Paths
+
+```typescript
+// Planned
+route.get('/blog/:year/:month/:slug', getBlogPost);
+```
+
+**Intended parameters:**
+```typescript
+const getBlogPost: ControllerType = (request, reply) => {
+  const { year, month, slug } = request.params;
+  
+  // /blog/2024/01/my-post
+  // year: "2024", month: "01", slug: "my-post"
+};
+```
+
+## Optional Parameters (Planned)
+
+:::caution[Not Yet Available]
+Optional parameters are planned but not yet implemented.
+:::
+
+**Planned syntax:**
+```typescript
+route.get('/posts/:id?', listOrGetPost);
+```
+
+**Intended behavior:**
+```
+/posts        → List all posts (id is undefined)
+/posts/5      → Get post 5 (id is "5")
+```
+
+## Wildcard Routes (Planned)
+
+:::caution[Not Yet Available]
+Wildcard routes are planned for future releases.
+:::
+
+**Planned syntax:**
+```typescript
+route.get('/files/*', serveFiles);
+```
+
+**Intended behavior:**
+```
+/files/docs/guide.pdf     → Match
+/files/images/logo.png    → Match
+/files/a/b/c/d/e.txt      → Match
+```
+
+## Parameter Validation (Planned)
+
+:::note[Future Feature]
+Parameter validation and constraints are on the roadmap.
+:::
+
+### Type Constraints
+
+**Planned syntax:**
+```typescript
+route.get('/:id(\\d+)', getUser);  // Only digits
+route.get('/:slug([a-z-]+)', getPost);  // Only lowercase and hyphens
+```
+
+### Custom Validation
+
+**Planned syntax:**
+```typescript
+route.get('/:id', getUser, {
+  params: {
+    id: {
+      type: 'number',
+      min: 1,
+      max: 9999,
+    },
+  },
+});
+```
+
+## Current Workarounds
+
+Until full dynamic routing is available, here are some workarounds:
+
+### Manual Validation
+
+```typescript
+const getUser: ControllerType = (request, reply) => {
+  const { id } = request.params;
+  
+  // Validate manually
+  if (!id || isNaN(parseInt(id))) {
+    return reply.status(badRequest()).json({
+      success: false,
+      error: 'Invalid user ID',
+    });
+  }
+  
+  const userId = parseInt(id);
+  
+  if (userId < 1) {
+    return reply.status(badRequest()).json({
+      success: false,
+      error: 'User ID must be positive',
+    });
+  }
+  
+  // Continue with valid ID
+};
+```
+
+### Helper Functions
+
+```typescript
+// src/utils/validators.ts
+export const validateId = (id: string): number | null => {
+  const parsed = parseInt(id);
+  if (isNaN(parsed) || parsed < 1) {
+    return null;
+  }
+  return parsed;
+};
+
+export const validateSlug = (slug: string): boolean => {
+  return /^[a-z0-9-]+$/.test(slug);
+};
+```
+
+**Usage:**
+```typescript
+import { validateId } from '../utils/validators';
+
+const getUser: ControllerType = (request, reply) => {
+  const userId = validateId(request.params.id);
+  
+  if (userId === null) {
+    return reply.status(badRequest()).json({
+      success: false,
+      error: 'Invalid user ID',
+    });
+  }
+  
+  // Use validated userId
+};
+```
+
+## Query Parameters (Current Support)
+
+While dynamic route parameters are in development, query parameters work fully:
+
+```typescript
+const searchUsers: ControllerType = (request, reply) => {
+  const { query, page, limit, sort } = request.query;
+  
+  const pageNum = parseInt(page || '1');
+  const limitNum = parseInt(limit || '10');
+  
+  // Build search
+  const users = await User.find({
+    where: {
+      name: Like(`%${query}%`),
+    },
+    skip: (pageNum - 1) * limitNum,
+    take: limitNum,
+    order: {
+      [sort || 'name']: 'ASC',
+    },
+  });
+  
+  reply.status(ok()).json({ data: users });
+};
+```
+
+**Example URLs:**
+```
+/users/search?query=john
+/users/search?query=john&page=2&limit=20
+/users/search?query=john&sort=email&page=1
+```
+
+## Providing Feedback
+
+We're actively developing dynamic routing features. Your feedback helps us prioritize!
+
+### Report Issues
+
+If you encounter problems with current dynamic routing:
+
+1. **Check existing issues**: [GitHub Issues](https://github.com/rahulroy0322/structure-ts/issues)
+2. **Create new issue** with:
+   - What you're trying to do
+   - Current behavior
+   - Expected behavior
+   - Code examples
+
+### Request Features
+
+Have ideas for dynamic routing?
+
+1. **Open a discussion**: [GitHub Discussions](https://github.com/rahulroy0322/structure-ts/discussions)
+2. **Describe your use case**
+3. **Share example code** of how you'd like it to work
+
+### Stay Updated
+
+Follow development progress:
+
+- **GitHub**: Watch the repository for updates
+- **Changelog**: Check release notes for new features
+- **Documentation**: This page updates as features land
+
+## Roadmap
+
+### Short Term (Next Release)
+
+- ✅ Stabilize single parameter routes
+- 🚧 Multiple parameters support
+- 🚧 Parameter type validation
+
+### Medium Term (Next Few Releases)
+
+- 📋 Optional parameters
+- 📋 Wildcard routes
+- 📋 Regular expression constraints
+- 📋 Better error messages
+
+### Long Term
+
+- 📋 Named route parameters with types
+- 📋 Automatic parameter transformation
+- 📋 Route middleware for validation
+- 📋 Advanced pattern matching
+
+## Current Best Practices
+
+Until dynamic routing is fully mature:
+
+### 1. Keep Routes Simple
+
+```typescript
+// ✅ Good - simple and clear
+route.get('/:id', getUser);
+
+// ⚠️ Complex - wait for full support
+route.get('/:userId/posts/:postId/comments/:commentId', getComment);
+```
+
+### 2. Validate Parameters
+
+```typescript
+const getUser: ControllerType = (request, reply) => {
+  const { id } = request.params;
+  
+  // Always validate
+  if (!id) {
+    return reply.status(badRequest()).json({ error: 'ID required' });
+  }
+  
+  const userId = parseInt(id);
+  
+  if (isNaN(userId)) {
+    return reply.status(badRequest()).json({ error: 'ID must be a number' });
+  }
+  
+  // Use validated ID
+};
+```
+
+### 3. Use Query Parameters for Complex Filtering
+
+```typescript
+// Instead of: /posts/2024/01/tech
+// Use: /posts?year=2024&month=01&category=tech
+
+route.get('/', searchPosts);
+```
+
+### 4. Document Your Routes
+
+```typescript
+// src/users/routes.ts
+
+// Get user by ID
+// URL: /users/:id
+// Params: id (number) - User ID
+route.get('/:id', getUser);
+
+// Get user posts
+// URL: /users/:userId/posts
+// Params: userId (number) - User ID
+// Query: page (number), limit (number)
+route.get('/:userId/posts', getUserPosts);
+```
+
+## Migration Guide
+
+When dynamic routing features become stable, we'll provide migration guides here. For now:
+
+- Current code using single parameters will continue working
+- We'll maintain backward compatibility where possible
+- Breaking changes will be clearly documented
+
+## Alternative Approaches
+
+While waiting for full dynamic routing:
+
+### Approach 1: Query Parameters
+
+```typescript
+// Instead of /users/1/posts/5
+// Use /posts?userId=1&postId=5
+
+route.get('/', getPost);
+
+const getPost: ControllerType = (request, reply) => {
+  const { userId, postId } = request.query;
+  // ...
+};
+```
+
+### Approach 2: Separate Routes
+
+```typescript
+// Instead of /users/:userId/posts/:postId
+// Use separate endpoints:
+
+route.get('/posts/:id', getPost);  // Get any post
+route.get('/:id/posts', getUserPosts);  // Get user's posts
+```
+
+### Approach 3: Encoded Parameters
+
+```typescript
+// Instead of /users/1/posts/5
+// Use /posts/1-5 (userId-postId)
+
+route.get('/:ids', getPost);
+
+const getPost: ControllerType = (request, reply) => {
+  const { ids } = request.params;
+  const [userId, postId] = ids.split('-').map(Number);
+  // ...
+};
+```
+
+## Questions?
+
+Dynamic routing development is ongoing. If you have questions:
+
+- **Documentation**: Check back regularly for updates
+- **Issues**: Report bugs on GitHub
+- **Discussions**: Ask questions in Discussions
+- **Feature Requests**: Share your use cases
+
+We appreciate your patience as we build robust dynamic routing support!
+*/}
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

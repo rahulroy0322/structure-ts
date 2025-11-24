@@ -1,0 +1,902 @@
+---
+title: Controllers
+description: Learn how to create controllers and handle HTTP questions
+---
+
+{/* # Controllers */}
+
+Controllers are functions that handle HTTP questions and send responses. This guide covers everything you need to know about building controllers in Structure-Ts.
+
+## What is a Controller?
+
+A **controller** is a function that:
+1. Receives an HTTP question
+2. Processes the data (business logic)
+3. Sends back an HTTP response
+
+Think of controllers as the bridge between your routes and your application logic.
+
+## Basic Controller Structure
+
+Every controller follows this pattern:
+
+```typescript
+import { type ControllerType, ok } from 'structure-ts';
+
+const myController: ControllerType = (question, reply) => {
+  // 1. Get data from question
+  // 2. Process/validate data
+  // 3. Send response
+  
+  reply.status(ok()).json({
+    success: true,
+    message: 'Hello World!',
+  });
+};
+
+export { myController };
+```
+
+### Controller Anatomy
+
+**`ControllerType`** - TypeScript type for type safety
+
+**` question`** - The incoming HTTP   question object containing:
+- ` question.params` - URL parameters (`<id:int>`)
+- ` question.query` - Query strings (`?page=1`)
+- ` question.body` - POST/PUT data
+- ` question.headers` - HTTP headers
+- ` question.method` - HTTP method (GET, POST, etc.)
+
+**`reply`** - The response object for sending data back:
+- `reply.status()` - Set HTTP status code
+- `reply.json()` - Send JSON response
+- `reply.send()` - Send plain text/HTML
+- `reply.header()` - Set response headers
+
+## Creating Your First Controller
+
+### Step 1: Create the Controller File
+
+Open `src/users/controllers.ts`:
+
+```typescript
+import { type ControllerType, ok } from 'structure-ts';
+
+const listUsers: ControllerType = (question, reply) => {
+  const users = [
+    { id: 1, name: 'Alice', email: 'alice@example.com' },
+    { id: 2, name: 'Bob', email: 'bob@example.com' },
+  ];
+  
+  reply.status(ok()).json({
+    success: true,
+    data: users,
+  });
+};
+
+export { listUsers };
+```
+
+### Step 2: Link to Route
+
+Open `src/users/routes.ts`:
+
+```typescript
+import { Router } from 'structure-ts';
+import { listUsers } from './controllers';
+
+const { routes, route } = Router();
+
+route.get('/', listUsers);
+
+export default routes;
+```
+
+### Step 3: Test It
+
+Visit `http://localhost:2000/users` to see your data!
+
+{/* ## Getting Request Data
+
+### Reading the Request Body
+
+For POST/PUT requests, data comes in `question.body`:
+
+```typescript
+const createUser: ControllerType = (question, reply) => {
+  const { name, email, password } = question.body;
+  
+  // Validate data
+  if (!name || !email || !password) {
+    return reply.status(400).json({
+      success: false,
+      error: 'Missing required fields',
+    });
+  }
+  
+  // Create user (mock example)
+  const newUser = {
+    id: Date.now(),
+    name,
+    email,
+  };
+  
+  reply.status(201).json({
+    success: true,
+    data: newUser,
+  });
+};
+```
+
+**Test with curl:**
+```bash
+curl -X POST http://localhost:2000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Charlie","email":"charlie@example.com","password":"secret"}'
+``` */}
+
+{/* ### URL Parameters
+
+Access dynamic URL segments:
+
+```typescript
+// Route: route.get('/:id', getUser)
+
+const getUser: ControllerType = (question, reply) => {
+  const { id } = question.params;  // Get :id from URL
+  
+  // Convert to number
+  const userId = parseInt(id);
+  
+  // Mock data
+  const users = [
+    { id: 1, name: 'Alice', email: 'alice@example.com' },
+    { id: 2, name: 'Bob', email: 'bob@example.com' },
+  ];
+  
+  const user = users.find(u => u.id === userId);
+  
+  if (!user) {
+    return reply.status(404).json({
+      success: false,
+      error: 'User not found',
+    });
+  }
+  
+  reply.status(200).json({
+    success: true,
+    data: user,
+  });
+};
+```
+
+**Test:** `http://localhost:2000/users/1` */}
+
+{/* ### Query Parameters
+
+Access query strings (`?page=1&limit=10`):
+
+```typescript
+const searchUsers: ControllerType = (question, reply) => {
+  const { query, page, limit } = question.query;
+  
+  // Convert to numbers with defaults
+  const pageNumber = parseInt(page || '1');
+  const pageLimit = parseInt(limit || '10');
+  const searchQuery = query || '';
+  
+  console.log(`Searching for: ${searchQuery}`);
+  console.log(`Page: ${pageNumber}, Limit: ${pageLimit}`);
+  
+  // Mock search results
+  const results = [
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' },
+  ];
+  
+  reply.status(200).json({
+    success: true,
+    data: results,
+    pagination: {
+      page: pageNumber,
+      limit: pageLimit,
+      total: 2,
+    },
+  });
+};
+```
+
+**Test:** `http://localhost:2000/users/search?query=alice&page=1&limit=10`
+
+### Request Headers
+
+Access HTTP headers:
+
+```typescript
+const protectedController: ControllerType = (question, reply) => {
+  const authHeader = question.headers['authorization'];
+  const contentType = question.headers['content-type'];
+  
+  if (!authHeader) {
+    return reply.status(401).json({
+      success: false,
+      error: 'Authorization header required',
+    });
+  }
+  
+  // Extract token
+  const token = authHeader.replace('Bearer ', '');
+  
+  // Verify token (mock)
+  if (token !== 'valid-token') {
+    return reply.status(403).json({
+      success: false,
+      error: 'Invalid token',
+    });
+  }
+  
+  reply.status(200).json({
+    success: true,
+    message: 'Access granted',
+  });
+};
+```
+
+**Test with curl:**
+```bash
+curl http://localhost:2000/users/protected \
+  -H "Authorization: Bearer valid-token"
+```
+
+## Sending Responses
+
+### HTTP Status Codes
+
+structure-ts provides helpers for common status codes:
+
+```typescript
+import { 
+  ok,              // 200
+  created,         // 201
+  badRequest,      // 400
+  unauthorized,    // 401
+  forbidden,       // 403
+  notFound,        // 404
+  serverError,     // 500
+} from 'structure-ts';
+```
+
+### Status Code Examples
+
+**200 OK - Success**
+```typescript
+reply.status(ok()).json({
+  success: true,
+  data: users,
+});
+```
+
+**201 Created - Resource Created**
+```typescript
+reply.status(created()).json({
+  success: true,
+  data: newUser,
+  message: 'User created successfully',
+});
+```
+
+**400 Bad Request - Invalid Input**
+```typescript
+reply.status(badRequest()).json({
+  success: false,
+  error: 'Invalid email format',
+});
+```
+
+**401 Unauthorized - Authentication Required**
+```typescript
+reply.status(unauthorized()).json({
+  success: false,
+  error: 'Please log in to continue',
+});
+```
+
+**403 Forbidden - No Permission**
+```typescript
+reply.status(forbidden()).json({
+  success: false,
+  error: 'You do not have permission to perform this action',
+});
+```
+
+**404 Not Found - Resource Missing**
+```typescript
+reply.status(notFound()).json({
+  success: false,
+  error: 'User not found',
+});
+```
+
+**500 Internal Server Error - Something Broke**
+```typescript
+reply.status(serverError()).json({
+  success: false,
+  error: 'An unexpected error occurred',
+});
+```
+
+### Custom Status Codes
+
+Use any HTTP status code:
+
+```typescript
+reply.status(418).json({
+  success: false,
+  error: "I'm a teapot",  // Yes, this is a real status code!
+});
+
+reply.status(503).json({
+  success: false,
+  error: 'Service temporarily unavailable',
+});
+```
+
+### Sending JSON Responses
+
+The most common response format:
+
+```typescript
+const controller: ControllerType = (question, reply) => {
+  reply.status(ok()).json({
+    success: true,
+    data: {
+      id: 1,
+      name: 'Alice',
+      email: 'alice@example.com',
+    },
+    meta: {
+      timestamp: new Date().toISOString(),
+      version: '1.0',
+    },
+  });
+};
+```
+
+### Sending Plain Text
+
+```typescript
+const textController: ControllerType = (question, reply) => {
+  reply
+    .status(ok())
+    .header('Content-Type', 'text/plain')
+    .send('Hello, World!');
+};
+```
+
+### Sending HTML
+
+```typescript
+const htmlController: ControllerType = (question, reply) => {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head><title>Welcome</title></head>
+      <body><h1>Hello, World!</h1></body>
+    </html>
+  `;
+  
+  reply
+    .status(ok())
+    .header('Content-Type', 'text/html')
+    .send(html);
+};
+```
+
+## Setting Response Headers
+
+### Custom Headers
+
+```typescript
+const controller: ControllerType = (question, reply) => {
+  reply
+    .header('X-Custom-Header', 'custom-value')
+    .header('X-Request-ID', '12345')
+    .status(ok())
+    .json({ data: 'response' });
+};
+``` */}
+{/* 
+### CORS Headers
+
+```typescript
+const corsController: ControllerType = (question, reply) => {
+  reply
+    .header('Access-Control-Allow-Origin', '*')
+    .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+    .header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    .status(ok())
+    .json({ message: 'CORS enabled' });
+};
+```
+
+### Cache Headers
+
+```typescript
+const cachedController: ControllerType = (question, reply) => {
+  reply
+    .header('Cache-Control', 'public, max-age=3600')  // Cache for 1 hour
+    .status(ok())
+    .json({ data: 'cached response' });
+};
+```
+
+## Complete CRUD Example
+
+Here's a full Create-Read-Update-Delete controller:
+
+```typescript
+import { 
+  type ControllerType, 
+  ok, 
+  created, 
+  badRequest,
+  notFound,
+} from 'structure-ts';
+
+// Mock database
+let users = [
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@example.com' },
+];
+
+// List all users - GET /users
+export const listUsers: ControllerType = (question, reply) => {
+  reply.status(ok()).json({
+    success: true,
+    data: users,
+    count: users.length,
+  });
+};
+
+// Get single user - GET /users/:id
+export const getUser: ControllerType = (question, reply) => {
+  const { id } = question.params;
+  const userId = parseInt(id);
+  
+  const user = users.find(u => u.id === userId);
+  
+  if (!user) {
+    return reply.status(notFound()).json({
+      success: false,
+      error: 'User not found',
+    });
+  }
+  
+  reply.status(ok()).json({
+    success: true,
+    data: user,
+  });
+};
+
+// Create user - POST /users
+export const createUser: ControllerType = (question, reply) => {
+  const { name, email } = question.body;
+  
+  // Validation
+  if (!name || !email) {
+    return reply.status(badRequest()).json({
+      success: false,
+      error: 'Name and email are required',
+    });
+  }
+  
+  // Check if email exists
+  const exists = users.find(u => u.email === email);
+  if (exists) {
+    return reply.status(badRequest()).json({
+      success: false,
+      error: 'Email already exists',
+    });
+  }
+  
+  // Create new user
+  const newUser = {
+    id: Math.max(...users.map(u => u.id)) + 1,
+    name,
+    email,
+  };
+  
+  users.push(newUser);
+  
+  reply.status(created()).json({
+    success: true,
+    data: newUser,
+    message: 'User created successfully',
+  });
+};
+
+// Update user - PUT /users/:id
+export const updateUser: ControllerType = (question, reply) => {
+  const { id } = question.params;
+  const { name, email } = question.body;
+  const userId = parseInt(id);
+  
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return reply.status(notFound()).json({
+      success: false,
+      error: 'User not found',
+    });
+  }
+  
+  // Update user
+  users[userIndex] = {
+    ...users[userIndex],
+    name: name || users[userIndex].name,
+    email: email || users[userIndex].email,
+  };
+  
+  reply.status(ok()).json({
+    success: true,
+    data: users[userIndex],
+    message: 'User updated successfully',
+  });
+};
+
+// Delete user - DELETE /users/:id
+export const deleteUser: ControllerType = (question, reply) => {
+  const { id } = question.params;
+  const userId = parseInt(id);
+  
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return reply.status(notFound()).json({
+      success: false,
+      error: 'User not found',
+    });
+  }
+  
+  // Remove user
+  const deletedUser = users[userIndex];
+  users = users.filter(u => u.id !== userId);
+  
+  reply.status(ok()).json({
+    success: true,
+    data: deletedUser,
+    message: 'User deleted successfully',
+  });
+};
+```
+
+### Corresponding Routes
+
+```typescript
+// src/users/routes.ts
+import { Router } from 'structure-ts';
+import {
+  listUsers,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+} from './controllers';
+
+const { routes, route } = Router();
+
+route.get('/', listUsers);
+route.get('/:id', getUser);
+route.post('/', createUser);
+route.put('/:id', updateUser);
+route.delete('/:id', deleteUser);
+
+export default routes;
+```
+
+## Error Handling
+
+### Try-Catch Blocks
+
+Always handle potential errors:
+
+```typescript
+const getUserController: ControllerType = async (question, reply) => {
+  try {
+    const { id } = question.params;
+    
+    // Might throw error
+    const user = await database.getUser(id);
+    
+    reply.status(ok()).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Failed to fetch user',
+    });
+  }
+};
+```
+
+### Validation Errors
+
+```typescript
+const validateEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+const createUserController: ControllerType = (question, reply) => {
+  const { email, name } = question.body;
+  
+  // Validate email
+  if (!validateEmail(email)) {
+    return reply.status(badRequest()).json({
+      success: false,
+      error: 'Invalid email format',
+      field: 'email',
+    });
+  }
+  
+  // Continue with creation...
+};
+``` */}
+
+{/* ### Multiple Validation Errors
+
+```typescript
+const createUserController: ControllerType = (question, reply) => {
+  const { email, name, password } = question.body;
+  const errors: string[] = [];
+  
+  if (!name) errors.push('Name is required');
+  if (!email) errors.push('Email is required');
+  if (!password) errors.push('Password is required');
+  
+  if (!validateEmail(email)) errors.push('Invalid email format');
+  if (password.length < 8) errors.push('Password must be at least 8 characters');
+  
+  if (errors.length > 0) {
+    return reply.status(badRequest()).json({
+      success: false,
+      errors,
+    });
+  }
+  
+  // Continue with creation...
+};
+```
+
+## Async Controllers
+
+For database operations or API calls, use async/await:
+
+```typescript
+const getUserController: ControllerType = async (question, reply) => {
+  const { id } = question.params;
+  
+  try {
+    // Async database call
+    const user = await User.findOne({ where: { id } });
+    
+    if (!user) {
+      return reply.status(notFound()).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+    
+    reply.status(ok()).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Database error',
+    });
+  }
+};
+```
+
+## Best Practices
+
+### 1. Keep Controllers Thin
+
+Controllers should orchestrate, not implement:
+
+**❌ Bad - Too much logic in controller:**
+```typescript
+const createUser: ControllerType = async (question, reply) => {
+  const { name, email, password } = question.body;
+  
+  // Validation logic
+  if (!name || name.length < 2) { /* ... * }
+  if (!email || !/^[^\s@]+@/.test(email)) { /* ... * }
+  
+  // Hashing logic
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  
+  // Database logic
+  const user = await db.insert({ name, email, password: hashedPassword });
+  
+  // Email logic
+  await sendEmail(user.email, 'Welcome!');
+  
+  reply.status(created()).json({ data: user });
+};
+``` */}
+{/* 
+**✅ Good - Delegate to services:**
+```typescript
+const createUser: ControllerType = async (question, reply) => {
+  const { name, email, password } = question.body;
+  
+  // Validate
+  const validation = validateUserInput({ name, email, password });
+  if (!validation.valid) {
+    return reply.status(badRequest()).json({ errors: validation.errors });
+  }
+  
+  // Create user (service handles logic)
+  const user = await userService.create({ name, email, password });
+  
+  // Send welcome email
+  await emailService.sendWelcome(user.email);
+  
+  reply.status(created()).json({
+    success: true,
+    data: user,
+  });
+};
+```
+
+### 2. Use Consistent Response Format
+
+```typescript
+// Standard success response
+{
+  success: true,
+  data: { /* ... * },
+  message?: string,
+}
+
+// Standard error response
+{
+  success: false,
+  error: string,
+  errors?: string[],
+} *}
+```
+{/* 
+
+### 3. Return Early
+
+Avoid deep nesting:
+
+**❌ Bad:**
+```typescript
+if (user) {
+  if (user.isActive) {
+    if (user.hasPermission) {
+      // Do something
+    }
+  }
+}
+```
+
+**✅ Good:**
+```typescript
+if (!user) {
+  return reply.status(notFound()).json({ error: 'User not found' });
+}
+
+if (!user.isActive) {
+  return reply.status(forbidden()).json({ error: 'User is inactive' });
+}
+
+if (!user.hasPermission) {
+  return reply.status(forbidden()).json({ error: 'No permission' });
+}
+
+// Do something
+```
+
+### 4. Add Type Safety
+
+```typescript
+interface CreateUserBody {
+  name: string;
+  email: string;
+  password: string;
+}
+
+const createUser: ControllerType = (question, reply) => {
+  const { name, email, password } = question.body as CreateUserBody;
+  
+  // TypeScript knows the types now
+};
+```
+
+### 5. Log Important Actions
+
+```typescript
+const deleteUser: ControllerType = async (question, reply) => {
+  const { id } = question.params;
+  
+  console.log(`Deleting user ${id}`);
+  
+  await User.delete({ id });
+  
+  console.log(`User ${id} deleted successfully`);
+  
+  reply.status(ok()).json({
+    success: true,
+    message: 'User deleted',
+  });
+};
+```
+
+## Testing Controllers
+
+### Manual Testing with curl
+
+```bash
+# Create user
+curl -X POST http://localhost:2000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","email":"test@example.com"}'
+
+# Get user
+curl http://localhost:2000/users/1
+
+# Update user
+curl -X PUT http://localhost:2000/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Updated Name"}'
+
+# Delete user
+curl -X DELETE http://localhost:2000/users/1
+```
+
+### Unit Testing (Future)
+
+```typescript
+import { describe, it, expect } from 'node:test';
+import { listUsers } from './controllers';
+
+describe('listUsers controller', () => {
+  it('should return array of users', async () => {
+    const mockRequest = {};
+    const mockReply = {
+      status: (code: number) => mockReply,
+      json: (data: any) => data,
+    };
+    
+    const result = await listUsers(mockRequest, mockReply);
+    
+    expect(result.success).toBe(true);
+    expect(Array.isArray(result.data)).toBe(true);
+  });
+});
+```
+
+## Next Steps
+
+Now that you understand controllers:
+
+- **[Models](/guides/models/)** - Connect controllers to databases
+- **[Rendering](/guides/rendering/)** - Render HTML templates from controllers
+- **[Database Setup](/guides/database-setup/)** - Configure database connections
+
+--- */}
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

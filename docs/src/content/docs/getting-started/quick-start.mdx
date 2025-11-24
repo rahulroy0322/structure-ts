@@ -1,0 +1,539 @@
+---
+title: Quick Start
+description: Build your first Structure-Ts application in minutes
+---
+import { Code,FileTree } from '@astrojs/starlight/components';
+
+{/* # Quick Start */}
+
+Let's build your first Structure-Ts application! In this guide, you'll create a project, add an app, and build a working API endpoint—all in under 10 minutes.
+
+## Step 1: Create Your Project
+
+First, create a new Structure-Ts project:
+
+<Code
+code={
+   `st create project my-first-app`
+}
+  title={'terminal'}
+lang="bash"
+mark={['my-first-app']}
+/>
+
+This creates a new directory with everything you need to get started.
+
+Navigate into your project:
+
+```bash
+cd my-first-app
+```
+
+## Step 2: Install Dependencies
+
+Install all required packages:
+
+```bash
+pnpm i # or npm install
+```
+
+This will take a minute or two. While it's running, let's look at what was created.
+
+## Step 3: Explore the Project Structure
+
+Your new project has this structure:
+
+<FileTree>
+- my-first-app/
+   - node_modules/         # Installed dependencies
+   - src/                  # Your application code
+      - app.ts            # App setup
+      - main.ts           # Entry point
+      - settings.ts       # Configuration
+   - package.json          # Dependencies and scripts
+   - tsconfig.json         # TypeScript configuration
+</FileTree>
+
+### Understanding Key Files
+
+**`src/settings.ts`** - Your configuration center:
+
+<Code
+code={
+   `import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const PORT = 2000;              // Server port
+const APPS = [];                // Installed apps (empty for now)
+const DATABASE: DatabaseType = false;  // No database yet
+const TEMPLATE_DIR = 'templates';      // Template location
+
+   
+export default {
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
+} satisfies SettingsType;
+   `
+}
+  title={'src/settings.ts'}
+lang="ts"
+/>
+
+**`src/main.ts`** - Entry point that starts your server:
+
+<Code
+code={
+   `import main from './app'
+
+main()
+   `
+}
+  title={'src/main.ts'}
+lang="ts"
+/>
+
+**`src/app.ts`** - Configures and exports your application.
+
+<Code
+code={
+   `import { Structure } from 'structure-ts'
+
+const main = async () => {
+    const app = await Structure({})
+
+    const { close } = app.listen((port) => {
+        console.log(\`server running on port : \${port}\`) // this is showen in the terminal
+    })
+
+    process.on('SIGINT', close).on('SIGTERM', close)
+}
+
+export default main`
+}
+  title={'src/app.ts'}
+lang="ts"
+mark={['console.log(`server running on port : ${port}`)']}
+/>
+
+## Step 4: Run Your Server
+
+Start the development server:
+
+```bash
+pnpm dev # or npm run dev
+```
+
+You should see:
+
+
+<Code
+code={
+   `server running on port : 2000`
+}
+  title={'terminal'}
+lang="text"
+mark={['server running on port : 2000']}
+/>
+
+Open your browser and visit `http://localhost:2000`. You'll see a welcome message!
+
+:::tip[Server Running]
+Keep the server running in this terminal. Open a new terminal tab for the next steps.
+:::
+
+## Step 5: Create Your First App
+
+Now let's create an app. Apps are self-contained modules that organize your code.
+
+Open a **new terminal tab** (keep the server running) and run:
+
+<Code
+code={
+   `st create app users`
+}
+  title={'terminal'}
+lang="sh"
+mark={['users']}
+/>
+
+This creates a new `users` directory with this structure:
+
+<FileTree>
+- src/
+    - users/
+        - controllers.ts        # Request handlers
+        - routes.ts             # URL patterns
+</FileTree>
+
+## Step 6: Register Your App
+
+Open `src/settings.ts` and add your new app:
+
+
+<Code
+code={
+   `const APPS = ['users'];  // Add your app here`
+}
+  title={'src/settings.ts'}
+lang="ts"
+mark={[`'users'`]}
+/>
+
+Your settings file should now look like:
+
+<Code
+code={
+   `import type { DatabaseType, SettingsType } from 'structure-ts';
+
+const PORT = 2000;
+const APPS = ['users'];  // ← Changed!
+const DATABASE: DatabaseType = false;
+const TEMPLATE_DIR = 'templates';
+
+export default {
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
+} satisfies SettingsType;`
+}
+  title={'src/settings.ts'}
+lang="ts"
+mark={[`'users'`]}
+/>
+
+:::note[Auto-Registration]
+Structure-Ts automatically registers routes from all apps in the `APPS` array. No manual route configuration needed!
+:::
+
+## Step 7: Create a Controller
+
+Controllers handle HTTP requests. Open `src/users/controllers.ts`:
+
+<Code
+code={
+   `import { type ControllerType, ok } from 'structure-ts';
+
+const listUsers: ControllerType = (question, reply) => {
+  // Sample data
+  const users = [
+    { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
+    { id: 2, name: 'Bob Smith', email: 'bob@example.com' },
+    { id: 3, name: 'Charlie Brown', email: 'charlie@example.com' },
+  ];
+  
+  reply.status(ok()).json({
+      success: true,
+    data: users,
+  });
+};
+
+export { listUsers };`
+}
+  title={'src/users/controllers.ts'}
+lang="ts"
+mark={[`listUsers`]}
+/>
+
+**What's happening here?**
+
+- `ControllerType` provides type safety for request/response
+- `ok()` returns HTTP 200 status code
+- `reply.json()` sends JSON response
+- We're returning a success flag with sample user data
+
+## Step 8: Define Your Route
+
+Routes connect URLs to controllers. Open `src/users/routes.ts`:
+
+<Code
+code={
+   `import { Router } from 'structure-ts';
+import { listUsers } from './controllers';
+const { routes, route } = Router();
+
+route.get('/', listUsers);
+
+export default routes;`
+}
+  title={'src/users/routes.ts'}
+lang="ts"
+mark={[`listUsers`]}
+/>
+
+**What's happening here?**
+
+- `Router()` creates a new router for this app
+- `route.get('/', listUsers)` says "on GET requests to `/`, run `listUsers`"
+
+## Step 9: Test Your Endpoint
+
+Your server auto-reloads with the changes. Visit:
+
+``` bash
+http://localhost:2000/users
+```
+
+You should see:
+
+```json
+{
+    "success": true,
+    "data": [
+        { "id": 1, "name": "Alice Johnson", "email": "alice@example.com" },
+        { "id": 2, "name": "Bob Smith", "email": "bob@example.com" },
+        { "id": 3, "name": "Charlie Brown", "email": "charlie@example.com" }
+  ]
+}
+```
+
+🎉 **Congratulations!** You just built your first API endpoint with Structure-Ts!
+
+## Step 10: Add More Endpoints
+
+Let's add an endpoint to get a single user. Update `src/users/controllers.ts`:
+
+<Code
+code={
+   `import { type ControllerType, ok, notFound } from 'structure-ts';
+   
+    const users = [
+        { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
+        { id: 2, name: 'Bob Smith', email: 'bob@example.com' },
+        { id: 3, name: 'Charlie Brown', email: 'charlie@example.com' },
+    ];
+  
+    const listUsers: ControllerType = (question, reply) => {
+        reply.status(ok()).json({
+            success: true,
+            data: users,
+        });
+    };
+  
+    // NEW: Get single user
+    const getUser: ControllerType = (question, reply) => {
+        const { id } = question.params;
+
+        const user = users.find(u => u.id === parseInt(id));
+
+        if (!user) {
+            return reply.status(notFound()).json({
+                success: false,
+                error: 'User not found',
+            });
+        }
+
+        reply.status(ok()).json({
+            success: true,
+            data: user,
+        });
+    };
+  `
+}
+  title={'src/users/controllers.ts'}
+lang="ts"
+mark={[`listUsers`,'getUser']}
+/>
+
+Update your routes in `src/users/routes.ts`:
+
+<Code
+code={
+    `import { Router } from 'structure-ts';
+import { listUsers, getUser } from './controllers';
+
+const { routes, route } = Router();
+
+route.get('/', listUsers);
+route.get('/<id:int>', getUser);  // NEW: Dynamic route
+
+export default routes;`
+}
+  title={'src/users/routes.ts'}
+lang="ts"
+mark={[`listUsers`,'getUser']}
+/>
+
+Now test these URLs:
+
+``` bash
+http://localhost:2000/      → Lists all users
+http://localhost:2000/1    → Shows Alice
+http://localhost:2000/2    → Shows Bob
+http://localhost:2000/999  → Returns 404
+```
+
+## Understanding What You Built
+
+Let's recap what you accomplished:
+
+1. **Created a project** with Structure-Ts CLI
+2. **Created an app** to organize code
+3. **Registered the app** in settings
+4. **Built controllers** to handle requests
+5. **Defined routes** to connect URLs to controllers
+6. **Created a working API** with multiple endpoints
+
+All of this in less than 10 minutes, with minimal boilerplate!
+
+## What's Next?
+
+Now that you have a working application, here are your next steps:
+
+### Learn More About Apps
+Read [Creating Apps](/guides/creating-apps/) to understand:
+- App architecture in depth
+- Best practices for organizing code
+- How to create reusable apps
+
+### Configure Your Project
+Explore [Settings Configuration](/guides/settings-configuration/) to learn about:
+- Changing the server port
+- Configuring databases
+- Setting up templates
+- Adding more apps
+
+### Build Real Controllers
+Dive into [Controllers](/guides/controllers/) to discover:
+- Handling POST requests with body data
+- Working with headers
+- Error handling
+- Status codes
+- Response formats
+
+### Work with Databases
+When you're ready for databases, check out:
+- [Models](/guides/models/) - Define your data structure
+- [Database Setup](/guides/database-setup/) - Configure connections
+- [Migrations](/guides/migrations/) - Manage schema changes
+
+### Render HTML Pages
+Want to build traditional web pages? See:
+- [Template Rendering](/guides/rendering/) - Use EJS templates
+
+## Common Next Steps
+
+**Add a POST endpoint:**
+
+<Code
+code={
+    `
+    import { created } from 'structure-ts';
+
+const createUser: ControllerType = (question, reply) => {
+    const { 
+        body:{
+            name, 
+            email
+        }
+    } = await question.body()
+  
+    // In real app, save to database
+    const newUser = {
+        id: Date.now(),
+        name,
+        email,
+    };
+
+    reply.status(created()).json({
+        success: true,
+        data: newUser,
+    });
+};
+    
+    
+export { listUsers, getUser, createUser };`
+}
+  title={'users/controllers.ts'}
+lang="ts"
+mark={[`createUser`]}
+/>
+
+<Code
+code={
+    `route.post('/create', createUser);`
+}
+  title={'users/routes.ts'}
+lang="ts"
+mark={[`createUser`]}
+/>
+
+Test with curl:
+```bash
+curl -X POST http://localhost:2000/create \
+  -H "Content-Type: application/json" \
+  -d '{"name":"David","email":"david@example.com"}'
+```
+
+**Create another app:**
+
+<Code
+code={
+    `st create app blog`
+}
+  title={'terminal'}
+lang="sh"
+mark={[`blog`]}
+/>
+
+Add to settings:
+<Code
+code={
+    `const APPS = ['users', 'blog']; <- add here`
+}
+  title={'src/settings.ts'}
+lang="ts"
+mark={[`blog`]}
+/>
+
+Now build blog functionality in the `blog` app!
+
+## Tips for Success
+
+:::tip[Keep Apps Focused]
+Each app should handle one domain. Don't put user management and blog posts in the same app.
+:::
+
+:::tip[Use TypeScript]
+Take advantage of type safety. Let your IDE autocomplete and catch errors before runtime.
+:::
+
+:::tip[Follow REST Conventions]
+Use standard HTTP methods: GET for reading, POST for creating, PUT/PATCH for updating, DELETE for removing.
+:::
+
+:::tip[Start Simple]
+Begin with simple controllers and routes. Add complexity only when needed.
+:::
+
+## Getting Help
+
+Stuck on something? Here's where to get help:
+
+- **Search this documentation** - Use the search bar at the top
+- **Check examples** - Look at the code examples in each guide
+- **GitHub Issues** - [Ask questions or report bugs](https://github.com/rahulroy0322/structure-ts/issues)
+- **GitHub Discussions** - [Community Q&A](https://github.com/rahulroy0322/structure-ts/discussions)
+
+## Summary
+
+You've now:
+- ✅ Created a Structure-Ts project
+- ✅ Built your first app
+- ✅ Created controllers and routes
+- ✅ Built a working REST API
+- ✅ Understand the basic workflow
+
+You're ready to build real applications with structure-ts!
+
+**Continue learning:**
+- [Creating Apps](/guides/creating-apps/) - Master app architecture
+- [Settings Configuration](/guides/settings-configuration/) - Configure your project
+- [Routing](/guides/routing/) - Advanced routing patterns
+
+---
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

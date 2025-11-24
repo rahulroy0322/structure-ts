@@ -1,0 +1,763 @@
+---
+title: Models
+description: Define and work with database models in structure-ts
+---
+
+{/* # Models */}
+
+Models represent your database tables and define the structure of your data. This guide explains how to create and use models in Structure-Ts.
+
+#### Upcomming
+
+{/* 
+## What are Models?
+
+**Models** are TypeScript classes that:
+- Define the structure of database tables
+- Specify column types and constraints
+- Provide methods to query and manipulate data
+- Ensure type safety when working with databases
+
+Think of models as blueprints for your database tables.
+
+## Prerequisites
+
+Before working with models:
+1. Configure database in `src/settings.ts` (see [Database Setup](/guides/database-setup/))
+2. Ensure database connection is working
+3. Understand basic SQL/database concepts
+
+## Creating Your First Model
+
+### Basic User Model
+
+Create a model in `src/users/models.ts`:
+
+```typescript
+import { Entity, Column, PrimaryGeneratedColumn } from 'structure-ts';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+  
+  @Column()
+  email: string;
+  
+  @Column()
+  password: string;
+}
+```
+
+### Model Anatomy
+
+**`@Entity('users')`** - Decorator that marks this class as a database table
+- The string `'users'` is the table name
+- If omitted, uses lowercase class name
+
+**`@PrimaryGeneratedColumn()`** - Auto-incrementing primary key
+- Usually your `id` field
+- Automatically generates unique IDs
+
+**`@Column()`** - Database column
+- Each property with `@Column()` becomes a column
+- Type is inferred from TypeScript type
+
+## Column Types
+
+### Basic Types
+
+```typescript
+@Entity('examples')
+export class Example {
+  @Column()
+  name: string;              // VARCHAR
+  
+  @Column()
+  age: number;               // INTEGER
+  
+  @Column()
+  price: number;             // Can also be DECIMAL/FLOAT
+  
+  @Column()
+  isActive: boolean;         // BOOLEAN
+  
+  @Column()
+  createdAt: Date;           // TIMESTAMP
+}
+```
+
+### Explicit Types
+
+Specify column type explicitly:
+
+```typescript
+@Column({ type: 'varchar', length: 255 })
+name: string;
+
+@Column({ type: 'text' })
+description: string;
+
+@Column({ type: 'int' })
+count: number;
+
+@Column({ type: 'decimal', precision: 10, scale: 2 })
+price: number;
+
+@Column({ type: 'timestamp' })
+createdAt: Date;
+```
+
+### Common Column Options
+
+```typescript
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  // Required column (NOT NULL)
+  @Column()
+  name: string;
+  
+  // Optional column (NULL allowed)
+  @Column({ nullable: true })
+  middleName: string | null;
+  
+  // Unique constraint
+  @Column({ unique: true })
+  email: string;
+  
+  // Default value
+  @Column({ default: true })
+  isActive: boolean;
+  
+  // Length limit
+  @Column({ length: 100 })
+  username: string;
+  
+  // Text field (unlimited length)
+  @Column({ type: 'text' })
+  bio: string;
+}
+```
+
+## Primary Keys
+
+### Auto-Increment ID
+
+```typescript
+@PrimaryGeneratedColumn()
+id: number;
+```
+
+Most common choice. Database auto-generates: 1, 2, 3, etc.
+
+### UUID Primary Key
+
+```typescript
+@PrimaryGeneratedColumn('uuid')
+id: string;
+```
+
+Generates unique strings like: `550e8400-e29b-41d4-a716-446655440000`
+
+**When to use:** Distributed systems, need globally unique IDs
+
+### Custom Primary Key
+
+```typescript
+@PrimaryColumn()
+customId: string;
+```
+
+You manually set the ID. Useful for special cases.
+
+## Complete Model Example
+
+```typescript
+import { 
+  Entity, 
+  Column, 
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'structure-ts';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column({ length: 100 })
+  name: string;
+  
+  @Column({ unique: true, length: 255 })
+  email: string;
+  
+  @Column()
+  password: string;
+  
+  @Column({ nullable: true, length: 20 })
+  phone: string | null;
+  
+  @Column({ default: true })
+  isActive: boolean;
+  
+  @Column({ default: 'user' })
+  role: string;
+  
+  @Column({ type: 'text', nullable: true })
+  bio: string | null;
+  
+  @CreateDateColumn()
+  createdAt: Date;
+  
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+### Special Columns
+
+**`@CreateDateColumn()`** - Automatically set when record is created
+
+**`@UpdateDateColumn()`** - Automatically updated when record changes
+
+These save you from manually tracking timestamps!
+
+## Using Models in Controllers
+
+### Import Your Model
+
+```typescript
+import { User } from './models';
+```
+
+### Create (Insert)
+
+```typescript
+const createUser: ControllerType = async (request, reply) => {
+  const { name, email, password } = request.body;
+  
+  try {
+    const user = new User();
+    user.name = name;
+    user.email = email;
+    user.password = password;
+    
+    await user.save();
+    
+    reply.status(created()).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Failed to create user',
+    });
+  }
+};
+```
+
+**Alternative syntax:**
+```typescript
+const user = User.create({
+  name,
+  email,
+  password,
+});
+
+await user.save();
+```
+
+### Read (Find)
+
+**Find all:**
+```typescript
+const listUsers: ControllerType = async (request, reply) => {
+  try {
+    const users = await User.find();
+    
+    reply.status(ok()).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Failed to fetch users',
+    });
+  }
+};
+```
+
+**Find one by ID:**
+```typescript
+const getUser: ControllerType = async (request, reply) => {
+  const { id } = request.params;
+  
+  try {
+    const user = await User.findOneBy({ id: parseInt(id) });
+    
+    if (!user) {
+      return reply.status(notFound()).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+    
+    reply.status(ok()).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Failed to fetch user',
+    });
+  }
+};
+```
+
+**Find with conditions:**
+```typescript
+// Find by email
+const user = await User.findOne({ 
+  where: { email: 'alice@example.com' } 
+});
+
+// Find active users
+const activeUsers = await User.find({
+  where: { isActive: true }
+});
+
+// Find with multiple conditions
+const admins = await User.find({
+  where: { 
+    role: 'admin',
+    isActive: true,
+  }
+});
+```
+
+### Update
+
+```typescript
+const updateUser: ControllerType = async (request, reply) => {
+  const { id } = request.params;
+  const { name, email } = request.body;
+  
+  try {
+    const user = await User.findOneBy({ id: parseInt(id) });
+    
+    if (!user) {
+      return reply.status(notFound()).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+    
+    // Update fields
+    user.name = name || user.name;
+    user.email = email || user.email;
+    
+    await user.save();
+    
+    reply.status(ok()).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Failed to update user',
+    });
+  }
+};
+```
+
+**Alternative - update directly:**
+```typescript
+await User.update(
+  { id: parseInt(id) },  // Where
+  { name, email }         // New values
+);
+```
+
+### Delete
+
+```typescript
+const deleteUser: ControllerType = async (request, reply) => {
+  const { id } = request.params;
+  
+  try {
+    const result = await User.delete({ id: parseInt(id) });
+    
+    if (result.affected === 0) {
+      return reply.status(notFound()).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+    
+    reply.status(ok()).json({
+      success: true,
+      message: 'User deleted successfully',
+    });
+  } catch (error) {
+    reply.status(serverError()).json({
+      success: false,
+      error: 'Failed to delete user',
+    });
+  }
+};
+```
+
+**Remove specific instance:**
+```typescript
+const user = await User.findOneBy({ id });
+await user.remove();
+```
+
+## Advanced Queries
+
+### Pagination
+
+```typescript
+const listUsers: ControllerType = async (request, reply) => {
+  const { page = '1', limit = '10' } = request.query;
+  
+  const pageNumber = parseInt(page);
+  const pageLimit = parseInt(limit);
+  
+  const [users, total] = await User.findAndCount({
+    skip: (pageNumber - 1) * pageLimit,
+    take: pageLimit,
+  });
+  
+  reply.status(ok()).json({
+    success: true,
+    data: users,
+    pagination: {
+      page: pageNumber,
+      limit: pageLimit,
+      total,
+      pages: Math.ceil(total / pageLimit),
+    },
+  });
+};
+```
+
+### Sorting
+
+```typescript
+// Sort by name ascending
+const users = await User.find({
+  order: { name: 'ASC' }
+});
+
+// Sort by createdAt descending
+const recentUsers = await User.find({
+  order: { createdAt: 'DESC' }
+});
+
+// Multiple sort fields
+const sorted = await User.find({
+  order: {
+    role: 'ASC',
+    name: 'ASC',
+  }
+});
+```
+
+### Selecting Specific Fields
+
+```typescript
+// Only get name and email
+const users = await User.find({
+  select: ['name', 'email']
+});
+
+// Exclude password from results
+const users = await User.find({
+  select: ['id', 'name', 'email', 'createdAt']
+});
+```
+
+### Complex Conditions
+
+```typescript
+import { Like, MoreThan, LessThan } from 'structure-ts';
+
+// Search by name (LIKE query)
+const users = await User.find({
+  where: {
+    name: Like('%john%')  // Contains 'john'
+  }
+});
+
+// Users older than 18
+const adults = await User.find({
+  where: {
+    age: MoreThan(18)
+  }
+});
+
+// Recent users (last 7 days)
+const sevenDaysAgo = new Date();
+sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+const recentUsers = await User.find({
+  where: {
+    createdAt: MoreThan(sevenDaysAgo)
+  }
+});
+```
+
+## Relationships
+
+### One-to-Many
+
+```typescript
+// User has many posts
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+  
+  @OneToMany(() => Post, post => post.author)
+  posts: Post[];
+}
+
+@Entity('posts')
+export class Post {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  title: string;
+  
+  @ManyToOne(() => User, user => user.posts)
+  author: User;
+}
+```
+
+**Usage:**
+```typescript
+// Get user with their posts
+const user = await User.findOne({
+  where: { id: 1 },
+  relations: ['posts']
+});
+
+console.log(user.posts);  // Array of posts
+```
+
+### Many-to-Many
+
+```typescript
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+  
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles: Role[];
+}
+
+@Entity('roles')
+export class Role {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+}
+```
+
+## Validation
+
+### Basic Validation
+
+```typescript
+import { Entity, Column, PrimaryGeneratedColumn } from 'structure-ts';
+import { IsEmail, Length, Min } from 'class-validator';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  @Length(2, 100)
+  name: string;
+  
+  @Column({ unique: true })
+  @IsEmail()
+  email: string;
+  
+  @Column()
+  @Length(8, 50)
+  password: string;
+  
+  @Column()
+  @Min(18)
+  age: number;
+}
+```
+
+**Validate in controller:**
+```typescript
+import { validate } from 'class-validator';
+
+const createUser: ControllerType = async (request, reply) => {
+  const user = User.create(request.body);
+  
+  const errors = await validate(user);
+  
+  if (errors.length > 0) {
+    return reply.status(badRequest()).json({
+      success: false,
+      errors: errors.map(e => Object.values(e.constraints || {})).flat(),
+    });
+  }
+  
+  await user.save();
+  
+  reply.status(created()).json({
+    success: true,
+    data: user,
+  });
+};
+```
+
+## Best Practices
+
+### 1. One Model Per File (for complex models)
+
+```
+users/
+├── models/
+│   ├── User.ts
+│   ├── UserProfile.ts
+│   └── UserSettings.ts
+└── models.ts  # Re-export all models
+```
+
+### 2. Don't Expose Sensitive Data
+
+```typescript
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @Column()
+  name: string;
+  
+  @Column()
+  email: string;
+  
+  @Column()
+  password: string;
+  
+  // Method to get safe user object
+  toJSON() {
+    const { password, ...safeUser } = this;
+    return safeUser;
+  }
+}
+```
+
+### 3. Use Enums for Fixed Values
+
+```typescript
+enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  MODERATOR = 'moderator',
+}
+
+@Entity('users')
+export class User {
+  @Column({ 
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
+}
+```
+
+### 4. Add Indexes for Performance
+
+```typescript
+@Entity('users')
+@Index(['email'])  // Index for faster email lookups
+export class User {
+  @Column({ unique: true })
+  email: string;
+}
+```
+
+### 5. Use Soft Deletes
+
+```typescript
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+  
+  @DeleteDateColumn()
+  deletedAt: Date | null;
+}
+
+// Soft delete (doesn't actually remove from database)
+await user.softRemove();
+
+// Find only non-deleted users
+const users = await User.find();  // Automatically excludes deleted
+
+// Find all including deleted
+const allUsers = await User.find({ withDeleted: true });
+```
+
+## Troubleshooting
+
+### "Entity not found" Error
+
+**Solution:** Ensure model is imported in `app.ts` or configured in database settings.
+
+### "Column does not exist" Error
+
+**Solution:** Run migrations to sync database schema with your models.
+
+### TypeScript Type Errors
+
+**Solution:** Ensure model properties match your TypeScript types exactly.
+
+## Next Steps
+
+Now that you understand models:
+
+- **[Database Setup](/guides/database-setup/)** - Configure your database connection
+- **[Migrations](/guides/migrations/)** - Create and manage schema changes
+- **[Running Migrations](/guides/migrate/)** - Apply migrations to database
+
+--- */}
+
+<small>
+**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
+</small>

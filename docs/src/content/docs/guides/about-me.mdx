@@ -1,0 +1,452 @@
+---
+title: Contributing
+description: How to contribute to structure-ts and a note from the creator
+---
+import CopyrightNotice from '../../../components/CopyrightNotice.astro';
+
+{/* # Contributing & About Me */}
+
+## About Me
+
+Hi! I'm Rahul Roy, the creator of Structure-Ts. Before we talk about contributing, I want to be completely honest with you.
+
+### I'm Not an Expert Developer
+
+Let me be clear from the start: **I'm not an expert developer.** I'm still learning, growing, and making mistakes along the way. I don't have decades of experience or a computer science degree from a prestigious university. I'm just someone who loves building things and wanted to solve a problem I was facing.
+
+### Why Am I Sharing This?
+
+Because **transparency matters**. You deserve to know who's building the tools you might use. Too often in tech, we pretend to know everything and hide our uncertainty. That's not helpful, and it's not honest.
+
+I'm building structure-ts because:
+- I believe in the problem it solves
+- I'm learning by doing
+- Good ideas can come from anyone
+- Open source is about collaboration, not perfection
+
+### What This Means for You
+
+**You might find bugs.** Please report them—I want to fix them.
+
+**You might see code that could be better.** Please improve it—that's how we all learn.
+
+**You might have ideas I never thought of.** Please share them—fresh perspectives make projects better.
+
+**You might know patterns I don't.** Please teach me—that's how I grow as a developer.
+
+### Why Build This Anyway?
+
+I built Structure-Ts because I struggled with the same problems you probably have:
+- Express projects that turned into spaghetti code
+- Spending hours deciding how to organize files
+- Wanting structure without NestJS complexity
+- Missing Django's elegance in the TypeScript world
+
+If I'm facing these problems, others probably are too. Even if I'm not an expert, I can work on solutions.
+
+{/* 
+### The Learning Journey
+
+This project is my learning journey, made public. Every commit, every feature, every bug fix teaches me something. By open-sourcing it, I'm:
+- Learning faster through community feedback
+- Building something useful (hopefully)
+- Demonstrating that you don't need to be an expert to contribute to open source
+
+If structure-ts helps even one person build their project faster, it's worth it.
+
+## Contributing is Welcome
+
+Despite my limitations (or perhaps because of them), **I genuinely want your help**. This project will only get better with more perspectives, more expertise, and more hands on deck.
+
+Whether you're a:
+- **Seasoned developer** who can spot code smells I miss
+- **Beginner** who has questions that expose confusing documentation
+- **Designer** who can make things look better
+- **Writer** who can explain things more clearly
+- **User** who has feedback on what works and what doesn't
+
+**Your contribution matters.**
+
+## Ways to Contribute
+
+### 1. Use It and Share Feedback
+
+The most valuable contribution is using structure-ts and telling me what you think.
+
+**Share Your Experience:**
+- What worked well?
+- What was confusing?
+- What broke?
+- What features are missing?
+
+**Where to Share:**
+- [GitHub Issues](https://github.com/rahulroy0322/structure-ts/issues) - Bug reports
+- [GitHub Discussions](https://github.com/rahulroy0322/structure-ts/discussions) - General feedback
+
+### 2. Report Bugs
+
+Found a bug? That's actually helpful!
+
+**Good Bug Reports Include:**
+- Clear title describing the issue
+- Steps to reproduce the problem
+- What you expected to happen
+- What actually happened
+- Your environment (OS, Node version, etc.)
+- Code example if possible
+
+**Example:**
+```markdown
+**Bug: Database connection fails with PostgreSQL**
+
+**Steps to Reproduce:**
+1. Configure PostgreSQL in settings.ts
+2. Run `npm run dev`
+3. See error
+
+**Expected:** Server starts successfully
+
+**Actual:** Error: "Connection refused"
+
+**Environment:**
+- OS: macOS 14.1
+- Node: v18.17.0
+- structure-ts: v0.1.0
+
+**Code:**
+\`\`\`typescript
+const DATABASE = {
+  type: 'postgres',
+  host: 'localhost',
+  // ...
+};
+\`\`\`
+```
+
+### 3. Suggest Features
+
+Have an idea? Let's hear it!
+
+**Good Feature Requests Include:**
+- Clear description of the feature
+- Why you need it (use case)
+- How you imagine it working
+- Example code of how you'd use it
+
+**Example:**
+```markdown
+**Feature Request: Middleware Support**
+
+**Description:**
+Add middleware functions that run before controllers, similar to Express middleware.
+
+**Use Case:**
+I need to authenticate users before certain routes run. Currently, I have to add auth checks in every controller.
+
+**Proposed API:**
+\`\`\`typescript
+route.get('/admin', adminController, [authMiddleware]);
+\`\`\`
+
+**Benefits:**
+- Reusable authentication logic
+- Cleaner controllers
+- Common pattern from Express/Fastify
+```
+
+### 4. Improve Documentation
+
+Documentation is as important as code.
+
+**Ways to Help:**
+- Fix typos and grammar
+- Clarify confusing sections
+- Add missing examples
+- Write tutorials
+- Translate to other languages
+
+**Even small fixes help!**
+
+### 5. Write Code
+
+Ready to contribute code? Awesome!
+
+#### Getting Started
+
+**1. Fork the Repository**
+```bash
+# Go to https://github.com/rahulroy0322/structure-ts
+# Click "Fork" button in top right
+```
+
+**2. Clone Your Fork**
+```bash
+git clone https://github.com/YOUR_USERNAME/structure-ts.git
+cd structure-ts
+```
+
+**3. Install Dependencies**
+```bash
+npm install
+```
+
+**4. Create a Branch**
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/bug-description
+```
+
+**5. Make Your Changes**
+- Write clean, readable code
+- Follow existing code style
+- Add comments where helpful
+- Test your changes
+
+**6. Commit Your Changes**
+```bash
+git add .
+git commit -m "Add feature: description of what you did"
+# or
+git commit -m "Fix: description of bug fix"
+```
+
+**7. Push to Your Fork**
+```bash
+git push origin feature/your-feature-name
+```
+
+**8. Open a Pull Request**
+- Go to the original repository
+- Click "New Pull Request"
+- Select your fork and branch
+- Fill out the PR template
+- Submit!
+
+#### Code Guidelines
+
+**Code Style:**
+- Use TypeScript strict mode
+- Follow existing naming conventions
+- Keep functions small and focused
+- Use meaningful variable names
+- Add JSDoc comments for public APIs
+
+**Example:**
+```typescript
+/**
+ * Creates a new user in the database
+ * @param name - User's full name
+ * @param email - User's email address
+ * @returns Promise resolving to created user
+ *
+async function createUser(name: string, email: string): Promise<User> {
+  // Implementation
+}
+```
+
+**Testing:**
+- Test your changes manually
+- Add automated tests (when possible)
+- Ensure existing tests still pass
+
+**Documentation:**
+- Update docs if you change APIs
+- Add examples for new features
+- Explain why, not just what
+
+#### Pull Request Guidelines
+
+**Good PRs:**
+- ✅ Focus on one thing (one feature or one bug)
+- ✅ Include clear description
+- ✅ Explain the problem being solved
+- ✅ Show before/after examples
+- ✅ Update relevant documentation
+- ✅ Are respectful and constructive
+
+**Example PR Description:**
+```markdown
+## Description
+Adds middleware support for route-level authentication.
+
+## Problem
+Currently, authentication checks must be added in every controller, leading to code duplication.
+
+## Solution
+Implements middleware functions that run before controllers.
+
+## Usage
+\`\`\`typescript
+route.get('/admin', adminController, [authMiddleware]);
+\`\`\`
+
+## Testing
+- Tested with authentication middleware
+- Existing routes still work
+- Error handling works correctly
+
+## Documentation
+- Updated routing.md
+- Added middleware.md guide
+- Added examples
+```
+
+**Avoid:**
+- ❌ Massive PRs that change everything
+- ❌ Unclear or vague descriptions
+- ❌ Breaking changes without discussion
+- ❌ Code without explanation
+
+### 6. Help Others
+
+Contribute by helping other users:
+- Answer questions in Discussions
+- Help troubleshoot issues
+- Share your knowledge
+- Welcome new contributors
+
+Community support is incredibly valuable!
+
+### 7. Spread the Word
+
+Help structure-ts reach more people:
+- ⭐ Star the repository
+- 📢 Share on social media
+- 📝 Write blog posts
+- 🎥 Create video tutorials
+- 💬 Tell colleagues about it
+
+## Code of Conduct
+
+### Be Kind and Respectful
+
+Everyone is welcome here, regardless of:
+- Experience level
+- Background
+- Identity
+- Beliefs
+
+**Expected Behavior:**
+- Be patient with newcomers
+- Assume good intentions
+- Give constructive feedback
+- Celebrate contributions
+- Treat everyone with respect
+
+**Not Acceptable:**
+- Harassment or discrimination
+- Insulting or aggressive behavior
+- Spam or trolling
+- Publishing others' private information
+- Any behavior that makes others feel unwelcome
+
+### Enforcement
+
+Violations of the code of conduct may result in:
+- Warning
+- Temporary ban
+- Permanent ban
+
+We want this to be a welcoming space for everyone.
+
+## Recognition
+
+All contributors are valued and recognized:
+
+### Contributors
+
+Every contributor is listed in:
+- README.md contributors section
+- GitHub contributors page
+- Release notes (for significant contributions)
+
+### Types of Contributions
+
+We recognize all contributions:
+- 💻 Code contributions
+- 📖 Documentation improvements
+- 🐛 Bug reports
+- 💡 Feature suggestions
+- 🎨 Design work
+- 💬 Community support
+- 📢 Advocacy and promotion
+
+**No contribution is too small!** Every improvement matters.
+
+## Questions?
+
+### Before Contributing
+
+- Read this guide
+- Check existing issues and PRs
+- Search Discussions for similar topics
+
+### Getting Help
+
+Stuck or have questions?
+- Open a Discussion for general questions
+- Comment on relevant issues
+- Ask in your PR
+
+Don't hesitate to ask for help—we're here to support you!
+
+## The Reality of Open Source
+
+Let me share some truths about working on this project:
+
+**Progress Isn't Always Fast**  
+This is a side project. Sometimes life gets busy. Sometimes I'm stuck on a problem. That's okay.
+
+**Not Every Idea Will Be Implemented**  
+Some suggestions won't fit the project's goals. That's not personal—it's about maintaining focus.
+
+**Mistakes Will Happen**  
+I'll write bugs. I'll make wrong decisions. When I do, I'll try to fix them quickly.
+
+**Feedback Might Take Time**  
+I'll try to respond to issues and PRs quickly, but patience is appreciated.
+
+**The Journey is Worth It**  
+Despite the challenges, building this project has been incredibly rewarding. Learning, growing, and connecting with others makes it worthwhile.
+
+## My Commitment
+
+Here's what I promise:
+
+**I will:**
+- Be honest about limitations
+- Listen to feedback with an open mind
+- Admit when I'm wrong
+- Learn from mistakes
+- Appreciate every contribution
+- Keep the project focused on its goals
+- Maintain a welcoming community
+
+**I won't:**
+- Pretend to know everything
+- Dismiss feedback without consideration
+- Make breaking changes lightly
+- Take contributors for granted
+- Let the project become complex for complexity's sake
+
+## Thank You
+
+If you've read this far, thank you. Whether you contribute code, report a bug, suggest a feature, or simply use structure-ts—**you're part of this project's story**.
+
+Every contribution, no matter how small, makes structure-ts better. Together, we're building something useful, learning along the way, and hopefully making TypeScript backend development a little bit easier.
+
+I don't have all the answers, but I'm committed to figuring them out—with your help.
+
+Let's build something great together! 🚀
+*/}
+---
+
+**Questions? Concerns? Just Want to Chat?**
+- GitHub Issues: [Report bugs](https://github.com/rahulroy0322/structure-ts/issues)
+- GitHub Discussions: [Start a conversation](https://github.com/rahulroy0322/structure-ts/discussions)
+{/* ! TODO  - Email: (if provided)  */}
+
+**Remember:** There are no stupid questions. We all started somewhere.
+
+<CopyrightNotice/>
