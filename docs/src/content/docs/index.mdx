@@ -19,7 +19,7 @@ hero:
       icon: external
       variant: minimal
 ---
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Code,Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Why Structure-Ts?
 
@@ -59,34 +59,40 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 Create a working API endpoint in seconds:
 
-```typescript
-// users/controllers.ts
-import { type ControllerType, ok } from 'structure-ts';
+<Code
+  code={
+    `import { type ControllerType, ok } from 'structure-ts';
 
 export const listUsers: ControllerType = (question, reply) => {
-  const users = [
-    { id: 1, name: 'Alice', email: 'alice@example.com' },
-    { id: 2, name: 'Bob', email: 'bob@example.com' },
-  ];
-  
-  reply.status(ok()).json({
-    success: true,
-    data: users,
-  });
-};
-```
+    const users = [
+      { id: 1, name: 'Alice', email: 'alice@example.com' },
+      { id: 2, name: 'Bob', email: 'bob@example.com' },
+    ];
+    
+    reply.status(ok()).json({
+      success: true,
+      data: users,
+    });
+};`
+  }
+  lang='ts'
+  title={'users/controllers.ts'}
+/>
 
-```typescript
-// users/routes.ts
-import { Router } from 'structure-ts';
+<Code
+  code={
+    `import { Router } from 'structure-ts';
 import { listUsers } from './controllers';
 
 const { routes, route } = Router();
 
 route.get('/', listUsers);
 
-export default routes;
-```
+export default routes;`
+  }
+  lang='ts'
+  title={'users/routes.ts'}
+/>
 
 That's it! Your `/` endpoint is ready to serve data.
 
@@ -125,8 +131,9 @@ From TypeScript integration to automatic route registration, every decision prio
 
 ## Get Started in 2 Minutes
 
-```bash
-# Install structure-ts globally
+<Code
+  code={
+    `# Install structure-ts globally
 pnpm add -g structure-ts 
 # or npm install -g structure-ts
 
@@ -139,8 +146,11 @@ pnpm install
 # or npm install
 
 pnpm dev
-# or npm run dev
-```
+# or npm run dev`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 Your server is now running at `http://localhost:2000`! 🎉
 

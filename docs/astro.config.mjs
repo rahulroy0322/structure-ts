@@ -5,6 +5,7 @@ import { defineConfig } from 'astro/config'
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://structure-ts.netlify.app',
   integrations: [
     starlight({
       title: 'Structure Ts',

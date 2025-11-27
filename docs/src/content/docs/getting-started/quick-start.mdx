@@ -23,17 +23,25 @@ This creates a new directory with everything you need to get started.
 
 Navigate into your project:
 
-```bash
-cd my-first-app
-```
+<Code
+  code={
+    `cd my-first-app`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ## Step 2: Install Dependencies
 
 Install all required packages:
 
-```bash
-pnpm i # or npm install
-```
+<Code
+  code={
+    `pnpm i # or npm install`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 This will take a minute or two. While it's running, let's look at what was created.
 
@@ -57,8 +65,8 @@ Your new project has this structure:
 **`src/settings.ts`** - Your configuration center:
 
 <Code
-code={
-   `import type { DatabaseType, SettingsType } from 'structure-ts';
+  code={
+    `import type { DatabaseType, SettingsType } from 'structure-ts';
 
 const PORT = 2000;              // Server port
 const APPS = [];                // Installed apps (empty for now)
@@ -71,11 +79,10 @@ export default {
     APPS,
     DATABASE,
     TEMPLATE_DIR,
-} satisfies SettingsType;
-   `
-}
+} satisfies SettingsType;`
+  }
   title={'src/settings.ts'}
-lang="ts"
+  lang="ts"
 />
 
 **`src/main.ts`** - Entry point that starts your server:
@@ -118,20 +125,23 @@ mark={['console.log(`server running on port : ${port}`)']}
 
 Start the development server:
 
-```bash
-pnpm dev # or npm run dev
-```
+<Code
+  code={
+    `pnpm dev # or npm run dev`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 You should see:
 
-
 <Code
-code={
-   `server running on port : 2000`
-}
+  code={
+    `server running on port : 2000`
+  }
   title={'terminal'}
-lang="text"
-mark={['server running on port : 2000']}
+  lang="text"
+  mark={['server running on port : 2000']}
 />
 
 Open your browser and visit `http://localhost:2000`. You'll see a welcome message!
@@ -147,21 +157,21 @@ Now let's create an app. Apps are self-contained modules that organize your code
 Open a **new terminal tab** (keep the server running) and run:
 
 <Code
-code={
-   `st create app users`
-}
+  code={
+    `st create app users`
+  }
   title={'terminal'}
-lang="sh"
-mark={['users']}
+  lang="sh"
+  mark={['users']}
 />
 
 This creates a new `users` directory with this structure:
 
 <FileTree>
 - src/
-    - users/
-        - controllers.ts        # Request handlers
-        - routes.ts             # URL patterns
+  - users/
+    - controllers.ts # Request handlers
+    - routes.ts # URL patterns
 </FileTree>
 
 ## Step 6: Register Your App
@@ -170,19 +180,19 @@ Open `src/settings.ts` and add your new app:
 
 
 <Code
-code={
-   `const APPS = ['users'];  // Add your app here`
-}
+  code={
+    `const APPS = ['users'];  // Add your app here`
+  }
   title={'src/settings.ts'}
-lang="ts"
-mark={[`'users'`]}
+  lang="ts"
+  mark={[`'users'`]}
 />
 
 Your settings file should now look like:
 
 <Code
-code={
-   `import type { DatabaseType, SettingsType } from 'structure-ts';
+  code={
+    `import type { DatabaseType, SettingsType } from 'structure-ts';
 
 const PORT = 2000;
 const APPS = ['users'];  // ← Changed!
@@ -195,10 +205,10 @@ export default {
     DATABASE,
     TEMPLATE_DIR,
 } satisfies SettingsType;`
-}
+  }
   title={'src/settings.ts'}
-lang="ts"
-mark={[`'users'`]}
+  lang="ts"
+  mark={[`'users'`]}
 />
 
 :::note[Auto-Registration]
@@ -210,28 +220,28 @@ Structure-Ts automatically registers routes from all apps in the `APPS` array. N
 Controllers handle HTTP requests. Open `src/users/controllers.ts`:
 
 <Code
-code={
-   `import { type ControllerType, ok } from 'structure-ts';
+  code={
+    `import { type ControllerType, ok } from 'structure-ts';
 
 const listUsers: ControllerType = (question, reply) => {
-  // Sample data
-  const users = [
+    // Sample data
+    const users = [
     { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
     { id: 2, name: 'Bob Smith', email: 'bob@example.com' },
     { id: 3, name: 'Charlie Brown', email: 'charlie@example.com' },
-  ];
-  
-  reply.status(ok()).json({
+    ];
+
+    reply.status(ok()).json({
       success: true,
-    data: users,
-  });
+      data: users,
+    });
 };
 
 export { listUsers };`
-}
+  }
   title={'src/users/controllers.ts'}
-lang="ts"
-mark={[`listUsers`]}
+  lang="ts"
+  mark={[`listUsers`]}
 />
 
 **What's happening here?**
@@ -251,7 +261,7 @@ code={
 import { listUsers } from './controllers';
 const { routes, route } = Router();
 
-route.get('/', listUsers);
+route.get('/users', listUsers);
 
 export default routes;`
 }
@@ -269,22 +279,30 @@ mark={[`listUsers`]}
 
 Your server auto-reloads with the changes. Visit:
 
-``` bash
-http://localhost:2000/users
-```
+<Code
+  code={
+    `http://localhost:2000/users`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 You should see:
 
-```json
-{
+<Code
+  code={
+    `{
     "success": true,
     "data": [
         { "id": 1, "name": "Alice Johnson", "email": "alice@example.com" },
         { "id": 2, "name": "Bob Smith", "email": "bob@example.com" },
         { "id": 3, "name": "Charlie Brown", "email": "charlie@example.com" }
-  ]
-}
-```
+    ]
+}`
+  }
+  lang='json'
+  title={'browser'}
+/>
 
 🎉 **Congratulations!** You just built your first API endpoint with Structure-Ts!
 
@@ -355,12 +373,16 @@ mark={[`listUsers`,'getUser']}
 
 Now test these URLs:
 
-``` bash
-http://localhost:2000/      → Lists all users
+<Code
+  code={
+    `http://localhost:2000/      → Lists all users
 http://localhost:2000/1    → Shows Alice
 http://localhost:2000/2    → Shows Bob
-http://localhost:2000/999  → Returns 404
-```
+http://localhost:2000/999  → Returns 404`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ## Understanding What You Built
 
@@ -458,11 +480,16 @@ mark={[`createUser`]}
 />
 
 Test with curl:
-```bash
-curl -X POST http://localhost:2000/create \
+
+<Code
+  code={
+    `curl -X POST http://localhost:2000/create \
   -H "Content-Type: application/json" \
-  -d '{"name":"David","email":"david@example.com"}'
-```
+  -d '{"name":"David","email":"david@example.com"}'`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 **Create another app:**
 

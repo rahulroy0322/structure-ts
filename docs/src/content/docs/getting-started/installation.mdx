@@ -37,49 +37,83 @@ Before installing Structure-Ts, ensure you have:
 
 Installing globally gives you access to the `st` command anywhere on your system.
 
-**Using npm:**
-```bash
-npm install -g structure-ts
-```
-
 **Using pnpm:**
-```bash
-pnpm add -g structure-ts
-```
+
+<Code
+  code={
+    `pnpm add -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
+
+or,
+
+**Using npm:**
+
+<Code
+  code={
+    `npm install -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
+
+or,
 
 **Using yarn:**
-```bash
-yarn global add structure-ts
-```
 
-This installs the structure-ts CLI globally, allowing you to run commands like `st create project` from any directory.
+<Code
+  code={
+    `yarn global add structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
-{/* ! TODO ### Method 2: Using npx (No Installation Required)
+This installs the `structure-ts` CLI globally, allowing you to run commands like `st create project` from any directory.
+
+{/*
+   ! TODO ### Method 2: Using npx (No Installation Required)
 
 If you don't want to install globally, use `npx` to run commands directly:
 
-```bash
-npx structure-ts create project my-app
-```
+<Code
+  code={
+    `npx structure-ts create project my-app`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 This downloads structure-ts temporarily, creates your project, and cleans up automatically.
 
 **Pros**: No global installation needed  
-**Cons**: Slower (downloads each time), requires internet connection */}
+**Cons**: Slower (downloads each time), requires internet connection 
+
+*/}
 
 ## Verify Installation
 
-After installing, verify structure-ts is accessible:
+After installing, verify `structure-ts` is accessible:
 
-```bash
-st --version
-```
+<Code
+  code={
+    `st --version`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 or
 
-```bash
-structure-ts --version
-```
+<Code
+  code={
+    `structure-ts --version`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 You should see the current version number, like `0.1.0`.
 
@@ -89,9 +123,13 @@ If you see "command not found," check the [Troubleshooting](#troubleshooting) se
 
 Once installed, create your first project:
 
-```bash
-st create project my-first-app
-```
+<Code
+  code={
+    `st create project my-first-app`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 This command:
 1. Creates a new directory called `my-first-app`
@@ -101,27 +139,35 @@ This command:
 
 You'll see output like:
 
-```
-✓ Creating project directory...
+<Code
+  code={
+    `✓ Creating project directory...
 ✓ Generating package.json...
 ✓ Setting up TypeScript configuration...
 ✓ Creating source files...
 ✓ Project created successfully!
 
 Next steps:
-  cd my-first-app
-  npm install
-  npm run dev
-```
+   cd my-first-app
+   npm install
+   npm run dev`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ## Install Dependencies
 
 Navigate to your project and install dependencies:
 
-```bash
-cd my-first-app
-pnpm i # or npm install
-```
+<Code
+  code={
+    `cd my-first-app
+pnpm i # or npm install`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 This installs all required packages including:
 - TypeScript compiler
@@ -132,15 +178,23 @@ This installs all required packages including:
 
 Run your application in development mode:
 
-```bash
-pnpm dev # or npm run dev
-```
+<Code
+  code={
+    `pnpm dev # or npm run dev`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 You should see:
 
-```
-server running on port : 2000
-```
+<Code
+  code={
+    `server running on port : 2000`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 Open your browser and visit `http://localhost:2000`. You should see a welcome message!
 
@@ -182,21 +236,39 @@ Central configuration for port, database, apps, and templates. [Learn more about
 Your project comes with several npm scripts:
 
 **Development:**
-```bash
-pnpm dev # or npm run dev
-```
+
+<Code
+  code={
+    `pnpm dev # or npm run dev`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
+
 Runs the application in development mode with hot reloading.
 
 **Build:**
-```bash
-pnpm build # or npm run build
-```
+
+<Code
+  code={
+    `pnpm build # or npm run build`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
+
 Compiles TypeScript to JavaScript for production.
 
 **Start:**
-```bash
-npm start # prefer because pnpm is over kill for prod
-```
+
+<Code
+  code={
+    `npm start # prefer because pnpm is over kill for prod`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
+
 Runs the compiled production build.
 
 ## Troubleshooting
@@ -208,26 +280,45 @@ If `st` or `structure-ts` isn't recognized:
 **On Linux/macOS:**
 
 1. Check npm global bin path:
-   ```bash
-   npm config get prefix
-   ```
+   <Code
+      code={
+         `npm config get prefix`
+      }
+      lang='sh'
+      title={'terminal'}
+   />
 
 2. Ensure this path is in your `$PATH`. Add to `~/.bashrc` or `~/.zshrc`:
-   ```bash
-   export PATH="$PATH:$(npm config get prefix)/bin"
-   ```
+   
+   <Code
+      code={
+         `export PATH="$PATH:$(npm config get prefix)/bin"`
+      }
+      lang='sh'
+      title={'terminal'}
+   />
 
 3. Reload your shell:
-   ```bash
-   source ~/.bashrc  # or ~/.zshrc
-   ```
+   
+   <Code
+      code={
+         `source ~/.bashrc  # or ~/.zshrc`
+      }
+      lang='sh'
+      title={'terminal'}
+   />
 
 **On Windows:**
 
 1. Check global installation directory:
-   ```bash
-   npm config get prefix
-   ```
+   
+   <Code
+      code={
+         `npm config get prefix`
+      }
+      lang='sh'
+      title={'terminal'}
+   />
 
 2. Add this path to your system's PATH environment variable:
    - Search for "Environment Variables" in Start menu
@@ -235,109 +326,171 @@ If `st` or `structure-ts` isn't recognized:
    - Add the npm prefix path
 
 **Alternative**: Use the full path:
-```bash
-npx structure-ts create project my-app
-```
+
+<Code
+  code={
+    `npx structure-ts create project my-app`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ### Permission Errors (Linux/macOS)
 
-If you get `EACCES` permission errors:
+If you get **`EACCES`** permission errors:
 
 **Option 1: Fix npm permissions (recommended)**
-```bash
-mkdir ~/.npm-global
+
+<Code
+  code={
+    `mkdir ~/.npm-global
 npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
-```
+source ~/.bashrc`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 Then reinstall:
-```bash
-npm install -g structure-ts
-```
 
+<Code
+  code={
+    `npm install -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 **Option 2: Use sudo (not recommended)**
-```bash
-sudo npm install -g structure-ts
-```
+
+<Code
+  code={
+    `sudo npm install -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ### Port Already in Use
 
 If port 2000 is busy, change it in `src/settings.ts`:
 
 <Code
-code={
-   `const PORT = 3000; // Use any available port`
-}
-  title={'src/settings.ts'}
-lang="ts"
-mark={['3000']}
+   code={
+      `const PORT = 3000; // Use any available port`
+   }
+   title={'src/settings.ts'}
+   lang="ts"
+   mark={['3000']}
 />
 
 ### TypeScript Errors
 
 Ensure you have compatible TypeScript version:
 
-```bash
-npm install -D typescript@latest
-```
+<Code
+  code={
+    `pnpm i -D typescript # or npm install -D typescript`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ### Module Not Found
 
 If imports fail, regenerate dependencies:
 
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
+<Code
+  code={
+    `rm -rf node_modules package-lock.json
+npm install`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ### Slow Installation
 
 If npm install is slow:
 
 **Use pnpm (faster):**
-```bash
-npm install -g pnpm
-pnpm install
-```
+
+<Code
+  code={
+    `npm install -g pnpm
+pnpm install`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 **Or enable npm cache:**
-```bash
-npm config set cache ~/.npm-cache --global
-```
+
+<Code
+  code={
+    `npm config set cache ~/.npm-cache --global`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ## Updating structure-ts
 
 To update to the latest version:
 
 **Global installation:**
-```bash
-npm update -g structure-ts
-```
+
+<Code
+  code={
+    `npm update -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 **Check for updates:**
-```bash
-npm outdated -g structure-ts
-```
+
+<Code
+  code={
+    `npm outdated -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 **Install specific version:**
-```bash
-npm install -g structure-ts@0.2.0
-```
+
+<Code
+  code={
+    `npm install -g structure-ts@0.2.0`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ## Uninstalling
 
 To remove structure-ts:
 
 **Global uninstallation:**
-```bash
-npm uninstall -g structure-ts
-```
 
-**Remove projects** (be careful!):
-```bash
-rm -rf my-first-app
-```
+<Code
+  code={
+    `npm uninstall -g structure-ts`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
+
+**Remove projects** **`(be careful!)`**:
+
+<Code
+  code={
+    `rm -rf my-first-app`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 ## Next Steps
 

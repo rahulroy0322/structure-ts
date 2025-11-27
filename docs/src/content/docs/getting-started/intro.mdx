@@ -2,7 +2,7 @@
 title: Introduction
 description: Why Structure-Ts exists and what problems it solves
 ---
-import { Code } from '@astrojs/starlight/components';
+import { Code, FileTree } from '@astrojs/starlight/components';
 
 Welcome to `Structure-Ts`! This page explains why this framework exists, what problems it solves, and whether it's the right choice for your project.
 
@@ -66,13 +66,13 @@ Need custom configuration? `Override` only what you need—nothing more.
 
 Large applications are easier to manage when divided into focused modules. Each "app" in Structure-Ts handles one domain:
 
-```
-my-project/
-└── src/
-    ├── users/        # Everything user-related
-    ├── blog/         # Everything blog-related
-    └── api/          # Everything API-related
-```
+<FileTree>
+- muy-project/
+  - src/
+    - users/        # Everything user-related
+    - blog/         # Everything blog-related
+    - api/          # Everything API-related
+</FileTree>
 
 Apps are:
 - **Self-contained**: Own routes, controllers, models
@@ -200,8 +200,9 @@ Structure-Ts provides:
 
 Let's see how quickly you can build a working feature:
 
-```typescript
-// 1. Create app (1 minute)
+<Code
+  code={
+    `// 1. Create app (1 minute)
 st create app blog
 
 // 2. Add to settings.ts (30 seconds)
@@ -210,19 +211,23 @@ const APPS = ['blog'];
 // 3. Create controller (2 minutes)
 // blog/controllers.ts
 export const listPosts: ControllerType = (question, reply) => {
-  const posts = [
-    { id: 1, title: 'Hello World', author: 'Alice' },
-    { id: 2, title: 'TypeScript Tips', author: 'Bob' },
-  ];
-  reply.status(ok()).json({ success: true, data: posts });
+    const posts = [
+      { id: 1, title: 'Hello World', author: 'Alice' },
+      { id: 2, title: 'TypeScript Tips', author: 'Bob' },
+    ];
+    reply.status(ok()).json({ success: true, data: posts });
 };
 
 // 4. Add route (1 minute)
 // blog/routes.ts
 route.get('/', listPosts);
 
-// Done! Visit http://localhost:2000/blog
-```
+// Done! Visit http://localhost:2000/blog`
+  }
+  lang='ts'
+  title={'app'}
+/>
+
 
 Five minutes from idea to working endpoint. That's the Structure-Ts way.
 
