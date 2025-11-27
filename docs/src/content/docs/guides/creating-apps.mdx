@@ -2,9 +2,7 @@
 title: Creating Apps
 description: Learn how to create and organize modular applications
 ---
-import { Code,FileTree } from '@astrojs/starlight/components';
-
-{/* # Creating Apps */}
+import { Code, FileTree } from '@astrojs/starlight/components';
 
 Apps are the building blocks of Structure-Ts applications. This guide explains what apps are, how to create them, and best practices for organizing your code.
 
@@ -30,10 +28,10 @@ Each app focuses on one responsibility, making your code easier to understand, t
 Apps keep related code together:
 <FileTree>
 - users/
-    - controllers.ts    # User-related request handlers
-    - routes.ts         # User-related URLs
-    - models.ts         # User database models
-    - services.ts       #  Services related to User models
+  - controllers.ts    # User-related request handlers
+  - routes.ts         # User-related URLs
+  - models.ts         # User database models
+  - services.ts       #  Services related to User models
 </FileTree>
 
 Everything about users lives in one place.
@@ -41,23 +39,35 @@ Everything about users lives in one place.
 ### 2. Reusability
 Apps can be moved between projects:
 
-```bash
-# Copy entire app to another project
-cp -r users/ ../other-project/src/users/
-```
+<Code
+  code={
+`# Copy entire app to another project
+cp -r users/ ../other-project/src/users/`
+  }
+  lang='sh'
+  title={'terminal'}
+/>
 
 Share common functionality across projects without code duplication.
 
 ### 3. Scalability
 Add features without touching existing code:
 
-```typescript
-// Before
+<Code
+  code={
+`// Before
 const APPS = ['users', 'blog'];
 
 // After - just add new app
-const APPS = ['users', 'blog', 'payments', 'notifications'];
-```
+const APPS = ['users', 'blog', 'payments', 'notifications'];`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+  mark={[
+    `'payments'`,
+    `'notifications'`
+  ]}
+/>
 
 Each app is independent—adding one doesn't break others.
 
@@ -73,14 +83,19 @@ No stepping on each other's toes!
 ### 5. Testing
 Test apps independently:
 
-```typescript
-import { listUsers } from './users/controllers';
+<Code 
+  code={
+    `import { test } from 'node:test';
+import { listUsers } from '../controllers';
 
 // Test user functionality in isolation
 test('listUsers returns all users', () => {
-  // ...
-});
-```
+    // ...
+});`
+  }
+  lang="ts"
+  title={'tests/controllers.ts'}
+/>
 
 ## Creating an App
 
@@ -88,15 +103,23 @@ test('listUsers returns all users', () => {
 
 The easiest way to create an app is with the CLI:
 
-```bash
-st create app users
-```
+<Code 
+  code={
+    `st create app users`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
 
 or the full command:
 
-```bash
-structure-ts create app users
-```
+<Code 
+  code={
+    `structure-ts create app users`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
 
 This creates a new directory with the standard structure.
 
@@ -104,8 +127,9 @@ This creates a new directory with the standard structure.
 
 Run this command from your **project root directory** (where `src/` folder exists):
 
-```bash
-my-first-app/
+<Code 
+  code={
+    `my-first-app/
 ├── src/              # You should be here
 │   └── settings.ts
 └── package.json
@@ -114,36 +138,44 @@ my-first-app/
 $ pwd
 /path/to/my-first-app
 
-$ st create app users
-```
+$ st create app users`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
 
 ### What Gets Created
 
 The CLI generates this structure:
 
-```
-src/
-└── users/
-    ├── controllers.ts    # Request handlers
-    ├── routes.ts        # URL routing
-    ├── models.ts        # Database models (optional)
-    └── migrations/      # Schema migrations (auto-generated)
-```
+<FileTree>
+- src/
+  - users/
+    - controllers.ts    # Request handlers
+    - routes.ts         # URL routing
+    - models.ts         # Database models (optional)
+    - services.ts       # If **`models.ts`** is presend then required
+</FileTree>
 
 ### Generated Files
 
 **`controllers.ts`** - Empty file ready for your controllers:
 
-```typescript
-import { type ControllerType } from 'structure-ts';
+<Code 
+  code={
+    `import { type ControllerType } from 'structure-ts';
 
-// Add your controllers here
-```
+// Add your controllers here`
+  }
+  lang="ts"
+  title={'app/controllers.ts'}
+/>
 
 **`routes.ts`** - Basic router setup:
 
-```typescript
-import { Router } from 'structure-ts';
+<Code 
+  code={
+    `import { Router } from 'structure-ts';
 
 const { routes, route } = Router();
 
@@ -151,13 +183,21 @@ const { routes, route } = Router();
 // Example: route.get('/', yourController);
 
 export default routes;
-```
+`
+  }
+  lang="ts"
+  title={'app/routes.ts'}
+/>
 
 **`models.ts`** - Empty file for database models:
 
-```typescript
-// Define your database models here
-```
+<Code 
+  code={
+    `// Define your database models here`
+  }
+  lang="ts"
+  title={'app/models.ts'}
+/>
 
 ## Linking Your App to the Project
 
@@ -167,8 +207,9 @@ Creating an app isn't enough—you must register it in settings.
 
 Edit `src/settings.ts`:
 
-```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+<Code 
+  code={
+    `import type { DatabaseType, SettingsType } from 'structure-ts';
 
 const PORT = 2000;
 const APPS = [];  // ← Currently empty
@@ -176,25 +217,35 @@ const DATABASE: DatabaseType = false;
 const TEMPLATE_DIR = 'templates';
 
 export default {
-  PORT,
-  APPS,
-  DATABASE,
-  TEMPLATE_DIR,
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
 } satisfies SettingsType;
-```
+`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### Step 2: Add Your App
 
 Add the app name to the `APPS` array:
 
-```typescript
-const APPS = ['users'];  // ← Added!
-```
+<Code 
+  code={
+    `const APPS = ['users'];  // ← Added!`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={`'users'`}
+/>
 
 Full example:
 
-```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+<Code 
+  code={
+    `import type { DatabaseType, SettingsType } from 'structure-ts';
 
 const PORT = 2000;
 const APPS = ['users'];  // Your app is now registered
@@ -202,22 +253,33 @@ const DATABASE: DatabaseType = false;
 const TEMPLATE_DIR = 'templates';
 
 export default {
-  PORT,
-  APPS,
-  DATABASE,
-  TEMPLATE_DIR,
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
 } satisfies SettingsType;
-```
+`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[`'users'`]}
+/>
 
 ### Step 3: Restart Your Server ?
 
 If your server is running and doesn't load new app, restart it to load the new app:
 
-```bash
-# Stop the server (Ctrl+C)
+
+<Code 
+  code={
+    `# Stop the server (Ctrl+C)
 # Start it again
 npm run dev
-```
+`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
 
 Your app's routes are now active!
 
@@ -237,82 +299,162 @@ When your server starts, structure-ts:
 
 Combine all the routes in one place:
 
-```typescript
-// App name: users
+<Code
+  code={
+    `// App name: users
 // Route defined as: route.get('/', controller)
 // Actual URL: /
 
 // App name: blog
 // Route defined as: route.get('/posts', controller)
 // Actual URL: /posts
-```
+`
+  }
+  lang="ts"
+  mark={[
+    "App name: users",
+    "App name: blog",
+  ]}
+/>
 
 ### 3. Route Examples
 
-```typescript
-// In users/routes.ts
+<Code
+  code={
+    `// users/routes.ts
+import { route } from 'structure-ts';
+
 route.get('/', listUsers);          // → /
 route.get('/<id:str>', getUser);    // → /:id
 route.post('/create', createUser);  // → /create
 
-// In blog/routes.ts
-route.get('/', listPosts);          // → /blog/
-route.get('/<slug:str>', getPost);  // → /blog/:slug
-```
+// blog/routes.ts
+route.get('/blog', listPosts);          // → /blog/
+route.get('/blog/<slug:str>', getPost);  // → /blog/:slug
+`
+  }
+  lang="ts"
+  title={'src/apps/users/routes.ts & src/apps/blog/routes.ts'}
+/>
 
 ## Creating Multiple Apps
 
 You can create as many apps as needed:
 
-```bash
-st create app users
+<Code
+  code={
+    `st create app users
 st create app blog
 st create app api
 st create app admin
-```
+`
+  }
+  lang="sh"
+  title={'terminal'}
+  mark={[
+    'users',
+    'blog',
+    'api',
+    'admin'
+  ]}
+/>
 
 Register all of them in settings:
 
-```typescript
-const APPS = [
-  'users',
-  'blog',
-  'api',
-  'admin',
-];
-```
+<Code
+  code={
+    `const APPS = [
+    'users',
+    'blog',
+    'api',
+    'admin',
+];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[
+    "'users'",
+    "'blog'",
+    "'api'",
+    "'admin'"
+  ]}
+/>
 
 ## App Naming Conventions
 
 ### Good Names
 
 ✅ **Lowercase, no special characters:**
-```bash
-st create app users
+
+<Code
+  code={
+    `st create app users
 st create app blog
 st create app api
-```
+`
+  }
+  lang="sh"
+  title={'terminal'}
+  mark={[
+    'users',
+    'blog',
+    'api'
+  ]}
+/>
+
 
 ✅ **Use hyphens for multi-word apps:**
-```bash
-st create app user-management
+
+<Code
+  code={
+    `st create app user-management
 st create app blog-posts
 st create app payment-gateway
-```
+`
+  }
+  lang="sh"
+  title={'terminal'}
+  mark={[
+    'user-management',
+    'blog-posts',
+    'payment-gateway'
+  ]}
+/>
 
 ### Bad Names
 
 ❌ **Uppercase letters:**
-```bash
-st create app Users      # Don't do this
+
+<Code
+  code={
+    `st create app Users      # Don't do this
 st create app BlogPosts  # Don't do this
-```
+`
+  }
+  lang="sh"
+  title={'terminal'}
+  mark={[
+    'Users',
+    'BlogPosts'
+  ]}
+/>
 
 ❌ **Spaces or special characters:**
-```bash
-st create app "user management"  # Don't do this
+
+<Code
+  code={
+    `st create app "user management"  # Don't do this
 st create app blog_posts         # Use hyphens instead
-```
+`
+  }
+  lang="sh"
+  title={'terminal'}
+  mark={[
+    '"user management"',
+    'blog_posts'
+  ]}
+/>
+
 
 ## Best Practices
 
@@ -321,46 +463,89 @@ st create app blog_posts         # Use hyphens instead
 Each app should have one clear purpose.
 
 **Good:**
-```typescript
-const APPS = [
-  'users',       // User management only
-  'blog',        // Blog functionality only
-  'payments',    // Payment processing only
-];
-```
+
+<Code
+  code={
+    `const APPS = [
+    'users',       // User management only
+    'blog',        // Blog functionality only
+    'payments',    // Payment processing only
+];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[
+    "'users'",
+    "'blog'",
+    "'payments'"
+  ]}
+/>
 
 **Bad:**
-```typescript
-const APPS = [
-  'everything',  // Users, blog, payments all mixed together
-];
-```
+
+<Code
+  code={
+    `const APPS = [
+    'everything',  // Users, blog, payments all mixed together
+];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[
+    `'everything'`,
+  ]}
+/>
 
 ### 2. Make Apps Independent
 
 Apps should work without depending on each other's internals.
 
 **Good:**
-```typescript
-// users/controllers.ts
+
+<Code
+  code={
+`// users/controllers.ts
 import { User } from './models';  // Import from own app
 
 // blog/controllers.ts
-import { Post } from './models';  // Import from own app
-```
+import { Post } from './models';  // Import from own app`
+  }
+  lang="ts"
+  mark={[
+    "import { User }",
+    "import { Post }"
+  ]}
+/>
+
 
 **Acceptable:**
-```typescript
-// blog/controllers.ts
-// If you need user data, import the public API
-import { getUserById } from '../users/services';
-```
+
+<Code
+  code={
+`// If you need user data, import the public API
+import { getUserById } from '../users/services';`
+  }
+  lang="ts"
+  title={'blog/controllers.ts'}
+  mark={[
+    "getUserById",
+    "../users/services"
+  ]}
+/>
 
 **Bad:**
-```typescript
-// blog/controllers.ts
-import { User } from '../users/models';  // Tight coupling
-```
+
+<Code
+  code={
+    `import { User } from '../users/models';  // Tight coupling`
+  }
+  lang="ts"
+  title={'blog/controllers.ts'}
+  mark={[
+    "User",
+    "../users/models"
+  ]}
+/>
 
 ### 3. Use Clear, Descriptive Names
 
@@ -381,25 +566,27 @@ App names should instantly convey their purpose.
 If features are closely related, keep them in one app.
 
 **Good:**
-```
-blog/
-├── controllers.ts
-│   ├── listPosts()
-│   ├── createPost()
-│   ├── listComments()
-│   └── createComment()
-└── models.ts
-    ├── Post
-    └── Comment
-```
+
+<FileTree>
+- blog/
+  - controllers.ts
+    - listPosts()
+    - createPost()
+    - listComments()
+    - createComment()
+  - models.ts
+    - Post
+    - Comment
+</FileTree>
 
 Posts and comments are related—they belong together.
 
 **Debatable:**
-```
-blog-posts/      # Separate apps for posts...
-blog-comments/   # ...and comments
-```
+
+<FileTree>
+- blog-posts/        # Separate app for posts...
+- blog-comments/     # ...and comments
+</FileTree>
 
 Only separate if they're truly independent features.
 
@@ -408,14 +595,30 @@ Only separate if they're truly independent features.
 Start simple. One app is fine for small projects.
 
 **For small projects:**
-```typescript
-const APPS = ['api'];  // Everything in one app is OK
-```
+
+<Code
+  code={
+    `const APPS = ['api'];  // Everything in one app is OK`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[
+    `'api'`
+  ]}
+/>
 
 **As you grow:**
-```typescript
-const APPS = ['users', 'blog', 'api'];
-```
+
+<Code
+  code={
+    `const APPS = ['users', 'blog', 'api'];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[
+    `'users', 'blog', 'api'`
+  ]}
+/>
 
 Split apps when complexity demands it, not before.
 
@@ -425,14 +628,24 @@ Split apps when complexity demands it, not before.
 
 Organize by feature/domain:
 
-```typescript
-const APPS = [
-  'users',        // User authentication
-  'blog',         // Blog posts
-  'shop',         // E-commerce
-  'admin',        // Admin panel
-];
-```
+<Code
+  code={
+`const APPS = [
+    'users',        // User authentication
+    'blog',         // Blog posts
+    'shop',         // E-commerce
+    'admin',        // Admin panel
+];`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+  mark={[
+    `'users'`,
+    `'blog'`,
+    `'shop'`,
+    `'admin'`
+  ]}
+/>
 
 **When to use:** Most applications benefit from this approach.
 
@@ -440,12 +653,20 @@ const APPS = [
 
 Separate apps for API versions:
 
-```typescript
-const APPS = [
-  'api-v1',       // Version 1 endpoints
-  'api-v2',       // Version 2 endpoints
-];
-```
+<Code
+  code={
+`const APPS = [
+    'api-v1',       // Version 1 endpoints
+    'api-v2',       // Version 2 endpoints
+];`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+  mark={[
+    'api-v1',
+    'api-v2'
+  ]}
+/>
 
 **When to use:** When maintaining multiple API versions.
 
@@ -453,13 +674,22 @@ const APPS = [
 
 Different apps for different clients:
 
-```typescript
-const APPS = [
-  'web',          // Web application routes
-  'mobile-api',   // Mobile app API
-  'admin',        // Admin panel
-];
-```
+<Code
+  code={
+`const APPS = [
+    'web',          // Web application routes
+    'mobile-api',   // Mobile app API
+    'admin',        // Admin panel
+];`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+  mark={[
+    `'web'`,
+    `'mobile-api'`,
+    `'admin'`
+  ]}
+/>
 
 **When to use:** When different clients need different functionality.
 
@@ -469,22 +699,31 @@ Let's walk through creating a complete blog app.
 
 ### Step 1: Create the App
 
-```bash
-st create app blog
-```
+<Code
+  code={
+    `st create app blog`
+  }
+  lang='sh'
+  title={'terminal'}
+  mark={['blog']}
+/>
 
 ### Step 2: Register the App
 
-```typescript
-// src/settings.ts
-const APPS = ['blog'];
-```
+<Code
+  code={
+    `const APPS = ['blog'];`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+  mark={['blog']}
+/>
 
 ### Step 3: Create Controllers
 
-```typescript
-// src/blog/controllers.ts
-import { type ControllerType, ok, created, notFound } from 'structure-ts';
+<Code
+  code={
+    `import { type ControllerType, ok, created, notFound } from 'structure-ts';
 
 const posts = [
     { id: 1, title: 'First Post', author: 'Alice' },
@@ -493,48 +732,56 @@ const posts = [
 
 // List all posts
 export const listPosts: ControllerType = (question, reply) => {
-  reply.status(ok()).json({ success: true, data: posts });
+    reply.status(ok()).json({ success: true, data: posts });
 };
 
 // Get single post
 export const getPost: ControllerType = (question, reply) => {
-  const { id } = question.params;
+    const { id } = question.params;
+      
+    const post = posts.find(p => p.id === parseInt(id));
     
-  const post = posts.find(p => p.id === parseInt(id));
-  
-  if (!post) {
-    return reply.status(notFound()).json({
-      success: false,
-      error: 'Post not found',
-    });
-  }
-  
-  reply.status(ok()).json({ success: true, data: post });
+    if (!post) {
+      return reply.status(notFound()).json({
+        success: false,
+        error: 'Post not found',
+      });
+    }
+    
+    reply.status(ok()).json({ success: true, data: post });
 };
 
 // Create post
 export const createPost: ControllerType = (question, reply) => {
-  const { title, content, author } = question.body;
-  
-  const newPost = {
-    id: Date.now(),
-    title,
-    content,
-    author,
-    createdAt: new Date(),
-  };
+    const { title, content, author } = question.body;
+    
+    const newPost = {
+      id: Date.now(),
+      title,
+      content,
+      author,
+      createdAt: new Date(),
+    };
 
-  posts.push(newPost);
-  
-  reply.status(created()).json({ success: true, data: newPost });
-};
-```
+    posts.push(newPost);
+    
+    reply.status(created()).json({ success: true, data: newPost });
+};`
+  }
+  lang='ts'
+  title={'src/blog/controllers.ts'}
+  mark={[
+    'listPosts',
+    'getPost',
+    'createPost'
+  ]}
+/>
 
 ### Step 4: Define Routes
 
-```typescript
-// src/blog/routes.ts
-import { Router } from 'structure-ts';
+<Code
+  code={
+    `import { Router } from 'structure-ts';
 import { listPosts, getPost, createPost } from './controllers';
 
 const { routes, route } = Router();
@@ -543,22 +790,40 @@ route.get('/', listPosts);
 route.get('/<id:int>', getPost);
 route.post('/create', createPost);
 
-export default routes;
-```
+export default routes;`
+  }
+  lang='ts'
+  title={'src/blog/routes.ts'}
+  mark={[
+    "route.get('/')",
+    "route.get('/<id:int>')",
+    "route.post('/create')"
+  ]}
+/>
 
 ### Step 5: Test Your Blog
 
-```bash
-# Start server
+<Code
+  code={
+`# Start server
 npm run dev
 
 # Test endpoints
 curl http://localhost:2000/
 curl http://localhost:2000/1
-curl -X POST http://localhost:2000/create \
-  -H "Content-Type: application/json" \
-  -d '{"title":"New Post","content":"Content","author":"Charlie"}'
-```
+curl -X POST http://localhost:2000/create \\
+  -H 'Content-Type: application/json' \\
+  -d '{"title":"New Post","content":"Content","author":"Charlie"}'`
+  }
+  lang='sh'
+  title={'terminal'}
+  mark={[
+    'npm run dev',
+    'curl http://localhost:2000/',
+    'curl http://localhost:2000/1',
+    'curl -X POST http://localhost:2000/create'
+  ]}
+/>
 
 Your blog app is complete!
 
@@ -585,22 +850,22 @@ Your blog app is complete!
 **Problem:** Cannot import from app.
 
 **Solution:** Use correct relative paths:
-```typescript
-import { controller } from './controllers';  // Same directory
-import { User } from './models';             // Same directory
-```
+
+<Code
+  code={
+`import { controller } from './controllers';  // Same directory
+import { User } from './models';             // Same directory`
+  }
+  lang='ts'
+  title={'users/{file name}.ts'}
+  mark={[
+    './controllers',
+    './models'
+  ]}
+/>
 
 ## Next Steps
 
 Now that you understand apps, explore:
 
-- **[Settings Configuration](/guides/settings-configuration/)** - Configure your apps
-- **[Routing](/guides/routing/)** - Advanced routing patterns
 - **[Controllers](/guides/controllers/)** - Build request handlers
-- **[Models](/guides/models/)** - Add database models
-
----
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>

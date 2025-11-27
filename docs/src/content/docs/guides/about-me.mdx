@@ -1,10 +1,8 @@
 ---
 title: Contributing
-description: How to contribute to structure-ts and a note from the creator
+description: How to contribute to Structure-Ts and a note from the creator
 ---
-import CopyrightNotice from '../../../components/CopyrightNotice.astro';
-
-{/* # Contributing & About Me */}
+import { Code } from '@astrojs/starlight/components';
 
 ## About Me
 
@@ -18,7 +16,7 @@ Let me be clear from the start: **I'm not an expert developer.** I'm still learn
 
 Because **transparency matters**. You deserve to know who's building the tools you might use. Too often in tech, we pretend to know everything and hide our uncertainty. That's not helpful, and it's not honest.
 
-I'm building structure-ts because:
+I'm building Structure-Ts because:
 - I believe in the problem it solves
 - I'm learning by doing
 - Good ideas can come from anyone
@@ -44,7 +42,6 @@ I built Structure-Ts because I struggled with the same problems you probably hav
 
 If I'm facing these problems, others probably are too. Even if I'm not an expert, I can work on solutions.
 
-{/* 
 ### The Learning Journey
 
 This project is my learning journey, made public. Every commit, every feature, every bug fix teaches me something. By open-sourcing it, I'm:
@@ -52,7 +49,7 @@ This project is my learning journey, made public. Every commit, every feature, e
 - Building something useful (hopefully)
 - Demonstrating that you don't need to be an expert to contribute to open source
 
-If structure-ts helps even one person build their project faster, it's worth it.
+If Structure-Ts helps even one person build their project faster, it's worth it.
 
 ## Contributing is Welcome
 
@@ -71,7 +68,7 @@ Whether you're a:
 
 ### 1. Use It and Share Feedback
 
-The most valuable contribution is using structure-ts and telling me what you think.
+The most valuable contribution is using Structure-Ts and telling me what you think.
 
 **Share Your Experience:**
 - What worked well?
@@ -96,12 +93,14 @@ Found a bug? That's actually helpful!
 - Code example if possible
 
 **Example:**
-```markdown
-**Bug: Database connection fails with PostgreSQL**
+
+<Code
+  code={
+    `**Bug: Database connection fails with PostgreSQL**
 
 **Steps to Reproduce:**
 1. Configure PostgreSQL in settings.ts
-2. Run `npm run dev`
+2. Run \`npm run dev\`
 3. See error
 
 **Expected:** Server starts successfully
@@ -114,14 +113,17 @@ Found a bug? That's actually helpful!
 - structure-ts: v0.1.0
 
 **Code:**
-\`\`\`typescript
 const DATABASE = {
-  type: 'postgres',
-  host: 'localhost',
-  // ...
-};
-\`\`\`
-```
+    engine: 'postgre',
+    host: process.env.DB_HOST!,
+    port: parseInt(process.env.DB_PORT!),
+    user: process.env.DB_USER!,
+    password: process.env.DB_PASSWORD!,
+    database: process.env.DB_NAME!,
+};`
+  }
+  lang='md'
+/>
 
 ### 3. Suggest Features
 
@@ -134,8 +136,10 @@ Have an idea? Let's hear it!
 - Example code of how you'd use it
 
 **Example:**
-```markdown
-**Feature Request: Middleware Support**
+
+<Code
+  code={
+    `**Feature Request: Middleware Support**
 
 **Description:**
 Add middleware functions that run before controllers, similar to Express middleware.
@@ -151,8 +155,10 @@ route.get('/admin', adminController, [authMiddleware]);
 **Benefits:**
 - Reusable authentication logic
 - Cleaner controllers
-- Common pattern from Express/Fastify
-```
+- Common pattern from Express/Fastify`
+  }
+  lang='md'
+/>
 
 ### 4. Improve Documentation
 
@@ -174,28 +180,47 @@ Ready to contribute code? Awesome!
 #### Getting Started
 
 **1. Fork the Repository**
-```bash
-# Go to https://github.com/rahulroy0322/structure-ts
-# Click "Fork" button in top right
-```
+
+<Code
+  code={
+    `# Go to https://github.com/rahulroy0322/structure-ts
+# Click "Fork" button in top right`
+  }
+  lang='md'
+/>
 
 **2. Clone Your Fork**
-```bash
-git clone https://github.com/YOUR_USERNAME/structure-ts.git
-cd structure-ts
-```
+
+<Code
+  code={
+    `git clone https://github.com/YOUR_USERNAME/structure-ts.git
+cd structure-ts`
+  }
+  lang='sh'
+  title='terminal'
+/>
 
 **3. Install Dependencies**
-```bash
-npm install
-```
+
+<Code
+  code={
+    `pnpm i`
+  }
+  lang='sh'
+  title='terminal'
+/>
 
 **4. Create a Branch**
-```bash
-git checkout -b feature/your-feature-name
+
+<Code
+  code={
+    `git checkout -b feature/your-feature-name
 # or
-git checkout -b fix/bug-description
-```
+git checkout -b fix/bug-description`
+  }
+  lang='sh'
+  title='terminal'
+/>
 
 **5. Make Your Changes**
 - Write clean, readable code
@@ -204,22 +229,34 @@ git checkout -b fix/bug-description
 - Test your changes
 
 **6. Commit Your Changes**
-```bash
-git add .
-git commit -m "Add feature: description of what you did"
+
+<Code
+  code={
+    `git add .
+git commit -m "fix: Add feature
+
+description body of what you did"
 # or
-git commit -m "Fix: description of bug fix"
-```
+git commit -m "fix: description of bug fix"`
+  }
+  lang='sh'
+  title='terminal'
+/>
 
 **7. Push to Your Fork**
-```bash
-git push origin feature/your-feature-name
-```
+
+<Code
+  code={
+    `git push origin feature/your-feature-name`
+  }
+  lang='sh'
+  title='terminal'
+/>
 
 **8. Open a Pull Request**
 - Go to the original repository
 - Click "New Pull Request"
-- Select your fork and branch
+- Select your fork and appropriate branch to marge
 - Fill out the PR template
 - Submit!
 
@@ -230,20 +267,18 @@ git push origin feature/your-feature-name
 - Follow existing naming conventions
 - Keep functions small and focused
 - Use meaningful variable names
-- Add JSDoc comments for public APIs
+{/* - Add JSDoc comments for public APIs */}
 
 **Example:**
-```typescript
-/**
- * Creates a new user in the database
- * @param name - User's full name
- * @param email - User's email address
- * @returns Promise resolving to created user
- *
-async function createUser(name: string, email: string): Promise<User> {
-  // Implementation
-}
-```
+
+<Code
+  code={
+    `async function createUser(name: string, email: string): Promise<User> {
+    // Implementation
+}`
+  }
+  lang='ts'
+/>
 
 **Testing:**
 - Test your changes manually
@@ -266,8 +301,10 @@ async function createUser(name: string, email: string): Promise<User> {
 - ✅ Are respectful and constructive
 
 **Example PR Description:**
-```markdown
-## Description
+
+<Code
+  code={
+    `## Description
 Adds middleware support for route-level authentication.
 
 ## Problem
@@ -287,10 +324,12 @@ route.get('/admin', adminController, [authMiddleware]);
 - Error handling works correctly
 
 ## Documentation
-- Updated routing.md
-- Added middleware.md guide
-- Added examples
-```
+- Updated routing.mdx
+- Added middleware.mdx guide
+- Added examples`
+  }
+  lang='md'
+/>
 
 **Avoid:**
 - ❌ Massive PRs that change everything
@@ -310,7 +349,7 @@ Community support is incredibly valuable!
 
 ### 7. Spread the Word
 
-Help structure-ts reach more people:
+Help Structure-Ts reach more people:
 - ⭐ Star the repository
 - 📢 Share on social media
 - 📝 Write blog posts
@@ -321,7 +360,7 @@ Help structure-ts reach more people:
 
 ### Be Kind and Respectful
 
-Everyone is welcome here, regardless of:
+Everyone is **welcome** here, regardless of:
 - Experience level
 - Background
 - Identity
@@ -338,7 +377,7 @@ Everyone is welcome here, regardless of:
 - Harassment or discrimination
 - Insulting or aggressive behavior
 - Spam or trolling
-- Publishing others' private information
+- Publishing others' **private information**
 - Any behavior that makes others feel unwelcome
 
 ### Enforcement
@@ -361,6 +400,8 @@ Every contributor is listed in:
 - GitHub contributors page
 - Release notes (for significant contributions)
 
+**i am asking every if any one know then help me in this process**
+
 ### Types of Contributions
 
 We recognize all contributions:
@@ -373,6 +414,12 @@ We recognize all contributions:
 - 📢 Advocacy and promotion
 
 **No contribution is too small!** Every improvement matters.
+
+:::caution[Note]
+**`README`** update is not Acceptable even if have contribute early for Breaking or small changes
+
+if u have some suggestions regarding **`README`** them email me directly or get it in discussion
+:::
 
 ## Questions?
 
@@ -389,7 +436,7 @@ Stuck or have questions?
 - Comment on relevant issues
 - Ask in your PR
 
-Don't hesitate to ask for help—we're here to support you!
+Don't **hesitate** to ask for help—we're/everyone are here to support you!
 
 ## The Reality of Open Source
 
@@ -432,14 +479,14 @@ Here's what I promise:
 
 ## Thank You
 
-If you've read this far, thank you. Whether you contribute code, report a bug, suggest a feature, or simply use structure-ts—**you're part of this project's story**.
+If you've read this far, thank you. Whether you contribute code, report a bug, suggest a feature, or simply use Structure-Ts—**you're part of this project's story**.
 
-Every contribution, no matter how small, makes structure-ts better. Together, we're building something useful, learning along the way, and hopefully making TypeScript backend development a little bit easier.
+Every contribution, no matter how small, makes Structure-Ts better. Together, we're building something useful, learning along the way, and hopefully making TypeScript backend development a little bit easier.
 
 I don't have all the answers, but I'm committed to figuring them out—with your help.
 
 Let's build something great together! 🚀
-*/}
+
 ---
 
 **Questions? Concerns? Just Want to Chat?**
@@ -448,5 +495,3 @@ Let's build something great together! 🚀
 {/* ! TODO  - Email: (if provided)  */}
 
 **Remember:** There are no stupid questions. We all started somewhere.
-
-<CopyrightNotice/>

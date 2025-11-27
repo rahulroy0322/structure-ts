@@ -2,14 +2,11 @@
 title: Template Rendering
 description: Render dynamic HTML pages with EJS templates
 ---
+import { Code,FileTree } from '@astrojs/starlight/components';
 
-{/* # Template Rendering */}
+Structure-Ts uses **`EJS (Embedded JavaScript)`** for rendering dynamic HTML pages. This guide covers everything you need to build server-side rendered applications.
 
-structure-ts uses EJS (Embedded JavaScript) for rendering dynamic HTML pages. This guide covers everything you need to build server-side rendered applications.
-
-
-#### Upcomming
-{/* ## What is Template Rendering? 
+## What is Template Rendering? 
 
 **Template rendering** generates HTML dynamically on the server:
 - Mix HTML with JavaScript
@@ -23,33 +20,42 @@ structure-ts uses EJS (Embedded JavaScript) for rendering dynamic HTML pages. Th
 
 In `src/settings.ts`:
 
-```typescript
-const TEMPLATE_DIR = 'templates';
-```
+<Code
+  code={
+    `const TEMPLATE_DIR = 'templates';`
+  }
+  lang='ts'
+  title='src/settings.ts'
+/>
 
 This tells structure-ts where to find your templates.
 
 ### Create Template Directory
 
-```bash
-mkdir templates
+<Code
+  code={
+    `mkdir templates
 mkdir templates/layouts
 mkdir templates/partials
-mkdir templates/pages
-```
+mkdir templates/pages`
+  }
+  lang='sh'
+  title='terminal'
+/>
 
 **Structure:**
-```
-templates/
-├── layouts/
-│   └── base.ejs         # Main layout
-├── partials/
-│   ├── header.ejs       # Reusable header
-│   └── footer.ejs       # Reusable footer
-└── pages/
-    ├── home.ejs         # Home page
-    └── about.ejs        # About page
-```
+
+<FileTree>
+- templates/
+  - layouts/
+    - base.ejs         # Main layout
+  - partials/
+    - header.ejs       # Reusable header
+    - footer.ejs       # Reusable footer
+  - pages/
+    - home.ejs         # Home page
+    - about.ejs        # About page
+</FileTree>
 
 ## Your First Template
 
@@ -57,186 +63,40 @@ templates/
 
 Create `templates/pages/home.ejs`:
 
-```html
-<!DOCTYPE html>
+<Code
+  code={
+    `<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome</title>
-</head>
-<body>
-  <h1>Hello, World!</h1>
-  <p>Welcome to structure-ts!</p>
-</body>
-</html>
-```
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome</title>
+    </head>
+    <body>
+      <h1>Hello, World!</h1>
+      <p>Welcome to structure-ts!</p>
+    </body>
+</html>`
+  }
+  lang='html'
+  title='templates/pages/home.ejs'
+/>
 
 ### Step 2: Render from Controller
 
-```typescript
-// src/pages/controllers.ts
-import { type ControllerType, render } from 'structure-ts';
+<Code
+  code={
+    `import { type ControllerType, render } from 'structure-ts';
 
 const homeController: ControllerType = (request, reply) => {
-  render(reply, 'pages/home.ejs');
+    reply.render('pages/home.ejs');
 };
 
-export { homeController };
-```
-
-### Step 3: Add Route
-
-```typescript
-// src/pages/routes.ts
-import { Router } from 'structure-ts';
-import { homeController } from './controllers';
-
-const { routes, route } = Router();
-
-route.get('/', homeController);
-
-export default routes;
-```
-
-### Step 4: Test It
-
-Visit `http://localhost:2000/pages/` to see your page!
-
-## Passing Data to Templates
-
-### From Controller
-
-```typescript
-const homeController: ControllerType = (request, reply) => {
-  render(reply, 'pages/home.ejs', {
-    title: 'Welcome',
-    user: {
-      name: 'Alice',
-      email: 'alice@example.com',
-    },
-    isLoggedIn: true,
-  });
-};
-```
-
-### In Template
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <title><%= title %></title>
-</head>
-<body>
-  <h1>Hello, <%= user.name %>!</h1>
-  <p>Email: <%= user.email %></p>
-  
-  <% if (isLoggedIn) { %>
-    <p>You are logged in!</p>
-  <% } else { %>
-    <p>Please log in.</p>
-  <% } %>
-</body>
-</html>
-```
-
-## EJS Syntax
-
-### Output Data
-
-**Escaped output (safe HTML):**
-```html
-<%= value %>
-```
-
-Converts special characters:
-- `<` becomes `&lt;`
-- `>` becomes `&gt;`
-- `&` becomes `&amp;`
-
-**Unescaped output (raw HTML):**
-```html
-<%- value %>
-```
-
-Use for trusted HTML content.
-
-**Example:**
-```html
-<!-- Escaped - safe from XSS -->
-<p><%= userInput %></p>
-
-<!-- Unescaped - for HTML you control -->
-<div><%- articleContent %></div>
-```
-
-### JavaScript Code
-
-**Execute code without output:**
-```html
-<% const greeting = 'Hello'; %>
-<% const user = { name: 'Alice' }; %>
-```
-
-### Comments
-
-```html
-<%# This is a comment - not rendered in HTML %>
-```
-
-## Control Flow
-
-### If Statements
-
-```html
-<% if (user.isAdmin) { %>
-  <a href="/admin">Admin Panel</a>
-<% } %>
-
-<% if (user.role === 'admin') { %>
-  <p>Welcome, Admin!</p>
-<% } else if (user.role === 'moderator') { %>
-  <p>Welcome, Moderator!</p>
-<% } else { %>
-  <p>Welcome, User!</p>
-<% } %>
-```
-
-### Loops
-
-**Array iteration:**
-```html
-<ul>
-  <% users.forEach(user => { %>
-    <li><%= user.name %> - <%= user.email %></li>
-  <% }); %>
-</ul>
-```
-
-**For loop:**
-```html
-<% for (let i = 0; i < items.length; i++) { %>
-  <p>Item <%= i + 1 %>: <%= items[i] %></p>
-<% } %>
-```
-
-**Object iteration:**
-```html
-<% Object.keys(settings).forEach(key => { %>
-  <p><%= key %>: <%= settings[key] %></p>
-<% }); %>
-```
-
-### Ternary Operator
-
-```html
-<p>Status: <%= user.isActive ? 'Active' : 'Inactive' %></p>
-
-<button class="<%= isPremium ? 'btn-gold' : 'btn-standard' %>">
-  <%= isPremium ? 'Premium User' : 'Free User' %>
-</button>
-```
+export { homeController };`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 ## Layouts
 
@@ -246,246 +106,91 @@ Layouts provide consistent structure across pages.
 
 Create `templates/layouts/base.ejs`:
 
-```html
-<!DOCTYPE html>
+<Code
+  code={
+    `<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title || 'My App' %></title>
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-  <%- include('../partials/header') %>
-  
-  <main>
-    <%- body %>
-  </main>
-  
-  <%- include('../partials/footer') %>
-  
-  <script src="/js/main.js"></script>
-</body>
-</html>
-```
+    <head>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title><%= title || 'My App' %></title>
+      <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body>
+      <%- include('../partials/header') %>
+
+      <main>
+        <%- block main %>
+      </main>
+
+      <%- include('../partials/footer') %>
+
+      <script src="/js/main.js"></script>
+    </body>
+</html>`
+  }
+  lang='html'
+  title='layouts/base.ejs'
+/>
 
 ### Using Layout
 
-```typescript
-const homeController: ControllerType = (request, reply) => {
-  render(reply, 'pages/home.ejs', {
-    layout: 'layouts/base.ejs',
-    title: 'Home Page',
-    content: 'Welcome to the home page!',
-  });
-};
-```
+<Code
+  code={
+    `<%- layout("layouts/base",{
+    title: 'home page'
+}) %>
 
-### Page Content
-
-```html
-<!-- pages/home.ejs -->
-<h1>Welcome Home!</h1>
-<p><%= content %></p>
-```
-
-**Rendered output uses base layout** with page content injected at `<%- body %>`.
+<% block main %>
+    <h2>this is home page content</h2>
+<% block main end %>`
+  }
+  lang='html'
+  title='pages/home.ejs'
+/>
 
 ## Partials
 
 Reusable template fragments.
 
-### Header Partial
-
 Create `templates/partials/header.ejs`:
 
-```html
-<header>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/contact">Contact</a>
-    
-    <% if (user) { %>
-      <a href="/profile">Profile</a>
-      <a href="/logout">Logout</a>
-    <% } else { %>
-      <a href="/login">Login</a>
-    <% } %>
-  </nav>
-</header>
-```
-
-### Footer Partial
-
-Create `templates/partials/footer.ejs`:
-
-```html
-<footer>
-  <p>&copy; <%= new Date().getFullYear() %> My Company</p>
-  <p>
-    <a href="/privacy">Privacy</a> |
-    <a href="/terms">Terms</a>
-  </p>
-</footer>
-```
+<Code
+  code={
+    `<header>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      
+      <% if (user) { %>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+      <% } %>
+    </nav>
+</header>`
+  }
+  lang='html'
+  title='pages/home.ejs'
+/>
 
 ### Including Partials
 
-```html
-<!-- Include without data -->
-<%- include('../partials/header') %>
+<Code
+  code={
+    `<!-- Include without data -->
+<%- include('partials/header') %>
 
 <!-- Include with data -->
-<%- include('../partials/card', { title: 'Card Title', content: 'Card content' }) %>
-```
+<%- include('partials/card', { title: 'Card Title', content: 'Card content' }) %>`
+  }
+  lang='html'
+  title='pages/home.ejs'
+/>
 
-### Reusable Card Partial
-
-Create `templates/partials/card.ejs`:
-
-```html
-<div class="card">
-  <h3><%= title %></h3>
-  <p><%= content %></p>
-</div>
-```
-
-**Use it:**
-```html
-<% posts.forEach(post => { %>
-  <%- include('../partials/card', { 
-    title: post.title, 
-    content: post.excerpt 
-  }) %>
-<% }); %>
-```
-
-## Complete Example: Blog
-
-### Controller
-
-```typescript
-// src/blog/controllers.ts
-import { type ControllerType, render } from 'structure-ts';
-
-export const listPosts: ControllerType = async (request, reply) => {
-  const posts = [
-    {
-      id: 1,
-      title: 'Getting Started with structure-ts',
-      excerpt: 'Learn how to build web apps quickly...',
-      author: 'Alice',
-      date: new Date('2024-01-15'),
-    },
-    {
-      id: 2,
-      title: 'Advanced Routing Techniques',
-      excerpt: 'Master dynamic routes and parameters...',
-      author: 'Bob',
-      date: new Date('2024-01-20'),
-    },
-  ];
-  
-  render(reply, 'pages/blog.ejs', {
-    layout: 'layouts/base.ejs',
-    title: 'Blog',
-    posts,
-    user: request.user || null,
-  });
-};
-
-export const viewPost: ControllerType = async (request, reply) => {
-  const { id } = request.params;
-  
-  const post = {
-    id: parseInt(id),
-    title: 'Getting Started with structure-ts',
-    content: '<p>Full article content here...</p>',
-    author: 'Alice',
-    date: new Date('2024-01-15'),
-    comments: [
-      { author: 'Bob', text: 'Great article!', date: new Date() },
-      { author: 'Charlie', text: 'Very helpful!', date: new Date() },
-    ],
-  };
-  
-  render(reply, 'pages/post.ejs', {
-    layout: 'layouts/base.ejs',
-    title: post.title,
-    post,
-    user: request.user || null,
-  });
-};
-```
-
-### Blog List Template
-
-```html
-<!-- templates/pages/blog.ejs -->
-<h1>Blog Posts</h1>
-
-<% if (posts.length === 0) { %>
-  <p>No posts yet. Check back soon!</p>
-<% } else { %>
-  <div class="posts">
-    <% posts.forEach(post => { %>
-      <article class="post-card">
-        <h2><a href="/blog/<%= post.id %>"><%= post.title %></a></h2>
-        <p class="meta">
-          By <%= post.author %> on <%= post.date.toLocaleDateString() %>
-        </p>
-        <p><%= post.excerpt %></p>
-        <a href="/blog/<%= post.id %>" class="read-more">Read More →</a>
-      </article>
-    <% }); %>
-  </div>
-<% } %>
-```
-
-### Single Post Template
-
-```html
-<!-- templates/pages/post.ejs -->
-<article class="post">
-  <h1><%= post.title %></h1>
-  <p class="meta">
-    By <%= post.author %> on <%= post.date.toLocaleDateString() %>
-  </p>
-  
-  <div class="content">
-    <%- post.content %>
-  </div>
-  
-  <section class="comments">
-    <h2>Comments (<%= post.comments.length %>)</h2>
-    
-    <% if (post.comments.length === 0) { %>
-      <p>No comments yet. Be the first!</p>
-    <% } else { %>
-      <% post.comments.forEach(comment => { %>
-        <div class="comment">
-          <p class="author"><%= comment.author %></p>
-          <p><%= comment.text %></p>
-          <p class="date"><%= comment.date.toLocaleDateString() %></p>
-        </div>
-      <% }); %>
-    <% } %>
-    
-    <% if (user) { %>
-      <form method="POST" action="/blog/<%= post.id %>/comment">
-        <textarea name="text" placeholder="Add a comment..."></textarea>
-        <button type="submit">Post Comment</button>
-      </form>
-    <% } else { %>
-      <p><a href="/login">Login</a> to comment</p>
-    <% } %>
-  </section>
-</article>
-
-<a href="/blog">← Back to Blog</a>
-```
-
+{/* 
 ## Working with Forms
 
 ### Form Template
@@ -724,18 +429,10 @@ const notFound: ControllerType = (request, reply) => {
   });
 };
 ```
+*/}
 
 ## Next Steps
 
 Now that you understand template rendering:
 
-- **[Controllers](/guides/controllers/)** - Pass data to templates
-- **[Routing](/guides/routing/)** - Connect URLs to templates
-- **[Models](/guides/models/)** - Fetch data for templates
-
-*/}
----
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>
+- **[Plan](/guides/future-plans/)** - Check the status of the project

@@ -2,512 +2,587 @@
 title: Dynamic Routes
 description: Advanced routing with dynamic parameters (Work in Progress)
 ---
+import { Code } from '@astrojs/starlight/components';
 
-{/* # Dynamic Routes */}
+## Overview
+
+Dynamic routes allow you to capture URL segments as parameters with type safety. Structure-Ts uses a typed parameter syntax that makes routes explicit and predictable.
+
+:::note[Partial Implementation]
+Dynamic routing is currently implemented with typed parameter syntax. Parameter value extraction is under development. The features described on this page show both what's working and what's coming soon.
+:::
 
 :::caution[Work in Progress]
 Dynamic routing is currently under active development. The features described on this page are being implemented and may change before the final release. Use with caution in production environments.
 :::
-## Upcoming
-{/* ## Overview
 
-Dynamic routes allow you to capture URL segments as parameters, enabling you to build flexible and scalable routing patterns.
 
 ## Current Status
 
 **What's Working:**
-- ✅ Basic parameter capture (`:id`)
-- ✅ Single parameters in routes
-- ✅ Accessing parameters in controllers
+- ✅ Typed parameter syntax (`<id:int>`, `<slug:str>`)
+- ✅ Multiple parameters in single route
+- ✅ Route matching and registration
 
 **Under Development:**
-- 🚧 Multiple parameters in single route
-- 🚧 Optional parameters
-- 🚧 Wildcard routes
-- 🚧 Regular expression constraints
+- 🚧 Parameter value extraction in controllers
+- 🚧 Automatic type conversion (int, str, etc.)
 - 🚧 Parameter validation
 
+**Not tested yet!**
+- Wildcard routes ⏳
+
 **Planned Features:**
-- 📋 Named parameters with types
-- 📋 Parameter transformation
-- 📋 Nested dynamic routes
-- 📋 Query parameter handling improvements
+- 📋 Optional parameters
+- 📋 Parameter constraints (min, max, pattern)
+
+## Parameter Syntax
+
+Structure-Ts uses an explicit typed syntax for parameters:
+
+<Code
+  code={
+    `<parameter_name:type>`
+  }
+  lang='ts'
+  mark={[
+    '<parameter_name:type>'
+  ]}
+/>
+
+**Supported types:**
+- `int` - Integer numbers (e.g., 1, 42, 999)
+- `str` - Strings (e.g., "hello", "my-slug", "user-123")
+- `bool` - Boolean (spacific: true,false) its a nish case
+- `*` - Any (e.g., "hello", "my-slug", 123) but it's Returns as String
+
+:::note[Type Bool]
+`bool` as type is a nish case
+:::
+
+**Examples:**
+
+<Code
+  code={
+    `<id:int>        // Matches: 1, 42, 999
+<slug:str>      // Matches: hello, my-post, about-us
+<userId:int>    // Matches: 1, 2, 3
+<username:str>  // Matches: john, alice, bob-smith
+<is-active:bool>  // Matches: true, false
+<any:*>  // Matches: john, alice, 123`
+  }
+  lang='ts'
+  mark={[
+    `<id:int>`,`<slug:str>`,`<userId:int>`,`<username:str>`,`<is-active:bool>`,`<any:*>`
+  ]}
+/>
 
 ## Basic Dynamic Parameters
 
-### Single Parameter
+### Single Integer Parameter
 
 **Route definition:**
-```typescript
-// src/users/routes.ts
-import { Router } from 'structure-ts';
+
+<Code
+  code={
+    `import { Router } from 'structure-ts';
 import { getUser } from './controllers';
 
 const { routes, route } = Router();
 
-route.get('/:id', getUser);
+route.get('/<id:int>', getUser);
 
-export default routes;
-```
-
-**Controller:**
-```typescript
-// src/users/controllers.ts
-import { type ControllerType, ok, notFound } from 'structure-ts';
-
-const getUser: ControllerType = (request, reply) => {
-  const { id } = request.params;
-  
-  // Convert to number
-  const userId = parseInt(id);
-  
-  // Fetch user (mock example)
-  const user = users.find(u => u.id === userId);
-  
-  if (!user) {
-    return reply.status(notFound()).json({
-      success: false,
-      error: 'User not found',
-    });
+export default routes;`
   }
-  
-  reply.status(ok()).json({
-    success: true,
-    data: user,
-  });
-};
-```
+  lang='ts'
+  title='src/users/routes.ts'
+  mark={[
+    `<id:int>`
+  ]}
+/>
 
-**Example URLs:**
-```
-/users/1      → { id: "1" }
-/users/42     → { id: "42" }
-/users/abc    → { id: "abc" }
-```
+**Matches:**
 
-### String Parameters
-
-```typescript
-route.get('/:slug', getPost);
-```
-
-**Controller:**
-```typescript
-const getPost: ControllerType = (request, reply) => {
-  const { slug } = request.params;
-  
-  // slug examples: "my-first-post", "getting-started", etc.
-  const post = await Post.findOne({ where: { slug } });
-  
-  if (!post) {
-    return reply.status(notFound()).json({
-      success: false,
-      error: 'Post not found',
-    });
+<Code
+  code={
+    `/1      ✅ Matches (id = 1)
+/42     ✅ Matches (id = 42)
+/999    ✅ Matches (id = 999)
+/abc    ❌ No match (not an integer)
+/1.5    ❌ No match (not an integer)`
   }
+  lang='sh'
+/>
+
+{/* **Controller (when parameter extraction is implemented):** */}
+
+### Single String Parameter
+
+**Route definition:**
+
+<Code
+  code={
+    `route.get('/<slug:str>', getPost);`
+  }
+  lang='ts'
+  title='src/blog/routes.ts'
+  mark={[
+    `<slug:str>`
+  ]}
+/>
+
+**Matches:**
+
+<Code
+  code={
+    `/hello-world        ✅ Matches (slug = "hello-world")
+/my-first-post      ✅ Matches (slug = "my-first-post")
+/about              ✅ Matches (slug = "about")
+/123                ✅ Matches (slug = "123")`
+  }
+  lang='sh'
+/>
+
+## Multiple Parameters
+
+structure-ts supports multiple parameters in a single route.
+
+### Two Parameters
+
+**Route definition:**
+
+<Code
+  code={
+    `route.get('/<userId:int>/posts/<postId:int>', getUserPost);`
+  }
+  lang='ts'
+  title='src/post/routes.ts'
+  mark={[
+    `<userId:int>`,`<postId:int>`
+  ]}
+/>
+
+**Matches:**
+
+<Code
+  code={
+    `/1/posts/5        ✅ Matches (userId=1, postId=5)
+/42/posts/123     ✅ Matches (userId=42, postId=123)
+/1/posts/abc      ❌ No match (postId not int)`
+  }
+  lang='sh'
+/>
+
+### Mixed Parameter Types
+
+**Route definition:**
+
+<Code
+  code={
+    `route.get('/<year:int>/<month:int>/<slug:str>', getBlogPost);`
+  }
+  lang='ts'
+  title='src/post/routes.ts'
+  mark={[
+    `<year:int>`,`<month:int>`,
+    `<slug:str>`
+  ]}
+/>
+
+**Matches:**
+
+<Code
+  code={
+    `/2024/01/my-post        ✅ Matches
+/2024/12/hello-world    ✅ Matches
+/2024/abc/my-post       ❌ No match (month not int)`
+  }
+  lang='sh'
+/>
+
+## Controller (when parameter extraction is implemented):
+
+<Code
+  code={
+    `const getBlogPost: ControllerType = async (request, reply) => {
+  const { year, month, slug } = request.params;
+  // all the params
   
-  reply.status(ok()).json({
-    success: true,
-    data: post,
-  });
-};
-```
-
-## Multiple Parameters (In Development)
-
-:::note[Under Development]
-This feature is currently being implemented. API may change.
-:::
-
-### Nested Resources
-
-```typescript
-// Planned syntax
-route.get('/:userId/posts/:postId', getUserPost);
-```
-
-**Intended usage:**
-```typescript
-const getUserPost: ControllerType = (request, reply) => {
-  const { userId, postId } = request.params;
-  
-  // Find post belonging to specific user
   const post = await Post.findOne({
     where: {
-      id: postId,
-      userId: userId,
+      year,
+      month,
+      slug,
     },
   });
   
   reply.status(ok()).json({ data: post });
-};
-```
+};`
+  }
+  lang='ts'
+  title='src/post/routes.ts'
+  mark={[
+    `{ year, month, slug }`
+  ]}
+/>
 
-**Example URLs:**
-```
-/users/1/posts/5      → { userId: "1", postId: "5" }
-/users/42/posts/123   → { userId: "42", postId: "123" }
-```
+## Type Safety Benefits
 
-### Complex Paths
+The typed parameter syntax provides several benefits:
 
-```typescript
-// Planned
-route.get('/blog/:year/:month/:slug', getBlogPost);
-```
+### 1. Clear Route Intent
 
-**Intended parameters:**
-```typescript
-const getBlogPost: ControllerType = (request, reply) => {
-  const { year, month, slug } = request.params;
+<Code
+  code={
+    `// others way (ambiguous)
+route.get('/:id', getUser);  // Is id a number? String? UUID?
+
+// structure-ts way (explicit)
+route.get('/<id:int>', getUser);  // Clearly an integer`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+### 2. Automatic Type Conversion
+
+When parameter extraction is implemented, types will be automatically converted:
+
+<Code
+  code={
+    `// others way:
+const id = parseInt(request.params.id);  // Manual conversion
+
+// No manual parsing needed
+const { id } = request.params;  // Already a number!`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+
+### 3. Route Validation
+
+Routes that don't match the type won't trigger the controller:
+
+<Code
+  code={
+    `route.get('/<id:int>', getUser);
+
+// /users/abc → 404 (doesn't match route)
+// /users/123 → Calls getUser with id=123`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+## Route Order and Specificity
+
+More specific routes should come before general ones:
+
+<Code
+  code={
+    `// ✅ Correct order
+route.get('/featured', getFeaturedPosts);      // Static route first
+route.get('/recent', getRecentPosts);           // Static route
+route.get('/<slug:str>', getPost);              // Dynamic last
+
+// ❌ Wrong order
+route.get('/<slug:str>', getPost);              // Matches everything!
+route.get('/featured', getFeaturedPosts);       // Never reached`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+**Rule:** Define routes from most specific to least specific.
+
+
+
+## Current Workarounds
+
+Until parameter extraction is fully implemented, here are temporary workarounds:
+
+### Manual Parameter Extraction
+
+<Code
+  code={
+    `const getUser: ControllerType = (request, reply) => {
+  // Temporary: Extract from URL manually
+  const urlParts = request.url.split('/');
+  const id = parseInt(urlParts[urlParts.length - 1]);
   
-  // /blog/2024/01/my-post
-  // year: "2024", month: "01", slug: "my-post"
-};
-```
+  if (isNaN(id)) {
+    return reply.status(400).json({
+      success: false,
+      error: 'Invalid ID',
+    });
+  }
+  
+  // Use id...
+};`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
 
 ## Optional Parameters (Planned)
 
 :::caution[Not Yet Available]
-Optional parameters are planned but not yet implemented.
+Optional parameters are planned for a future release.
 :::
 
 **Planned syntax:**
-```typescript
-route.get('/posts/:id?', listOrGetPost);
-```
+
+<Code
+  code={
+    `route.get('/posts/<id:int>?', listOrGetPost);`
+  }
+  lang='ts'
+  title='src/post/routes.ts'
+  mark={[
+    `<id:int>?`
+  ]}
+/>
 
 **Intended behavior:**
-```
-/posts        → List all posts (id is undefined)
-/posts/5      → Get post 5 (id is "5")
-```
 
-## Wildcard Routes (Planned)
+<Code
+  code={
+    `/posts        → List all posts (id is undefined)
+/posts/5      → Get post 5 (id = 5)`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+
+
+{/* ## Custom Types (Planned)
 
 :::caution[Not Yet Available]
-Wildcard routes are planned for future releases.
+Custom parameter types are on the roadmap.
 :::
 
 **Planned syntax:**
 ```typescript
-route.get('/files/*', serveFiles);
+route.get('/<id:uuid>', getUser);
+route.get('/<date:date>', getPostsByDate);
 ```
 
-**Intended behavior:**
+**Intended matching:**
 ```
-/files/docs/guide.pdf     → Match
-/files/images/logo.png    → Match
-/files/a/b/c/d/e.txt      → Match
+<id:uuid>   → Matches UUID format only
+<date:date> → Matches date format (YYYY-MM-DD)
 ```
+*/}
 
-## Parameter Validation (Planned)
+## Parameter Constraints (Planned)
 
-:::note[Future Feature]
-Parameter validation and constraints are on the roadmap.
+:::caution[Not Yet Available]
+Parameter validation constraints are planned.
 :::
 
-### Type Constraints
+**Planned syntax:**
+
+<Code
+  code={
+    `route.get('/<id:int:min=1:max=9999>', getUser);
+route.get('/<slug:str:pattern=[a-z-]+>', getPost);`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+## Wildcard Routes
+
+:::caution[Not Yet Available]
+Wildcard routes are not tested yet
+:::
 
 **Planned syntax:**
-```typescript
-route.get('/:id(\\d+)', getUser);  // Only digits
-route.get('/:slug([a-z-]+)', getPost);  // Only lowercase and hyphens
-```
 
-### Custom Validation
-
-**Planned syntax:**
-```typescript
-route.get('/:id', getUser, {
-  params: {
-    id: {
-      type: 'number',
-      min: 1,
-      max: 9999,
-    },
-  },
-});
-```
-
-## Current Workarounds
-
-Until full dynamic routing is available, here are some workarounds:
-
-### Manual Validation
-
-```typescript
-const getUser: ControllerType = (request, reply) => {
-  const { id } = request.params;
-  
-  // Validate manually
-  if (!id || isNaN(parseInt(id))) {
-    return reply.status(badRequest()).json({
-      success: false,
-      error: 'Invalid user ID',
-    });
+<Code
+  code={
+    `route.get('/files/<path:path>', serveFile);`
   }
-  
-  const userId = parseInt(id);
-  
-  if (userId < 1) {
-    return reply.status(badRequest()).json({
-      success: false,
-      error: 'User ID must be positive',
-    });
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+**Would match:**
+
+<Code
+  code={
+    `✅ /files/guide.pdf
+✅ /files/logo.png
+✅ /files/file.txt`
   }
-  
-  // Continue with valid ID
-};
-```
+  lang='sh'
+/>
 
-### Helper Functions
+## Best Practices
 
-```typescript
-// src/utils/validators.ts
-export const validateId = (id: string): number | null => {
-  const parsed = parseInt(id);
-  if (isNaN(parsed) || parsed < 1) {
-    return null;
+### 1. Use Descriptive Parameter Names
+
+<Code
+  code={
+    `// ✅ Good - clear what the parameter is
+route.get('/<userId:int>/posts/<postId:int>', getPost);
+
+// ❌ Bad - unclear parameter names
+route.get('/<a:int>/posts/<b:int>', getPost);`
   }
-  return parsed;
-};
+  lang='ts'
+  title='src/app/routes.ts'
+  mark={[
+    `<userId:int>`,`<postId:int>`
+  ]}
+/>
 
-export const validateSlug = (slug: string): boolean => {
-  return /^[a-z0-9-]+$/.test(slug);
-};
-```
+### 2. Choose Appropriate Types
 
-**Usage:**
-```typescript
-import { validateId } from '../utils/validators';
+<Code
+  code={
+    `// ✅ Good - use int for numeric IDs
+route.get('/<id:int>', getUser);
 
-const getUser: ControllerType = (request, reply) => {
-  const userId = validateId(request.params.id);
-  
-  if (userId === null) {
-    return reply.status(badRequest()).json({
-      success: false,
-      error: 'Invalid user ID',
-    });
+// ✅ Good - use str for slugs
+route.get('/<slug:str>', getPost);
+
+// ❌ Bad - using str for numeric ID
+route.get('/<age:str>', getUser);  // Should be int`
   }
-  
-  // Use validated userId
-};
-```
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+### 3. Keep Routes Simple
 
-## Query Parameters (Current Support)
+<Code
+  code={
+    `// ✅ Good - reasonable nesting
+route.get('/<userId:int>/posts/<postId:int>', getPost);
 
-While dynamic route parameters are in development, query parameters work fully:
+// ⚠️ Consider simplifying - too nested
+route.get(
+  '/<userId:int>/posts/<postId:int>/comments/<commentId:int>/replies/<replyId:int>',
+  getReply
+);`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
 
-```typescript
-const searchUsers: ControllerType = (request, reply) => {
-  const { query, page, limit, sort } = request.query;
+## Complete Example
+
+Here's a complete example using typed dynamic routes:
+
+<Code
+  code={
+    `// src/blog/routes.ts
+import { Router } from 'structure-ts';
+import {
+  listPosts,
+  getPost,
+  getPostsByYear,
+  getPostsByYearMonth,
+  getUserPosts,
+} from './controllers';
+
+const { routes, route } = Router();
+
+// Static routes first
+route.get('/', listPosts);
+route.get('/featured', getFeaturedPosts);
+
+// Dynamic routes (more specific first)
+route.get('/<year:int>/<month:int>/<slug:str>', getPostsByYearMonth);
+route.get('/<year:int>/<slug:str>', getPostsByYear);
+route.get('/user/<userId:int>', getUserPosts);
+route.get('/<slug:str>', getPost);
+
+export default routes;`
+  }
+  lang='ts'
+  title='src/app/routes.ts'
+/>
+
+<Code
+  code={
+    `// src/blog/controllers.ts
+import { type ControllerType, ok } from 'structure-ts';
+
+export const getPostsByYearMonth: ControllerType = async (request, reply) => {
+  // When parameter extraction is implemented:
+  const { year, month, slug } = request.params;
+  // year: number, month: number, slug: string
   
-  const pageNum = parseInt(page || '1');
-  const limitNum = parseInt(limit || '10');
-  
-  // Build search
-  const users = await User.find({
-    where: {
-      name: Like(`%${query}%`),
-    },
-    skip: (pageNum - 1) * limitNum,
-    take: limitNum,
-    order: {
-      [sort || 'name']: 'ASC',
-    },
+  const post = await Post.findOne({
+    where: { year, month, slug },
   });
   
-  reply.status(ok()).json({ data: users });
-};
-```
+  reply.status(ok()).json({ data: post });
+};`
+  }
+  lang='ts'
+  title='src/app/controllers.ts'
+/>
 
-**Example URLs:**
-```
-/users/search?query=john
-/users/search?query=john&page=2&limit=20
-/users/search?query=john&sort=email&page=1
-```
+## Development Timeline
+
+### Current 
+- ✅ Typed parameter syntax implemented
+- ✅ Route matching works
+- ✅ Wildcard routes
+- 🚧 Parameter extraction in development
+
+### Next Release
+- 🚧 Complete parameter extraction
+- 🚧 Automatic type conversion
+- 🚧 Better error messages
+
+### Future Releases
+- 📋 Optional parameters
+- 📋 Custom types
+- 📋 Parameter constraints
 
 ## Providing Feedback
 
-We're actively developing dynamic routing features. Your feedback helps us prioritize!
+We value your input on dynamic routing!
 
 ### Report Issues
 
-If you encounter problems with current dynamic routing:
+Found a bug? [Open an issue](https://github.com/rahulroy0322/structure-ts/issues)
 
-1. **Check existing issues**: [GitHub Issues](https://github.com/rahulroy0322/structure-ts/issues)
-2. **Create new issue** with:
-   - What you're trying to do
-   - Current behavior
-   - Expected behavior
-   - Code examples
+Include:
+- Route definition
+- Expected behavior
+- Actual behavior
+- Example code
 
 ### Request Features
 
-Have ideas for dynamic routing?
+Want a feature? [Start a discussion](https://github.com/rahulroy0322/structure-ts/discussions)
 
-1. **Open a discussion**: [GitHub Discussions](https://github.com/rahulroy0322/structure-ts/discussions)
-2. **Describe your use case**
-3. **Share example code** of how you'd like it to work
+Share:
+- Your use case
+- Example of desired syntax
+- Why it's important
 
 ### Stay Updated
 
-Follow development progress:
-
 - **GitHub**: Watch the repository for updates
-- **Changelog**: Check release notes for new features
-- **Documentation**: This page updates as features land
-
-## Roadmap
-
-### Short Term (Next Release)
-
-- ✅ Stabilize single parameter routes
-- 🚧 Multiple parameters support
-- 🚧 Parameter type validation
-
-### Medium Term (Next Few Releases)
-
-- 📋 Optional parameters
-- 📋 Wildcard routes
-- 📋 Regular expression constraints
-- 📋 Better error messages
-
-### Long Term
-
-- 📋 Named route parameters with types
-- 📋 Automatic parameter transformation
-- 📋 Route middleware for validation
-- 📋 Advanced pattern matching
-
-## Current Best Practices
-
-Until dynamic routing is fully mature:
-
-### 1. Keep Routes Simple
-
-```typescript
-// ✅ Good - simple and clear
-route.get('/:id', getUser);
-
-// ⚠️ Complex - wait for full support
-route.get('/:userId/posts/:postId/comments/:commentId', getComment);
-```
-
-### 2. Validate Parameters
-
-```typescript
-const getUser: ControllerType = (request, reply) => {
-  const { id } = request.params;
-  
-  // Always validate
-  if (!id) {
-    return reply.status(badRequest()).json({ error: 'ID required' });
-  }
-  
-  const userId = parseInt(id);
-  
-  if (isNaN(userId)) {
-    return reply.status(badRequest()).json({ error: 'ID must be a number' });
-  }
-  
-  // Use validated ID
-};
-```
-
-### 3. Use Query Parameters for Complex Filtering
-
-```typescript
-// Instead of: /posts/2024/01/tech
-// Use: /posts?year=2024&month=01&category=tech
-
-route.get('/', searchPosts);
-```
-
-### 4. Document Your Routes
-
-```typescript
-// src/users/routes.ts
-
-// Get user by ID
-// URL: /users/:id
-// Params: id (number) - User ID
-route.get('/:id', getUser);
-
-// Get user posts
-// URL: /users/:userId/posts
-// Params: userId (number) - User ID
-// Query: page (number), limit (number)
-route.get('/:userId/posts', getUserPosts);
-```
-
-## Migration Guide
-
-When dynamic routing features become stable, we'll provide migration guides here. For now:
-
-- Current code using single parameters will continue working
-- We'll maintain backward compatibility where possible
-- Breaking changes will be clearly documented
-
-## Alternative Approaches
-
-While waiting for full dynamic routing:
-
-### Approach 1: Query Parameters
-
-```typescript
-// Instead of /users/1/posts/5
-// Use /posts?userId=1&postId=5
-
-route.get('/', getPost);
-
-const getPost: ControllerType = (request, reply) => {
-  const { userId, postId } = request.query;
-  // ...
-};
-```
-
-### Approach 2: Separate Routes
-
-```typescript
-// Instead of /users/:userId/posts/:postId
-// Use separate endpoints:
-
-route.get('/posts/:id', getPost);  // Get any post
-route.get('/:id/posts', getUserPosts);  // Get user's posts
-```
-
-### Approach 3: Encoded Parameters
-
-```typescript
-// Instead of /users/1/posts/5
-// Use /posts/1-5 (userId-postId)
-
-route.get('/:ids', getPost);
-
-const getPost: ControllerType = (request, reply) => {
-  const { ids } = request.params;
-  const [userId, postId] = ids.split('-').map(Number);
-  // ...
-};
-```
+- **Changelog**: Check release notes
+- **This page**: Updates as features land
 
 ## Questions?
 
-Dynamic routing development is ongoing. If you have questions:
+Dynamic routing is actively evolving. Have questions?
 
-- **Documentation**: Check back regularly for updates
-- **Issues**: Report bugs on GitHub
-- **Discussions**: Ask questions in Discussions
-- **Feature Requests**: Share your use cases
+- **Documentation**: Check back for updates
+- **GitHub Issues**: Report problems
+- **Discussions**: Ask questions
+- **Examples**: See [Examples](/examples/) for working code
 
-We appreciate your patience as we build robust dynamic routing support!
-*/}
----
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>
+Thank you for your patience as we complete this feature!

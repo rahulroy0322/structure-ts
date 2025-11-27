@@ -2,8 +2,7 @@
 title: Routing
 description: Learn how to define routes and connect URLs to controllers
 ---
-
-{/* # Routing */}
+import { Code } from '@astrojs/starlight/components';
 
 Routes connect URLs to your controllers. This guide covers everything you need to know about routing in Structure-Ts.
 
@@ -21,17 +20,23 @@ Each app has its own `routes.ts` file that defines its routes.
 
 ### Minimal Example
 
-```typescript
-// src/users/routes.ts
-import { Router } from 'structure-ts';
+<Code
+  code={
+    `import { Router } from 'structure-ts';
 import { listUsers } from './controllers';
 
 const { routes, route } = Router();
 
 route.get('/', listUsers);
 
-export default routes;
-```
+export default routes;`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'listUsers',
+  ]}
+/>
 
 **What's happening:**
 1. Import `Router` from structure-ts
@@ -45,51 +50,94 @@ Structure-Ts supports all standard HTTP methods.
 
 ### GET - Retrieve Data
 
-```typescript
-route.get('/', listUsers);
-route.get('/<id:int>', getUser);
-```
+<Code
+  code={
+    `route.get('/', listUsers);
+route.get('/<id:int>', getUser);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'route.get',
+  ]}
+/>
 
 **When to use:** Fetching data, displaying pages, reading resources
 
 ### POST - Create Data
 
-```typescript
-route.post('/create', createUser);
-route.post('/login', loginUser);
-```
+<Code
+  code={
+    `route.post('/create', createUser);
+route.post('/login', loginUser);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'route.post',
+  ]}
+/>
 
 **When to use:** Creating new resources, submitting forms, uploading data
 
 ### PUT - Update Data (Complete)
 
-```typescript
-route.put('/<id:int>', updateUser); // not fully implemented 
-```
+<Code
+  code={
+    `route.put('/<id:int>', updateUser);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'route.put',
+  ]}
+/>
 
 **When to use:** Replacing entire resources
 
 ### PATCH - Update Data (Partial)
 
-```typescript
-route.patch('/<id:int>', patchUser);
-```
+<Code
+  code={
+    `route.patch('/<id:int>', patchUser);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'route.patch'
+  ]}
+/>
 
 **When to use:** Updating specific fields
 
 ### DELETE - Remove Data
 
-```typescript
-route.delete('/<id:int>', deleteUser);
-```
+<Code
+  code={
+    `route.delete('/<id:int>', deleteUser);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'route.delete'
+  ]}
+/>
 
 **When to use:** Removing resources
 
 ### ALL - Any Method
 
-```typescript
-route.all('/webhook', handleWebhook); // doesn't support yet trying hard
-```
+{/* ! TODO it code plz */}
+<Code
+  code={
+    `route.all('/webhook', handleWebhook); // doesn't support yet trying hard`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    'route.all',
+  ]}
+/>
 
 **When to use:** Endpoints that accept any HTTP method
 
@@ -97,64 +145,119 @@ route.all('/webhook', handleWebhook); // doesn't support yet trying hard
 
 ### Root Path
 
-```typescript
-route.get('/', controller);
-```
+<Code
+  code={
+    `route.get('/', controller);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `'/'`,
+  ]}
+/>
 
 ### Named Paths
 
-```typescript
-route.get('/profile', getProfile);
-route.get('/settings', getSettings);
-```
+<Code
+  code={
+    `route.get('/profile', getProfile);
+route.get('/settings', getSettings);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `'/profile'`,
+    `'/settings'`
+  ]}
+/>
 
 Full URLs:
-- `/users/profile`
-- `/users/settings`
+- `/profile`
+- `/settings`
 
 ### Nested Paths
 
-```typescript
-route.get('/posts/recent', getRecentPosts);
-route.get('/admin/dashboard', getDashboard);
-```
+<Code
+  code={
+    `route.get('/posts/recent', getRecentPosts);
+route.get('/admin/dashboard', getDashboard);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `'/posts/recent'`,
+    `'/admin/dashboard'`
+  ]}
+/>
 
 ## Dynamic Parameters
 
 :::note[Work in Progress]
-Dynamic routing is currently under development. Check the [Dynamic Routes](/advanced/dynamic-routes/) page for the latest status.
+Dynamic routing is currently under development. Check the [Plan](/advanced/future-plans/) page for the latest status.
 :::
 
 ### Basic Parameters
 
-```typescript
-route.get('/<id:int>', getUser);
-```
+<Code
+  code={
+    `route.get('/<id:int>', getUser);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `'/<id:int>'`
+  ]}
+/>
 
 Access in controller:
-```typescript
-const getUserController: ControllerType = (request, reply) => {
-  const { id } = request.params;
-  console.log(`User ID: ${id}`);
-};
-```
+
+<Code
+  code={
+    `const getUserController: ControllerType = (request, reply) => {
+    const { id } = request.params;
+    console.log(\`User ID: \${id}\`);
+};`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+   `const { id } = request.params;`
+  ]}
+/>
 
 ### Multiple Parameters
 
-```typescript
-route.get('/<userId:int>/posts/<postId:int>', getPost);
-```
+<Code
+  code={
+    `route.get('/<userId:int>/posts/<postId:int>', getPost);`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `/<userId:int>`,`/<postId:int>'`
+  ]}
+/>
 
 Access in controller:
-```typescript
-const { userId, postId } = request.params;
-```
+
+<Code
+  code={
+    `const { userId, postId } = request.params;`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `const { userId, postId } = request.params;`
+  ]}
+/>
 
 ## Query Parameters
 
 Query parameters appear after `?` in URLs: `/users?page=2&limit=10`
 
-### Accessing Query Parameters
+#### Upcomming
+
+{/* ### Accessing Query Parameters
 
 ```typescript
 const listUsersController: ControllerType = (request, reply) => {
@@ -165,8 +268,8 @@ const listUsersController: ControllerType = (request, reply) => {
   
   // Fetch users with pagination
 };
-```
-
+``` */}
+{/* 
 ### Example URLs
 
 ```
@@ -174,31 +277,38 @@ const listUsersController: ControllerType = (request, reply) => {
 /users?page=2&limit=20
 /users?sort=name&order=asc
 /search?q=javascript&category=tutorials
-```
+``` */}
 
-### Base URL
+### Base URL / Prefix
 
 You can customize the base URL:
 
-```typescript
-const { routes, route } = Router( '/api/v1' );
+<Code
+  code={
+    `const { routes, route } = Router('/api/v1');
 
-route.get('/users', handler);  // → /api/v1/users
-```
+route.get('/users', handler);  // → /api/v1/users`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `Router('/api/v1');`
+  ]}
+/>
 
 ## Multiple Routes Example
 
 Here's a complete CRUD (Create, Read, Update, Delete) setup:
 
-```typescript
-// src/users/routes.ts
-import { Router } from 'structure-ts';
+<Code
+  code={
+    `import { Router } from 'structure-ts';
 import {
-  listUsers,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
+    listUsers,
+    getUser,
+    createUser,
+    updateUser,
+    deleteUser,
 } from './controllers';
 
 const { routes, route } = Router();
@@ -219,17 +329,30 @@ route.put('/<id:int>', updateUser);
 route.delete('/<id:int>', deleteUser);
 
 export default routes;
-```
+`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    `route.get('/<id:int>', getUser);`,
+    `route.put('/<id:int>', updateUser);`,
+    `route.delete('/<id:int>', deleteUser);`
+  ]}
+/>
 
 ### Resulting Routes
 
-```
-GET    /         → listUsers
+<Code
+  code={
+`GET    /         → listUsers
 GET    /:id      → getUser
 POST   /create   → createUser
 PUT    /:id      → updateUser
-DELETE /:id      → deleteUser
-```
+DELETE /:id      → deleteUser`
+  }
+  lang='sh'
+  title={'Users Route Summary'}
+/>
 
 ## RESTful Routing
 
@@ -237,8 +360,9 @@ Follow REST conventions for clean, predictable APIs.
 
 ### Standard REST Routes
 
-```typescript
-// Collection routes
+<Code
+  code={
+`// Collection routes
 route.get('/', listResources);          // GET /users
 route.post('/', createResource);        // POST /users
 
@@ -246,17 +370,29 @@ route.post('/', createResource);        // POST /users
 route.get('/<id:int>', getResource);         // GET /users/:id
 route.put('/<id:int>', updateResource);      // PUT /users/:id
 route.patch('/<id:int>', patchResource);     // PATCH /users/:id
-route.delete('/<id:int>', deleteResource);   // DELETE /users/:id
-```
+route.delete('/<id:int>', deleteResource);   // DELETE /users/:id`
+  }
+  lang='ts'
+  title='src/users/routes.ts'
+/>
 
 ### Nested Resources
 
-```typescript
-// Posts belong to users
+<Code
+  code={
+`// Posts belong to users
 route.get('/<userId:int>/posts', getUserPosts);
 route.post('/<userId:int>/posts', createUserPost);
-route.get('/<userId:int>/posts/<postId:int>', getUserPost);
-```
+route.get('/<userId:int>/posts/<postId:int>', getUserPost);`
+  }
+  lang='ts'
+  title='src/users/routes.ts'
+  mark={[
+    `route.get('/<userId:int>/posts', getUserPosts);`,
+    `route.post('/<userId:int>/posts', createUserPost);`,
+    `route.get('/<userId:int>/posts/<postId:int>', getUserPost);`,
+  ]}
+/>
 
 URLs become:
 - `/1/posts` - Get all posts by user 1
@@ -268,8 +404,9 @@ URLs become:
 
 Group related functionality:
 
-```typescript
-// User routes
+<Code
+  code={
+`// User routes
 route.get('/', listUsers);
 route.get('/<id:int>', getUser);
 route.post('/create', createUser);
@@ -281,36 +418,11 @@ route.post('/register', registerUser);
 
 // Profile routes
 route.get('/profile', getProfile);
-route.patch('/profile', updateProfile);
-```
-
-### Separate Complex Routes
-
-For complex apps, consider multiple route files:
-
-```
-users/
-├── routes.ts           # Main routes
-├── auth-routes.ts      # Authentication routes
-├── admin-routes.ts     # Admin routes
-└── controllers.ts
-```
-
-Then import and combine:
-
-```typescript
-// routes.ts
-import { Router } from 'structure-ts';
-import { setupUserRoutes } from './user-routes';
-import { setupAuthRoutes } from './auth-routes';
-
-const { routes, route } = Router();
-
-setupUserRoutes(route);
-setupAuthRoutes(route);
-
-export default routes;
-```
+route.patch('/profile', updateProfile);`
+  }
+  lang='ts'
+  title='src/users/routes.ts'
+/>
 
 ## Route Order Matters
 
@@ -318,43 +430,59 @@ Routes are matched in the order they're defined.
 
 ### Specific Before Generic
 
-```typescript
-// ✅ Correct order
+<Code
+  code={
+    `// ✅ Correct order
 route.get('/profile', getMyProfile);      // Matches /profile
-route.get('/<id:int>', getUser);               // Matches /123
+route.get('/<id:int>', getUser);          // Matches /123
 
 // ❌ Wrong order
-route.get('/<id:int>', getUser);               // Matches /profile too!
+route.get('/<id:int>', getUser);          // Matches /profile too!
 route.get('/profile', getMyProfile);      // Never reached
-```
+`}
+  lang='ts'
+  title='users/routes.ts'
+  mark={[
+    `'/profile'`,
+    `'/<id:int>'`,
+  ]}
+/>
 
 **Rule:** Define specific routes before dynamic routes.
 
 ### Static Before Dynamic
 
-```typescript
-// Good
+<Code
+  code={`// Good
 route.get('/search', searchUsers);
 route.get('/new', newUserForm);
 route.get('/<id:str>', getUser);
 
 // Bad
 route.get('/<id:str>', getUser);          // Catches '/search' and '/new'
-route.get('/search', searchUsers);   // Never reached
-route.get('/new', newUserForm);      // Never reached
-```
+route.get('/search', searchUsers);        // Never reached
+route.get('/new', newUserForm);           // Never reached
+`}
+  lang='ts'
+  title='app/routes.ts'
+  mark={[
+    `'/search'`,
+    `'/new'`,
+    `'/<id:str>'`,
+  ]}
+/>
 
 ## Testing Routes
 
 ### Using curl
 
-```bash
-# GET request
+<Code
+  code={`# GET request
 curl http://localhost:2000/users
 
 # POST request with JSON data
-curl -X POST http://localhost:2000/users/create \
-  -H "Content-Type: application/json" \
+curl -X POST http://localhost:2000/users/create \\
+  -H 'Content-Type: application/json' \\
   -d '{"name":"Alice","email":"alice@example.com"}'
 
 # GET with parameters
@@ -362,16 +490,23 @@ curl http://localhost:2000/users/1
 
 # DELETE request
 curl -X DELETE http://localhost:2000/users/1
-```
+`}
+  lang='sh'
+  title='terminal'
+/>
 
 ### Using Browser
 
 Visit in your browser for GET requests:
-```
-http://localhost:2000/users
+
+<Code
+  code={`http://localhost:2000/users
 http://localhost:2000/users/1
 http://localhost:2000/users?page=2
-```
+`}
+  lang='sh'
+  title='endpoints'
+/>
 
 ### Using Postman/Insomnia
 
@@ -384,40 +519,61 @@ http://localhost:2000/users?page=2
 
 ### Pattern 1: API Endpoints
 
-```typescript
-const { routes, route } = Router( '/api' );
+<Code
+  code={`const { routes, route } = Router('/api');
 
 route.get('/users', listUsers);
 route.get('/posts', listPosts);
 route.get('/comments', listComments);
 
 // URLs: /api/users, /api/posts, /api/comments
-```
+`}
+  lang='ts'
+  title='src/api/routes.ts'
+  mark={[`Router('/api')`, '/users', '/posts', '/comments']}
+/>
 
 ### Pattern 2: Versioned API
 
-```typescript
-const { routes, route } = Router( '/api/v1' );
+<Code
+  code={`// api/routes.ts
+  const { routes, route } = Router('/api/v1');
+route.get('/users', listUsers);
 
-route.get('/users', listUsersV1);
-
-// Later, create v2
-const { routes: routesV2, route: routeV2 } = Router({ prefix: '/api/v2' });
-routeV2.get('/users', listUsersV2);
-```
+// api-v2/routes.ts
+const { routes, route } = Router('/api/v2');
+route.get('/users', listUsers);
+`}
+  lang='ts'
+  title='src/{api,api-v2}/routes.ts'
+  mark={[
+    `Router('/api/v1')`,
+    `Router('/api/v2')`
+  ]}
+/>
 
 ### Pattern 3: Admin Routes
 
-```typescript
-// In admin app
-const { routes, route } = Router();
+#### Although planed for default admin panel
+{/* ! TODO */}
+<Code
+  code={`// In admin app
+const { routes, route } = Router('/admin');
 
 route.get('/dashboard', adminDashboard);
 route.get('/users', adminListUsers);
 route.delete('/users/<id:int>', adminDeleteUser);
 
 // URLs: /admin/dashboard, /admin/users, etc.
-```
+`}
+  lang='ts'
+  title='src/admin/routes.ts'
+  mark={[
+    `route.get('/dashboard', adminDashboard)`,
+    `route.get('/users', adminListUsers)`,
+    `route.delete('/users/<id:int>', adminDeleteUser)`
+  ]}
+/>
 
 ## Debugging Routes
 
@@ -425,18 +581,22 @@ route.delete('/users/<id:int>', adminDeleteUser);
 
 Add a debug route to see all registered routes:
 
-```typescript
-route.get('/debug/routes', (request, reply) => {
-  const allRoutes = [
-    'GET /users',
-    'GET /users/:id',
-    'POST /users/create',
-    // ... list all your routes
-  ];
-  
-  reply.status(200).json({ routes: allRoutes });
-});
-```
+<Code
+  code={`// In admin app
+const { routes, route } = Router();
+
+route.get('/dashboard', dashboard);
+route.get('/users', users);
+route.delete('/users/<id:int>', user);
+
+console.log(routes);
+`}
+  lang='ts'
+  title='src/admin/routes.ts'
+  mark={[
+    'console.log(routes);'
+  ]}
+/>
 
 ### Console Logging
 
@@ -460,8 +620,8 @@ const controller: ControllerType = (request, reply) => {
 
 Follow standard REST patterns for predictable APIs:
 
-```typescript
-// ✅ Good - RESTful
+<Code
+  code={`// ✅ Good - RESTful
 route.get('/', listUsers);
 route.post('/', createUser);
 route.get('/<id:int>', getUser);
@@ -471,36 +631,58 @@ route.delete('/<id:int>', deleteUser);
 // ❌ Bad - non-standard
 route.get('/getAllUsers', listUsers);
 route.get('/createNewUser', createUser);
-```
+`}
+  lang='ts'
+  title='src/users/routes.ts'
+  mark={[
+    `route.get('/getAllUsers', listUsers);`,
+    `route.get('/createNewUser', createUser);`
+  ]}
+/>
 
 ### 2. Keep URLs Simple
 
-```typescript
-// ✅ Good
+<Code
+  code={`// ✅ Good
 route.get('/posts', listPosts);
 route.get('/posts/<id:int>', getPost);
 
 // ❌ Bad
 route.get('/get-all-posts-from-database', listPosts);
-route.get('/retrieve-single-post-by-id/<id:int>', getPost);
-```
+route.get('/retrieve-single-post-by-id/<id:int>', getPost);`
+  }
+  lang='ts'
+  title='src/blog/routes.ts'
+  mark={[
+    `route.get('/get-all-posts-from-database', listPosts);`,
+    `route.get('/retrieve-single-post-by-id/<id:int>', getPost);`
+
+  ]}
+/>
 
 ### 3. Use Nouns, Not Verbs
 
-```typescript
-// ✅ Good - nouns
+<Code
+  code={`// ✅ Good - nouns
 route.get('/users', listUsers);
 route.post('/users', createUser);
 
 // ❌ Bad - verbs
 route.get('/getUsers', listUsers);
-route.post('/createUser', createUser);
-```
+route.post('/createUser', createUser);`
+  }
+  lang='ts'
+  title='src/users/routes.ts'
+  mark={[
+    `route.get('/getUsers', listUsers);`,
+    `route.post('/createUser', createUser);`
+  ]}
+/>
 
 ### 4. Be Consistent
 
-```typescript
-// ✅ Good - consistent
+<Code
+  code={`// ✅ Good - consistent
 route.get('/users', listUsers);
 route.get('/posts', listPosts);
 route.get('/comments', listComments);
@@ -508,16 +690,31 @@ route.get('/comments', listComments);
 // ❌ Bad - inconsistent
 route.get('/users', listUsers);
 route.get('/all-posts', listPosts);
-route.get('/comment-list', listComments);
-```
+route.get('/comment-list', listComments);`
+  }
+  lang='ts'
+  title='src/routes-consistency.ts'
+  mark={[
+    `route.get('/users', listUsers);`,
+    `route.get('/all-posts', listPosts);`,
+    `route.get('/comment-list', listComments);`,
+  ]}
+/>
 
 ### 5. Version Your API
 
 For public APIs, use versioning:
 
-```typescript
-const { routes, route } = Router( '/api/v1' );
-```
+<Code
+  code={
+    `const { routes, route } = Router('/api/v1');`
+  }
+  lang='ts'
+  title='src/routes-consistency.ts'
+  mark={[
+    `'/api/v1'`,
+  ]}
+/>
 
 This allows changes without breaking existing clients.
 
@@ -549,12 +746,5 @@ This allows changes without breaking existing clients.
 
 Now that you understand routing:
 
-- **[Controllers](/guides/controllers/)** - Build request handlers
-- **[Dynamic Routes](/advanced/dynamic-routes/)** - Advanced routing (WIP)
 - **[Models](/guides/models/)** - Connect routes to databases
-
----
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>
+- **[Dynamic Routes](/guides/dynamic-routes/)** - Let's see Dynamic Routes

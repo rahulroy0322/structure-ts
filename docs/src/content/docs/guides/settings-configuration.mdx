@@ -2,8 +2,7 @@
 title: Settings Configuration
 description: Complete guide to configuring your Structure-Ts application
 ---
-
-{/* # Settings Configuration */}
+import { Code } from '@astrojs/starlight/components';
 
 The `src/settings.ts` file is the central configuration hub for your Structure-Ts application. This guide explains every configuration option in simple, easy-to-understand language.
 
@@ -17,8 +16,9 @@ Your settings file controls:
 
 Here's what a typical settings file looks like:
 
-```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+<Code
+  code={
+`import type { DatabaseType, SettingsType } from 'structure-ts';
 
 const PORT = 2000;
 const APPS = ['users', 'blog'];
@@ -26,12 +26,16 @@ const DATABASE: DatabaseType = false;
 const TEMPLATE_DIR = 'templates';
 
 export default {
-  PORT,
-  APPS,
-  DATABASE,
-  TEMPLATE_DIR,
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
 } satisfies SettingsType;
-```
+`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+/>
 
 Let's break down each setting in detail.
 
@@ -41,67 +45,100 @@ Let's break down each setting in detail.
 
 The `PORT` setting determines which port number your server listens on.
 
-```typescript
-const PORT = 2000;
-```
+<Code 
+  code={
+    `const PORT = 2000;`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[`2000`]} 
+/>
 
 ### Understanding Ports
 
 Think of ports as doors to your server:
-- Port 80: Standard HTTP (web browsers)
-- Port 443: Standard HTTPS (secure web)
-- Port 3000: Common for Node.js development
-- Port 2000: Structure-Ts default
+- Port `80`: Standard HTTP (web browsers)
+- Port `443`: Standard HTTPS (secure web)
+- Port `3000`: Common for Node.js development
+- Port `2000`: Structure-Ts default
 
 **Your server URL becomes:** `http://localhost:PORT`
 
 ### Common Values
 
-```typescript
-const PORT = 2000;  // Default - good for development
-const PORT = 3000;  // Popular alternative
-const PORT = 8080;  // Common for APIs
-const PORT = 4000;  // Any available port works
-```
+<Code 
+  code={
+    `const PORT = 2000;  // Default - good for development
+  const PORT = 3000;  // Popular alternative
+  const PORT = 8080;  // Common for APIs
+  const PORT = 4000;  // Any available port works`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+  mark={[
+    '2000',
+    '3000',
+    '8080',
+    '4000'
+  ]} 
+/>
 
 ### Using Environment Variables
 
 For production, use environment variables:
 
-```typescript
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 2000;
-```
+<Code 
+  code={
+    `const PORT = process.env.PORT ? parseInt(process.env.PORT) : 2000;`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 **Why?** Production servers (Heroku, Railway, etc.) assign ports dynamically.
 
 ### Example: Dynamic Port Configuration
 
-```typescript
-// Development: Use 2000
+<Code 
+  code={
+    `// Development: Use 2000
 // Production: Use whatever the hosting platform provides
 const PORT = process.env.ENV === 'prod'
-  ? parseInt(process.env.PORT || '8080')
-  : 2000;
-```
+    ? parseInt(process.env.PORT || '8080')
+    : 2000;`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+/>
 
 ### Troubleshooting
 
 **"Port already in use" error?**
 
 Change to a different port:
-```typescript
-const PORT = 3000;  // Try different numbers until one works
-```
+
+<Code 
+  code={
+    `const PORT = 3000;  // Try different numbers until one works`
+  }
+  lang='ts'
+  title={'src/settings.ts'}
+/>
 
 Or find and stop the process using that port:
-```bash
-# On macOS/Linux
+
+<Code 
+  code={
+  `# On macOS/Linux
 lsof -ti:2000 | xargs kill -9
 
 # On Windows
 netstat -ano | findstr :2000
-taskkill /PID <process_id> /F
-```
+taskkill /PID <process_id> /F`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
 
 ## APPS - Installed Applications
 
@@ -109,9 +146,13 @@ taskkill /PID <process_id> /F
 
 The `APPS` array lists all the apps your application should load.
 
-```typescript
-const APPS = ['users', 'blog', 'api'];
-```
+<Code 
+  code={
+    `const APPS = ['users', 'blog', 'api'];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### How It Works
 
@@ -125,69 +166,95 @@ When your server starts:
 
 ### Empty Apps (Default)
 
-```typescript
-const APPS = [];  // No apps loaded
-```
+<Code 
+  code={
+    `const APPS = []; // No apps loaded`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 Use this when you first create a project. Add apps as you build them.
 
 ### Single App
-
-```typescript
-const APPS = ['users'];  // Only users app is loaded
-```
+<Code 
+  code={
+    `const APPS = ['users'];  // Only users app is loaded`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### Multiple Apps
 
-```typescript
-const APPS = [
-  'users',
-  'blog',
-  'api',
-  'admin',
-];
-```
+<Code 
+  code={
+    `const APPS = [
+    'users',
+    'blog',
+    'api',
+    'admin',
+  ];` 
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 **Order matters!** Apps are loaded in this order. If two apps define the same route, the first one wins.
 
 ### Example: Adding a New App
 
 1. Create the app:
-   ```bash
-   st create app payments
-   ```
+
+  <Code 
+    code={
+      `st create app payments`
+    }
+    lang="sh"
+    title={'terminal'} />
 
 2. Add to settings:
-   ```typescript
-   const APPS = [
-     'users',
-     'blog',
-     'payments',  // New app added
-   ];
-   ```
 
-3. Restart your server—routes are now active!
+  <Code 
+    code={
+      `const APPS = [
+      'users',
+      'blog',
+      'payments',  // New app added
+    ];`
+    }
+    lang="ts"
+    title={'src/settings.ts'}
+    mark={[`'payments'`]} />
+
+3. Start your development server — routes are now active!
 
 ### Best Practices
 
 **Keep it organized:**
-```typescript
-const APPS = [
-  // Core functionality
-  'users',
-  'auth',
-  
-  // Features
-  'blog',
-  'shop',
-  
-  // Admin
-  'admin',
-];
-```
+<Code 
+  code={
+`const APPS = [
+    // Core functionality
+    'users',
+    'auth',
+    
+    // Features
+    'blog',
+    'shop',
+    
+    // Admin
+    'admin',
+];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 **Start small, grow as needed:**
-```typescript
+<Code 
+  code={
+  `
 // Small project
 const APPS = ['api'];
 
@@ -195,8 +262,11 @@ const APPS = ['api'];
 const APPS = ['users', 'blog', 'api'];
 
 // Larger project
-const APPS = ['users', 'blog', 'api', 'admin', 'notifications'];
-```
+const APPS = ['users', 'blog', 'api', 'admin', 'notifications'];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 {/* 
 ## DATABASE - Database Configuration
 
@@ -479,16 +549,20 @@ const DATABASE: DatabaseType = {
 
 Specifies where your EJS template files are stored.
 
-```typescript
-const TEMPLATE_DIR = 'templates';
-```
+<Code 
+  code={
+    `const TEMPLATE_DIR = 'templates';`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### Understanding the Path
 
 The path is relative to your project root:
-
-```typescript
-const TEMPLATE_DIR = 'templates';
+<Code 
+  code={
+    `const TEMPLATE_DIR = 'templates';
 
 // Results in:
 my-project/
@@ -496,14 +570,21 @@ my-project/
 │   ├── home.ejs
 │   └── about.ejs
 ├── src/
-└── package.json
-```
+└── package.json`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### Default Configuration
 
-```typescript
-const TEMPLATE_DIR = 'templates';
-```
+<Code 
+  code={
+    `const TEMPLATE_DIR = 'templates';`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 This is the default and works for most projects.
 
@@ -511,27 +592,37 @@ This is the default and works for most projects.
 
 You can change where templates are stored:
 
-```typescript
+<Code 
+  code={
+    `
 const TEMPLATE_DIR = 'views';  // Common alternative
 
 my-project/
 ├── views/            ← Templates here now
-└── src/
-```
+└── src/`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
-```typescript
-const TEMPLATE_DIR = 'src/templates';  // Inside src
+<Code 
+  code={
+    `const TEMPLATE_DIR = 'src/templates';  // Inside src
 
 my-project/
 └── src/
     ├── templates/    ← Templates here
-    └── settings.ts
-```
+    └── settings.ts`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### Nested Structure Example
 
-```typescript
-const TEMPLATE_DIR = 'templates';
+<Code 
+  code={
+    `const TEMPLATE_DIR = 'templates';
 
 // Organize templates in subdirectories:
 templates/
@@ -543,8 +634,13 @@ templates/
 └── pages/
     ├── home.ejs
     ├── about.ejs
-    └── contact.ejs
-```
+    └── contact.ejs`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
+
+
 
 ### When to Change It
 
@@ -557,16 +653,22 @@ templates/
 
 Once configured, render templates in controllers:
 
-```typescript
-import { render } from 'structure-ts';
+<Code 
+  code={
+    `import { render } from 'structure-ts';
 
-const homeController: ControllerType = (request, reply) => {
-  render(reply, 'pages/home', {
-    title: 'Home Page',
-    user: { name: 'Alice' },
-  });
-};
-```
+  const homeController: ControllerType = (request, reply) => {
+    render(reply, 'pages/home', {
+      title: 'Home Page',
+      user: { name: 'Alice' },
+    });
+  };`
+  }
+  lang="ts"
+  title={'src/users/controllers.ts'}
+/>
+
+
 
 **Note:** Path is relative to `TEMPLATE_DIR`:
 - `TEMPLATE_DIR = 'templates'`
@@ -577,9 +679,13 @@ const homeController: ControllerType = (request, reply) => {
 
 If you're building a pure API without HTML pages:
 
-```typescript
-const TEMPLATE_DIR = 'templates';  // Keep it, even if unused
-```
+<Code 
+  code={
+    `const TEMPLATE_DIR = 'templates';  // Keep it, even if unused`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 It won't hurt to leave it—just don't create template files.
 
@@ -587,8 +693,9 @@ It won't hurt to leave it—just don't create template files.
 
 ### Example 1: Simple API (No Database, No Templates)
 
-```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+<Code 
+  code={
+    `import type { DatabaseType, SettingsType } from 'structure-ts';
 
 const PORT = 3000;
 const APPS = ['api'];
@@ -596,12 +703,16 @@ const DATABASE: DatabaseType = false;
 const TEMPLATE_DIR = 'templates';
 
 export default {
-  PORT,
-  APPS,
-  DATABASE,
-  TEMPLATE_DIR,
-} satisfies SettingsType;
-```
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
+} satisfies SettingsType;`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
+
 
 ### Example 2: Full-Stack App with PostgreSQL
 
@@ -744,14 +855,24 @@ export default {
 ### 1. Use Environment Variables for Secrets
 
 ❌ **Don't do this:**
-```typescript
-password: 'my_secret_password',  // NEVER commit passwords!
-```
+
+<Code 
+  code={
+    `password: 'my_secret_password',  // NEVER commit passwords!`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ✅ **Do this:**
-```typescript
-password: process.env.DB_PASSWORD || '',
-```
+
+<Code 
+  code={
+    `password: process.env.DB_PASSWORD || '',`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### 2. Set Defaults for Development
 #### Upcomming
@@ -769,31 +890,39 @@ const DATABASE: DatabaseType = process.env.DATABASE_URL
 
 Don't overcomplicate your settings file:
 
-```typescript
-// Good - clear and simple
+<Code 
+  code={
+    `// Good - clear and simple
 const PORT = 2000;
-const APPS = ['users', 'blog'];
 
 // Overkill - too complex
 const PORT = parseInt(
-  process.env.PORT || 
-  process.env.APP_PORT || 
-  process.env.SERVER_PORT || 
-  '2000'
-);
-```
+    process.env.PORT || 
+    process.env.APP_PORT || 
+    process.env.SERVER_PORT || 
+    '2000'
+);`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
+
 
 ### 4. Document Custom Configuration
 
 Add comments for non-obvious settings:
 
-```typescript
-// Using custom port because 2000 conflicts with another service
+<Code 
+  code={
+    `// Using custom port because 2000 conflicts with another service
 const PORT = 3500;
 
 // Only loading public-facing apps, admin is separate deployment
-const APPS = ['users', 'blog', 'api'];
-```
+const APPS = ['users', 'blog', 'api'];`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
 
 ### 5. Validate Configuration
 #### Upcomming
@@ -816,36 +945,51 @@ if (process.env.NODE_ENV === 'production') {
 
 Add a debug script to see your configuration:
 
-```typescript
-// src/settings.ts
-const settings = {
-  PORT,
-  APPS,
-  DATABASE,
-  TEMPLATE_DIR,
+<Code 
+  code={
+    `const SETTINGS = {
+    PORT,
+    APPS,
+    DATABASE,
+    TEMPLATE_DIR,
 } satisfies SettingsType;
 
 // In development, log settings
 if (process.env.NODE_ENV !== 'production') {
-  console.log('Current settings:', settings);
+    console.log('Current settings:', SETTINGS);
 }
 
-export default settings;
-```
+export default SETTINGS;
+`
+  }
+  lang="ts"
+  title={'src/settings.ts'}
+/>
+
 
 ### Verify Database Connection
 
 Test your database configuration:
 
-```bash
-pnpm dev # or npm run dev
-```
+<Code 
+  code={
+    `pnpm dev # or npm run dev`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
 
 Look for:
-```
-database connected successfully
-server running on port : 200
-```
+
+<Code 
+  code={
+    `database connected successfully
+server running on port : 2000`
+  }
+  lang="sh"
+  title={'terminal'}
+/>
+
 
 If you see connection errors, review your database settings.
 
@@ -853,13 +997,4 @@ If you see connection errors, review your database settings.
 
 Now that you understand configuration:
 
-- **[Routing](/guides/routing/)** - Define URL patterns
-- **[Controllers](/guides/controllers/)** - Handle requests
-- **[Database Setup](/guides/database-setup/)** - Detailed database guide
-- **[Models](/guides/models/)** - Create database models
-
----
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>
+- **[Creating Apps](/guides/creating-apps/)** - Master app architecture

@@ -8,6 +8,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Structure Ts',
+      components: {
+        Footer: './src/components/footer.astro',
+      },
       social: [
         {
           icon: 'github',

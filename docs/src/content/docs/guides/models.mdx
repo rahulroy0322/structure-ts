@@ -1,18 +1,14 @@
 ---
 title: Models
-description: Define and work with database models in structure-ts
+description: Define and work with database models in Structure-Ts
 ---
-
-{/* # Models */}
+import { Code } from '@astrojs/starlight/components';
 
 Models represent your database tables and define the structure of your data. This guide explains how to create and use models in Structure-Ts.
 
-#### Upcomming
-
-{/* 
 ## What are Models?
 
-**Models** are TypeScript classes that:
+**Models** are TypeScript function that:
 - Define the structure of database tables
 - Specify column types and constraints
 - Provide methods to query and manipulate data
@@ -33,276 +29,529 @@ Before working with models:
 
 Create a model in `src/users/models.ts`:
 
-```typescript
-import { Entity, Column, PrimaryGeneratedColumn } from 'structure-ts';
+<Code
+  code={
+    `import { Model } from 'structure-ts';
 
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @Column()
-  name: string;
-  
-  @Column()
-  email: string;
-  
-  @Column()
-  password: string;
-}
-```
+const User = Model('user', {
+  name: {
+    type: 'string',
+    required: true,
+    min: 2,
+    max: 100,
+  },
+  email: {
+    type: 'email',
+    unique: true,
+    required: true,
+  },
+  password: {
+    type: 'string',
+    required: true,
+    select: false,  // Don't return in queries by default
+  },
+  age: {
+    type: 'number',
+    min: 18,
+    max: 100,
+  },
+  isActive: {
+    type: 'bool',
+    default: true,
+  },
+});
+
+export { User };`
+  }
+  lang='ts'
+  title='src/users/models.ts'
+  mark={['User', 'Model']}
+ />
 
 ### Model Anatomy
 
-**`@Entity('users')`** - Decorator that marks this class as a database table
-- The string `'users'` is the table name
-- If omitted, uses lowercase class name
+**`Model(tableName, schema)`** - Creates a model
+- First argument: Database table name 
+- Second argument: Schema object defining fields
 
-**`@PrimaryGeneratedColumn()`** - Auto-incrementing primary key
-- Usually your `id` field
-- Automatically generates unique IDs
+:::note[Note]
+table name should not end with 's' `Although it doesn't through error but it's better`
+:::
 
-**`@Column()`** - Database column
-- Each property with `@Column()` becomes a column
-- Type is inferred from TypeScript type
+**Field definition:**
 
-## Column Types
+<Code
+  code={`[fieldName]: {
+    type: 'string',      // Field type
+    required: true,      // Is field required?
+    unique: true,        // Must be unique?
+    default: 'value',    // Default value
+    min: 2,              // Minimum value/length
+    max: 100,            // Maximum value/length
+    select: false,       // Include in queries? # in development
+}`
+  }
+  lang='ts'
+  title='field definition'
+  mark={[
+    `type: 'string'`,
+    `required: true`,
+    `unique: true`,
+    `select: false`
+  ]}
+/>
 
-### Basic Types
+## Field Types
 
-```typescript
-@Entity('examples')
-export class Example {
-  @Column()
-  name: string;              // VARCHAR
-  
-  @Column()
-  age: number;               // INTEGER
-  
-  @Column()
-  price: number;             // Can also be DECIMAL/FLOAT
-  
-  @Column()
-  isActive: boolean;         // BOOLEAN
-  
-  @Column()
-  createdAt: Date;           // TIMESTAMP
-}
-```
+### String Type
 
-### Explicit Types
+<Code
+  code={`const User = Model('user', {
+    name: { 
+      type: 'string',
+      min: 2,           // Minimum length
+      max: 100,         // Maximum length
+      required: true,
+    },
+    
+    username: { 
+      type: 'string',
+      min: 3,
+      max: 30,
+      unique: true,     // Must be unique
+      required: true,
+    },
+    
+    bio: { 
+      type: 'string',
+      max: 500,
+      required: false,  // Optional field
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'string'`]}
+/>
 
-Specify column type explicitly:
+### Email Type
 
-```typescript
-@Column({ type: 'varchar', length: 255 })
-name: string;
+Special string type with email validation:
 
-@Column({ type: 'text' })
-description: string;
+<Code
+  code={`const User = Model('user', {
+    email: { 
+      type: 'email',
+      unique: true,
+      required: true,
+    },
+    
+    recoveryEmail: { 
+      type: 'email',
+      required: false,
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'email'`]}
+/>
 
-@Column({ type: 'int' })
-count: number;
+### Number Type
 
-@Column({ type: 'decimal', precision: 10, scale: 2 })
-price: number;
+<Code
+  code={`const Product = Model('products', {
+    price: {
+      type: 'number',
+      min: 0,           // Minimum value
+      max: 999999,      // Maximum value
+      required: true,
+    },
+    
+    stock: {
+      type: 'number',
+      default: 0,
+      min: 0,
+    },
+    
+    rating: {
+      type: 'number',
+      min: 0,
+      max: 5,
+      default: 0,
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'number'`]}
+/>
 
-@Column({ type: 'timestamp' })
-createdAt: Date;
-```
+### Boolean Type
 
-### Common Column Options
+<Code
+  code={`const User = Model('user', {
+    isActive: { 
+      type: 'bool',
+      default: true,
+    },
+    
+    isVerified: { 
+      type: 'bool',
+      default: false,
+    },
+    
+    isPremium: { 
+      type: 'bool',
+      default: false,
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'bool'`]}
+/>
 
-```typescript
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  // Required column (NOT NULL)
-  @Column()
-  name: string;
-  
-  // Optional column (NULL allowed)
-  @Column({ nullable: true })
-  middleName: string | null;
-  
-  // Unique constraint
-  @Column({ unique: true })
-  email: string;
-  
-  // Default value
-  @Column({ default: true })
-  isActive: boolean;
-  
-  // Length limit
-  @Column({ length: 100 })
-  username: string;
-  
-  // Text field (unlimited length)
-  @Column({ type: 'text' })
-  bio: string;
-}
-```
+### Enum Type
 
-## Primary Keys
+Restricts values to specific options:
 
-### Auto-Increment ID
+<Code
+  code={`const User = Model('user', {
+    gender: {
+      type: 'enum',
+      values: ['male', 'female', 'other'],
+      default: 'other',
+    },
+    
+    role: {
+      type: 'enum',
+      values: ['user', 'admin', 'moderator'],
+      default: 'user',
+      required: true,
+    },
+    
+    status: {
+      type: 'enum',
+      values: ['active', 'inactive', 'banned', 'pending'],
+      default: 'pending',
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'enum'`]}
+/>
 
-```typescript
-@PrimaryGeneratedColumn()
-id: number;
-```
+### Timestamp Type
 
-Most common choice. Database auto-generates: 1, 2, 3, etc.
+For date and time values:
 
-### UUID Primary Key
+<Code
+  code={`const User = Model('user', {
+    createdAt: { 
+      type: 'timestamp',
+      default: 'now',    // Set to current time
+    },
+    
+    updatedAt: { 
+      type: 'timestamp',
+      default: 'now',
+    },
+    
+    lastLogin: { 
+      type: 'timestamp'
+    },
+    
+    verifiedAt: { 
+      type: 'timestamp'
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'timestamp'`]}
+/>
 
-```typescript
-@PrimaryGeneratedColumn('uuid')
-id: string;
-```
+## Field Options
 
-Generates unique strings like: `550e8400-e29b-41d4-a716-446655440000`
+### required
 
-**When to use:** Distributed systems, need globally unique IDs
+Makes field mandatory:
 
-### Custom Primary Key
+<Code
+  code={`const User = Model('user', {
+    email: { 
+      type: 'email',
+      required: true,    // Must be provided
+    },
+    
+    phone: { 
+      type: 'string',     // Optional
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`required: true`]}
+/>
 
-```typescript
-@PrimaryColumn()
-customId: string;
-```
+### unique
 
-You manually set the ID. Useful for special cases.
+Ensures field values are unique across all records:
+
+<Code
+  code={`const User = Model('user', {
+    email: { 
+      type: 'email',
+      unique: true,      // No duplicate emails
+    },
+    
+    username: { 
+      type: 'string',
+      unique: true,      // No duplicate usernames
+    },
+    age:{
+      type: 'number'     // Optional
+    }
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`unique: true`]}
+/>
+
+### default
+
+Sets default value if not provided:
+
+<Code
+  code={`const User = Model('user', {
+    role: {
+      type: 'enum',
+      values: ['user', 'admin', 'moderator'],
+      default: 'user',
+    },
+    
+    isActive: { 
+      type: 'bool',
+      default: true,
+    },
+    
+    createdAt: { 
+      type: 'timestamp',
+      default: 'now',
+    },
+    
+    points: {
+      type: 'number',
+      default: 0,
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`default:`]}
+/>
+
+### select
+
+Controls if field is returned in queries:
+
+:::note[Note]
+select is in development
+:::
+
+<Code
+  code={`const User = Model('user', {
+    password: { 
+      type: 'string',
+      required: true,
+      select: false,     // Don't include in query results
+    },
+    
+    email: { 
+      type: 'email',
+      required: true,
+      select: true,      // Include in results (default) don't need to add
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`select: false`]}
+/>
+
+### min / max
+
+For strings (length) and numbers (value):
+
+<Code
+  code={`const User = Model('user', {
+    username: { 
+      type: 'string',
+      min: 3,            // Minimum 3 characters
+      max: 30,           // Maximum 30 characters
+    },
+    
+    age: {
+      type: 'number',
+      min: 13,           // Minimum value 13
+      max: 120,          // Maximum value 120
+    },
+    
+    bio: { 
+      type: 'string',
+      max: 500,          // Maximum 500 characters
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`select: false`]}
+/>
 
 ## Complete Model Example
 
-```typescript
-import { 
-  Entity, 
-  Column, 
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'structure-ts';
+<Code
+  code={`import { Model } from 'structure-ts';
 
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+const User = Model('user', {
+  // Basic info
+  username: { 
+    type: 'string', 
+    min: 3,
+    max: 30,
+    unique: true, 
+    required: true,
+  },
   
-  @Column({ length: 100 })
-  name: string;
+  email: { 
+    type: 'email', 
+    unique: true, 
+    required: true,
+  },
   
-  @Column({ unique: true, length: 255 })
-  email: string;
+  password: { 
+    type: 'string', 
+    required: true,
+    min: 8,
+    select: false,     // Doesn't return password by default untill ask
+  },
   
-  @Column()
-  password: string;
+  // Profile info
+  name: { 
+    type: 'string',
+    min: 2,
+    max: 100,
+  },
   
-  @Column({ nullable: true, length: 20 })
-  phone: string | null;
+  age: {
+    type: 'number',
+    min: 13,
+    max: 120,
+  },
   
-  @Column({ default: true })
-  isActive: boolean;
+  gender: {
+    type: 'enum',
+    values: ['male', 'female', 'other'],
+    default: 'other',
+  },
   
-  @Column({ default: 'user' })
-  role: string;
+  bio: { 
+    type: 'string',
+    max: 500,
+  },
   
-  @Column({ type: 'text', nullable: true })
-  bio: string | null;
+  // Account status
+  role: {
+    type: 'enum',
+    values: ['user', 'admin', 'moderator'],
+    default: 'user',
+  },
   
-  @CreateDateColumn()
-  createdAt: Date;
+  isActive: { 
+    type: 'bool', 
+    default: true,
+  },
   
-  @UpdateDateColumn()
-  updatedAt: Date;
-}
-```
+  isVerified: { 
+    type: 'bool', 
+    default: false,
+  },
+  
+  // Timestamps
+  verifiedAt: { 
+    type: 'timestamp',
+  },
+  
+  createdAt: { 
+    type: 'timestamp',
+    default: 'now',
+  },
+  
+  lastLogin: { 
+    type: 'timestamp',
+  },
+});
 
-### Special Columns
-
-**`@CreateDateColumn()`** - Automatically set when record is created
-
-**`@UpdateDateColumn()`** - Automatically updated when record changes
-
-These save you from manually tracking timestamps!
+export { User };`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`Model`]}
+/>
 
 ## Using Models in Controllers
 
 ### Import Your Model
 
-```typescript
-import { User } from './models';
-```
+<Code
+  code={`import { User } from './models';`}
+  lang='ts'
+  title='src/users/controllers.ts'
+/>
 
 ### Create (Insert)
 
-```typescript
-const createUser: ControllerType = async (request, reply) => {
-  const { name, email, password } = request.body;
-  
-  try {
-    const user = new User();
-    user.name = name;
-    user.email = email;
-    user.password = password;
-    
-    await user.save();
-    
+<Code
+  code={`const createUser: ControllerType = async (question, reply) => {
+    const { body:{
+      username, email, password, age 
+    } } = question.body();
+
+    const user = await User.create({
+      username,
+      email,
+      password,
+      age,
+    });
+      
     reply.status(created()).json({
       success: true,
       data: user,
     });
-  } catch (error) {
-    reply.status(serverError()).json({
-      success: false,
-      error: 'Failed to create user',
-    });
-  }
-};
-```
-
-**Alternative syntax:**
-```typescript
-const user = User.create({
-  name,
-  email,
-  password,
-});
-
-await user.save();
-```
+};`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={[
+    'User.create('
+  ]}
+/>
 
 ### Read (Find)
 
 **Find all:**
-```typescript
-const listUsers: ControllerType = async (request, reply) => {
-  try {
+
+<Code
+  code={`const listUsers: ControllerType = async (question, reply) => {
     const users = await User.find();
     
     reply.status(ok()).json({
       success: true,
       data: users,
     });
-  } catch (error) {
-    reply.status(serverError()).json({
-      success: false,
-      error: 'Failed to fetch users',
-    });
-  }
-};
-```
+};`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={['User.find()']}
+/>
 
-**Find one by ID:**
-```typescript
-const getUser: ControllerType = async (request, reply) => {
-  const { id } = request.params;
+**Find one by Primary Key/Id:**
+
+<Code
+  code={`const getUser: ControllerType = async (question, reply) => {
+    const { id } = question.params;
   
-  try {
-    const user = await User.findOneBy({ id: parseInt(id) });
+    const user = await User.findByPK(id);
     
     if (!user) {
       return reply.status(notFound()).json({
@@ -315,45 +564,48 @@ const getUser: ControllerType = async (request, reply) => {
       success: true,
       data: user,
     });
-  } catch (error) {
-    reply.status(serverError()).json({
-      success: false,
-      error: 'Failed to fetch user',
-    });
-  }
-};
-```
+};`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={['User.findByPK(id)']}
+/>
+
 
 **Find with conditions:**
-```typescript
-// Find by email
-const user = await User.findOne({ 
-  where: { email: 'alice@example.com' } 
-});
+
+<Code
+  code={`// Find by email
+const user = await User.findOne({ email: 'alice@example.com' });
 
 // Find active users
-const activeUsers = await User.find({
-  where: { isActive: true }
-});
+const activeUsers = await User.find({ isActive: true });
 
-// Find with multiple conditions
-const admins = await User.find({
-  where: { 
+// Find verified users
+const verifiedUsers = await User.find({ isVerified: true });
+
+// Find by multiple conditions
+// this will led to 'and' query
+const admins = await User.find({ 
     role: 'admin',
     isActive: true,
-  }
-});
-```
+});`}
+  lang='ts'
+  title='src/users/services.ts'
+  mark={['User.findOne', 'User.find']}
+ />
 
 ### Update
 
-```typescript
-const updateUser: ControllerType = async (request, reply) => {
-  const { id } = request.params;
-  const { name, email } = request.body;
-  
-  try {
-    const user = await User.findOneBy({ id: parseInt(id) });
+<Code
+  code={`const updateUser: ControllerType = async (question, reply) => {
+    const { id } = question.params;
+    const {
+      body:{
+        name, bio, age
+      } 
+    } = question.body();
+    
+    const user = await User.findByPK(id);
     
     if (!user) {
       return reply.status(notFound()).json({
@@ -363,401 +615,548 @@ const updateUser: ControllerType = async (request, reply) => {
     }
     
     // Update fields
-    user.name = name || user.name;
-    user.email = email || user.email;
-    
-    await user.save();
+    const updatedUser = await User.updateById(id, {
+      name,
+      bio,
+      age,
+    });
     
     reply.status(ok()).json({
       success: true,
-      data: user,
+      data: updatedUser,
     });
-  } catch (error) {
-    reply.status(serverError()).json({
-      success: false,
-      error: 'Failed to update user',
-    });
-  }
-};
-```
-
-**Alternative - update directly:**
-```typescript
-await User.update(
-  { id: parseInt(id) },  // Where
-  { name, email }         // New values
-);
-```
+};`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={['User.findByPK(id)',]}
+/>
 
 ### Delete
 
-```typescript
-const deleteUser: ControllerType = async (request, reply) => {
-  const { id } = request.params;
-  
-  try {
-    const result = await User.delete({ id: parseInt(id) });
+<Code
+  code={`const deleteUser: ControllerType = async (question, reply) => {
+    const { id } = question.params;
     
-    if (result.affected === 0) {
+    const result = await User.destroyByPK(id);
+    
+    if (!result) {
       return reply.status(notFound()).json({
         success: false,
         error: 'User not found',
       });
     }
-    
+  
     reply.status(ok()).json({
       success: true,
       message: 'User deleted successfully',
     });
-  } catch (error) {
-    reply.status(serverError()).json({
-      success: false,
-      error: 'Failed to delete user',
-    });
-  }
-};
-```
-
-**Remove specific instance:**
-```typescript
-const user = await User.findOneBy({ id });
-await user.remove();
-```
+};`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={['User.destroyByPK(id)',]}
+/>
 
 ## Advanced Queries
 
 ### Pagination
 
-```typescript
-const listUsers: ControllerType = async (request, reply) => {
-  const { page = '1', limit = '10' } = request.query;
-  
-  const pageNumber = parseInt(page);
-  const pageLimit = parseInt(limit);
-  
-  const [users, total] = await User.findAndCount({
-    skip: (pageNumber - 1) * pageLimit,
-    take: pageLimit,
-  });
-  
-  reply.status(ok()).json({
-    success: true,
-    data: users,
-    pagination: {
-      page: pageNumber,
+<Code
+  code={`const listUsers: ControllerType = async (question, reply) => {
+    const { page = '1', limit = '10' } = question.query;
+    
+    const pageNumber = parseInt(page);
+    const pageLimit = parseInt(limit);
+    
+    const users = await User.find(undefined, undefined, {
+      skip: (pageNumber - 1) * pageLimit,
       limit: pageLimit,
-      total,
-      pages: Math.ceil(total / pageLimit),
-    },
-  });
-};
-```
+    });
+  
+    const total = (await User.find(undefined, {_id:true})).length;
+    
+    reply.status(ok()).json({
+      success: true,
+      data: users,
+      pagination: {
+        page: pageNumber,
+        limit: pageLimit,
+        total,
+        pages: Math.ceil(total / pageLimit),
+      },
+    });
+};`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={['User.find']}
+/>
 
 ### Sorting
 
-```typescript
-// Sort by name ascending
-const users = await User.find({
-  order: { name: 'ASC' }
+<Code
+  code={`// Sort by createdAt descending
+const users = await User.find(undefined,undefined,{
+    orderBy:{
+      createdAt: 'DESC'
+    }
 });
 
-// Sort by createdAt descending
-const recentUsers = await User.find({
-  order: { createdAt: 'DESC' }
+// Sort by username ascending
+const users = await User.find(undefined,undefined,{
+    orderBy:{
+      username:'ASC'
+    }
 });
+
 
 // Multiple sort fields
-const sorted = await User.find({
-  order: {
-    role: 'ASC',
-    name: 'ASC',
-  }
-});
-```
+const users = await User.find(undefined,undefined,{
+    orderBy:{
+      role:'ASC',
+      createdAt: 'DESC'
+    }
+});`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={['orderBy','ASC','DESC']}
+/>
 
 ### Selecting Specific Fields
 
-```typescript
-// Only get name and email
-const users = await User.find({
-  select: ['name', 'email']
+<Code
+  code={`// Only get username and email
+const users = await User.find(undefined,{
+    email: true,
+    username: true
 });
 
-// Exclude password from results
-const users = await User.find({
-  select: ['id', 'name', 'email', 'createdAt']
-});
-```
-
-### Complex Conditions
-
-```typescript
-import { Like, MoreThan, LessThan } from 'structure-ts';
-
-// Search by name (LIKE query)
-const users = await User.find({
-  where: {
-    name: Like('%john%')  // Contains 'john'
-  }
+// Exclude password (if select: false)
+const users = await User.find(undefined,{
+    email: true,
+    username: true
 });
 
-// Users older than 18
-const adults = await User.find({
-  where: {
-    age: MoreThan(18)
-  }
+// Include password (if select: false)
+const users = await User.find(undefined,{
+    email: true,
+    username: true,
+    password: true
 });
+`}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={[
+    'email: true',
+    'username: true',
+    'password: true'
+  ]}
+/>
 
-// Recent users (last 7 days)
-const sevenDaysAgo = new Date();
-sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+### Counting Records
 
-const recentUsers = await User.find({
-  where: {
-    createdAt: MoreThan(sevenDaysAgo)
-  }
-});
-```
+{/* ! TODO */}
+#### Upcomming
 
-## Relationships
+{/* ```typescript
+// Count all users
+const total = await User.count();
 
-### One-to-Many
+// Count with condition
+const activeCount = await User.count({ isActive: true });
 
-```typescript
-// User has many posts
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+// Count verified users
+const verifiedCount = await User.count({ isVerified: true });
+``` */}
+
+### Search/Query
+
+<Code
+  code={`// Search by username
+  const users = await User.find({
+    username:'john'
+  });
   
-  @Column()
-  name: string;
-  
-  @OneToMany(() => Post, post => post.author)
-  posts: Post[];
-}
-
-@Entity('posts')
-export class Post {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @Column()
-  title: string;
-  
-  @ManyToOne(() => User, user => user.posts)
-  author: User;
-}
-```
-
-**Usage:**
-```typescript
-// Get user with their posts
-const user = await User.findOne({
-  where: { id: 1 },
-  relations: ['posts']
-});
-
-console.log(user.posts);  // Array of posts
-```
-
-### Many-to-Many
-
-```typescript
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @Column()
-  name: string;
-  
-  @ManyToMany(() => Role)
-  @JoinTable()
-  roles: Role[];
-}
-
-@Entity('roles')
-export class Role {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @Column()
-  name: string;
-}
-```
+  // Search in multiple fields
+  const users = await User.find({
+    email: 'test@example.com',
+    username:'john'
+  });
+  `}
+  lang='ts'
+  title='src/users/controllers.ts'
+  mark={[ 
+    `email: 'test@example.com'`,
+    `username:'john'`
+  ]}
+/>
 
 ## Validation
 
-### Basic Validation
+Models automatically validate based on schema:
 
-```typescript
-import { Entity, Column, PrimaryGeneratedColumn } from 'structure-ts';
-import { IsEmail, Length, Min } from 'class-validator';
+<Code
+  code={`const User = Model('user', {
+    email: { 
+      type: 'email',     // Validates email format
+      required: true,    // Validates presence
+      unique: true,      // Validates uniqueness
+    },
+    age: {
+      type: 'number',
+      min: 18,           // Validates minimum value
+      max: 120,          // Validates maximum value
+    },
+    username: { 
+      type: 'string',
+      min: 3,            // Validates minimum length
+      max: 30,           // Validates maximum length
+    },
+    gender: {
+      type: 'enum',
+      values: ['male', 'female', 'other'],  // Validates allowed values
+    },
+});
 
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @Column()
-  @Length(2, 100)
-  name: string;
-  
-  @Column({ unique: true })
-  @IsEmail()
-  email: string;
-  
-  @Column()
-  @Length(8, 50)
-  password: string;
-  
-  @Column()
-  @Min(18)
-  age: number;
-}
-```
-
-**Validate in controller:**
-```typescript
-import { validate } from 'class-validator';
-
-const createUser: ControllerType = async (request, reply) => {
-  const user = User.create(request.body);
-  
-  const errors = await validate(user);
-  
-  if (errors.length > 0) {
-    return reply.status(badRequest()).json({
-      success: false,
-      errors: errors.map(e => Object.values(e.constraints || {})).flat(),
+// This will fail validation
+try {
+    await User.create({
+      email: 'invalid-email',  // Invalid email format
+      age: 15,                 // Below minimum
+      username: 'ab',          // Too short
+      gender: 'unknown',       // Not in enum values
     });
-  }
-  
-  await user.save();
-  
-  reply.status(created()).json({
-    success: true,
-    data: user,
-  });
-};
-```
+} catch (error) {
+    // Validation error with details
+    console.error(error.message);
+}`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={['User.create', 'Model']}
+/>
 
 ## Best Practices
 
-### 1. One Model Per File (for complex models)
+### 1. Use Descriptive Field Names
 
-```
-users/
-├── models/
-│   ├── User.ts
-│   ├── UserProfile.ts
-│   └── UserSettings.ts
-└── models.ts  # Re-export all models
-```
+<Code
+  code={`// ✅ Good
+const User = Model('user', {
+    username: { type: 'string' },
+    isEmailVerified: { type: 'bool' },
+    lastLoginAt: { type: 'timestamp' },
+});
 
-### 2. Don't Expose Sensitive Data
+// ❌ Bad
+const User = Model('user', {
+    uname: { type: 'string' },
+    verified: { type: 'bool' },
+    login: { type: 'timestamp' },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[
+    'username', 
+    'isEmailVerified',
+    'lastLoginAt',
+    'uname',
+    'verified',
+    'login'
+  ]}
+/>
 
-```typescript
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @Column()
-  name: string;
-  
-  @Column()
-  email: string;
-  
-  @Column()
-  password: string;
-  
-  // Method to get safe user object
-  toJSON() {
-    const { password, ...safeUser } = this;
-    return safeUser;
-  }
-}
-```
+### 2. Always Hide Sensitive Fields
+
+<Code
+  code={`const User = Model('user', {
+    password: { 
+      type: 'string',
+      required: true,
+      select: false,     // Never return passwords!
+    },
+    
+    apiKey: { 
+      type: 'string',
+      select: false,     // Hide API keys
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={['password:', 'apiKey:', 'select: false']}
+/>
 
 ### 3. Use Enums for Fixed Values
 
-```typescript
-enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  MODERATOR = 'moderator',
-}
+<Code
+  code={`// ✅ Good - type safe
+const User = Model('user', {
+    role: {
+      type: 'enum',
+      values: ['user', 'admin', 'moderator'],
+      default: 'user',
+    },
+});
 
-@Entity('users')
-export class User {
-  @Column({ 
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER,
-  })
-  role: UserRole;
-}
-```
+// ❌ Bad - allows any string
+const User = Model('user', {
+    role: { 
+      type: 'string',
+      default: 'user',
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[`type: 'enum'`]}
+/>
 
-### 4. Add Indexes for Performance
+### 4. Set Reasonable Constraints
 
-```typescript
-@Entity('users')
-@Index(['email'])  // Index for faster email lookups
-export class User {
-  @Column({ unique: true })
-  email: string;
-}
-```
+<Code
+  code={`const User = Model('user', {
+    username: { 
+      type: 'string',
+      min: 3,      // Prevent single-character usernames
+      max: 30,     // Prevent extremely long usernames
+      unique: true,
+    },
+    
+    age: {
+      type: 'number',
+      min: 13,     // Minimum age requirement
+      max: 120,    // Reasonable maximum
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[
+    `max: 120`,
+    `min: 13`,
+    `min: 3`,
+    `max: 30`,
+    `unique: true`
+  ]}
+/>
 
-### 5. Use Soft Deletes
+### 5. Use Timestamps
 
-```typescript
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-  
-  @DeleteDateColumn()
-  deletedAt: Date | null;
-}
+<Code
+  code={`const User = Model('user', {
+    createdAt: { 
+      type: 'timestamp',
+      default: 'now',
+    },
+    
+    updatedAt: { 
+      type: 'timestamp',
+      default: 'now',
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[
+    `type: 'timestamp'`
+  ]}
+/>
 
-// Soft delete (doesn't actually remove from database)
-await user.softRemove();
+### 6. Provide Defaults
 
-// Find only non-deleted users
-const users = await User.find();  // Automatically excludes deleted
+<Code
+  code={`const User = Model('user', {
+    role: {
+      type: 'enum',
+      values: ['user', 'admin'],
+      default: 'user',       // New users are 'user' by default
+    },
+    
+    isActive: { 
+      type: 'bool',
+      default: true,         // Active by default
+    },
+    
+    points: {
+      type: 'number',
+      default: 0,           // Start with 0 points
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+  mark={[
+    `type: 'timestamp'`
+  ]}
+/>
 
-// Find all including deleted
-const allUsers = await User.find({ withDeleted: true });
-```
+## Common Patterns
+
+### User Model
+
+<Code
+  code={`const User = Model('user', {
+    username: { 
+      type: 'string', 
+      min: 3, 
+      max: 30, 
+      unique: true, 
+      required: true,
+    },
+    email: { 
+      type: 'email', 
+      unique: true, 
+      required: true,
+    },
+    password: { 
+      type: 'string', 
+      required: true, 
+      select: false,
+    },
+    role: {
+      type: 'enum',
+      values: ['user', 'admin'],
+      default: 'user',
+    },
+    isActive: { 
+      type: 'bool', 
+      default: true,
+    },
+    createdAt: { 
+      type: 'timestamp', 
+      default: 'now',
+    },
+});`}
+  lang='ts'
+  title='src/users/models.ts'
+/>
+
+### Product Model
+
+<Code
+  code={`const Product = Model('products', {
+    name: { 
+      type: 'string', 
+      required: true, 
+      min: 2, 
+      max: 200,
+    },
+    description: { 
+      type: 'string', 
+      max: 1000,
+    },
+    price: {
+      type: 'number',
+      required: true,
+      min: 0,
+    },
+    stock: {
+      type: 'number',
+      default: 0,
+      min: 0,
+    },
+    category: {
+      type: 'enum',
+      values: ['electronics', 'clothing', 'books', 'food'],
+      required: true,
+    },
+    isAvailable: { 
+      type: 'bool', 
+      default: true,
+    },
+    createdAt: { 
+      type: 'timestamp', 
+      default: 'now',
+    },
+});`}
+  lang='ts'
+  title='src/product/models.ts'
+/>
+
+### Post Model
+
+<Code
+  code={`const Post = Model('posts', {
+    title: { 
+      type: 'string', 
+      required: true, 
+      min: 5, 
+      max: 200,
+    },
+    slug: { 
+      type: 'string', 
+      unique: true, 
+      required: true,
+    },
+    content: { 
+      type: 'string', 
+      required: true,
+    },
+    author: { 
+      type: 'string', 
+      required: true,
+    },
+    status: {
+      type: 'enum',
+      values: ['draft', 'published', 'archived'],
+      default: 'draft',
+    },
+    publishedAt: { 
+      type: 'timestamp',
+    },
+    createdAt: { 
+      type: 'timestamp', 
+      default: 'now',
+    },
+});`}
+  lang='ts'
+  title='src/post/models.ts'
+/>
 
 ## Troubleshooting
 
-### "Entity not found" Error
+### Validation Errors
 
-**Solution:** Ensure model is imported in `app.ts` or configured in database settings.
+**Problem:** Create/update fails with validation error
 
-### "Column does not exist" Error
+**Check:**
+- Required fields are provided
+- String lengths within min/max
+- Number values within min/max
+- Enum values are valid
+- Email format is correct
 
-**Solution:** Run migrations to sync database schema with your models.
+### Unique Constraint Errors
 
-### TypeScript Type Errors
+**Problem:** "Duplicate entry" error
 
-**Solution:** Ensure model properties match your TypeScript types exactly.
+**Cause:** Trying to insert duplicate value for unique field
+
+**Solution:**
+
+<Code
+  code={`// Check if exists before creating
+const existing = await User.findOne({ email });
+if (existing) {
+    return reply.status(badRequest()).json({
+      error: 'Email already registered',
+    });
+}`}
+  lang='ts'
+  title='src/users/models.ts'
+/>
+
+### Field Not Returned
+
+**Problem:** Field missing in query results
+
+**Check:**
+
+<Code
+  code={`// Is select: false?
+  const users = await User.find(undefined,{
+    password: false
+  });
+`}
+  lang='ts'
+  title='src/users/models.ts'
+/>
 
 ## Next Steps
 
 Now that you understand models:
 
 - **[Database Setup](/guides/database-setup/)** - Configure your database connection
-- **[Migrations](/guides/migrations/)** - Create and manage schema changes
-- **[Running Migrations](/guides/migrate/)** - Apply migrations to database
-
---- */}
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>

@@ -2,8 +2,7 @@
 title: Controllers
 description: Learn how to create controllers and handle HTTP questions
 ---
-
-{/* # Controllers */}
+import { Code } from '@astrojs/starlight/components';
 
 Controllers are functions that handle HTTP questions and send responses. This guide covers everything you need to know about building controllers in Structure-Ts.
 
@@ -20,33 +19,41 @@ Think of controllers as the bridge between your routes and your application logi
 
 Every controller follows this pattern:
 
-```typescript
-import { type ControllerType, ok } from 'structure-ts';
+<Code
+  code={
+`import { type ControllerType, ok } from 'structure-ts';
 
 const myController: ControllerType = (question, reply) => {
-  // 1. Get data from question
-  // 2. Process/validate data
-  // 3. Send response
-  
-  reply.status(ok()).json({
-    success: true,
-    message: 'Hello World!',
-  });
+    // 1. Get data from question
+    // 2. Process/validate data
+    // 3. Send response
+      
+    reply.status(ok()).json({
+      success: true,
+      message: 'Hello World!',
+    });
 };
 
-export { myController };
-```
+export { myController };`
+  }
+  lang='ts'
+  title={'app/controllers.ts'}
+  mark={[
+    'myController',
+  ]}
+/>
 
 ### Controller Anatomy
 
 **`ControllerType`** - TypeScript type for type safety
 
 **` question`** - The incoming HTTP   question object containing:
-- ` question.params` - URL parameters (`<id:int>`)
-- ` question.query` - Query strings (`?page=1`)
-- ` question.body` - POST/PUT data
-- ` question.headers` - HTTP headers
-- ` question.method` - HTTP method (GET, POST, etc.)
+{/* ! TODO */}
+{/* - ` question.params` - URL parameters (`<id:int>`) */}
+{/* - ` question.query` - Query strings (`?page=1`) */}
+- ` question.body()` - POST/PUT data
+- ` question.headers()` - HTTP headers
+- ` question.method()` - HTTP method (GET, POST, etc.)
 
 **`reply`** - The response object for sending data back:
 - `reply.status()` - Set HTTP status code
@@ -60,123 +67,156 @@ export { myController };
 
 Open `src/users/controllers.ts`:
 
-```typescript
-import { type ControllerType, ok } from 'structure-ts';
+<Code
+  code={
+`import { type ControllerType, ok } from 'structure-ts';
+
+const users = [
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@example.com' },
+];
 
 const listUsers: ControllerType = (question, reply) => {
-  const users = [
-    { id: 1, name: 'Alice', email: 'alice@example.com' },
-    { id: 2, name: 'Bob', email: 'bob@example.com' },
-  ];
-  
-  reply.status(ok()).json({
-    success: true,
-    data: users,
-  });
+    reply.status(ok()).json({
+      success: true,
+      data: users,
+    });
 };
 
-export { listUsers };
-```
+export { listUsers };`
+  }
+  lang='ts'
+  title={'src/users/controllers.ts'}
+  mark={['listUsers']}
+/>
 
 ### Step 2: Link to Route
 
 Open `src/users/routes.ts`:
 
-```typescript
-import { Router } from 'structure-ts';
+<Code
+  code={
+`import { Router } from 'structure-ts';
 import { listUsers } from './controllers';
 
 const { routes, route } = Router();
 
 route.get('/', listUsers);
 
-export default routes;
-```
+export default routes;`
+  }
+  lang='ts'
+  title={'src/users/routes.ts'}
+  mark={[
+    "route.get('/', listUsers)"
+  ]}
+/>
 
 ### Step 3: Test It
 
 Visit `http://localhost:2000/users` to see your data!
 
-{/* ## Getting Request Data
+## Getting Request Data
 
 ### Reading the Request Body
 
 For POST/PUT requests, data comes in `question.body`:
 
-```typescript
-const createUser: ControllerType = (question, reply) => {
-  const { name, email, password } = question.body;
+<Code
+  code={
+    `const createUser: ControllerType = (question, reply) => {
+    const { body: {
+      name, email, password
+    } } = await question.body();
+    
+    // Validate data
+    if (!name || !email || !password) {
+      return reply.status(400).json({
+        success: false,
+        error: 'Missing required fields',
+      });
+    }
   
-  // Validate data
-  if (!name || !email || !password) {
-    return reply.status(400).json({
-      success: false,
-      error: 'Missing required fields',
+    // Create user (mock example)
+    const newUser = {
+      id: Date.now(),
+      name,
+      email,
+    };
+    
+    reply.status(201).json({
+      success: true,
+      data: newUser,
     });
+};`
   }
-  
-  // Create user (mock example)
-  const newUser = {
-    id: Date.now(),
-    name,
-    email,
-  };
-  
-  reply.status(201).json({
-    success: true,
-    data: newUser,
-  });
-};
-```
+  lang='ts'
+  title='src/app/controllers.ts'
+  mark={[
+    `await question.body();`
+  ]}
+/>
 
 **Test with curl:**
-```bash
-curl -X POST http://localhost:2000/users/create \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Charlie","email":"charlie@example.com","password":"secret"}'
-``` */}
 
-{/* ### URL Parameters
+<Code
+  code={
+    `curl -X POST http://localhost:2000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Charlie","email":"charlie@example.com","password":"secret"}'`
+  }
+  lang='sh'
+  title='terminal'
+/>
+
+ ### URL Parameters
 
 Access dynamic URL segments:
 
-```typescript
-// Route: route.get('/:id', getUser)
+<Code
+  code={
+    `// Route: route.get('/users/<id:str>', getUser)
 
 const getUser: ControllerType = (question, reply) => {
-  const { id } = question.params;  // Get :id from URL
-  
-  // Convert to number
-  const userId = parseInt(id);
-  
-  // Mock data
-  const users = [
-    { id: 1, name: 'Alice', email: 'alice@example.com' },
-    { id: 2, name: 'Bob', email: 'bob@example.com' },
-  ];
-  
-  const user = users.find(u => u.id === userId);
-  
-  if (!user) {
-    return reply.status(404).json({
-      success: false,
-      error: 'User not found',
+    const { id } = question.params;  // Get <id:str> from URL
+    
+    // Mock data
+    const users = [
+      { id: '1', name: 'Alice', email: 'alice@example.com' },
+      { id: '2', name: 'Bob', email: 'bob@example.com' },
+    ];
+    
+    const user = users.find(u => u.id === id);
+    
+    if (!user) {
+      return reply.status(404).json({
+        success: false,
+        error:{
+          message:'User not found',
+          name:'not found'
+        }
+      });
+    }
+    
+    reply.status(200).json({
+      success: true,
+      data: user,
     });
+};`
   }
-  
-  reply.status(200).json({
-    success: true,
-    data: user,
-  });
-};
-```
+  lang='sh'
+  title='terminal'
+/>
 
-**Test:** `http://localhost:2000/users/1` */}
+**Test:** `http://localhost:2000/users/1` 
 
-{/* ### Query Parameters
+### Query Parameters
 
 Access query strings (`?page=1&limit=10`):
 
+#### Upcomming
+
+{/*
 ```typescript
 const searchUsers: ControllerType = (question, reply) => {
   const { query, page, limit } = question.query;
@@ -209,39 +249,39 @@ const searchUsers: ControllerType = (question, reply) => {
 
 **Test:** `http://localhost:2000/users/search?query=alice&page=1&limit=10`
 
+*/}
+
 ### Request Headers
 
 Access HTTP headers:
 
-```typescript
-const protectedController: ControllerType = (question, reply) => {
-  const authHeader = question.headers['authorization'];
-  const contentType = question.headers['content-type'];
-  
-  if (!authHeader) {
-    return reply.status(401).json({
-      success: false,
-      error: 'Authorization header required',
+<Code
+  code={
+    `const protectedController: ControllerType = (question, reply) => {
+    const authHeader = question.get('authorization'); // question.header('authorization')
+    const contentType = question.get('content-type');
+    
+    if (!authHeader) {
+      throw new Error('Authorization header required')
+    }
+    
+    // Extract token
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify token (mock)
+    if (token !== 'valid-token') {
+      throw new Error('Invalid token')
+    }
+    
+    reply.status(200).json({
+      success: true,
+      data:{}
     });
+};`
   }
-  
-  // Extract token
-  const token = authHeader.replace('Bearer ', '');
-  
-  // Verify token (mock)
-  if (token !== 'valid-token') {
-    return reply.status(403).json({
-      success: false,
-      error: 'Invalid token',
-    });
-  }
-  
-  reply.status(200).json({
-    success: true,
-    message: 'Access granted',
-  });
-};
-```
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **Test with curl:**
 ```bash
@@ -253,115 +293,154 @@ curl http://localhost:2000/users/protected \
 
 ### HTTP Status Codes
 
-structure-ts provides helpers for common status codes:
+Structure-Ts provides helpers for common status codes:
 
-```typescript
-import { 
-  ok,              // 200
-  created,         // 201
-  badRequest,      // 400
-  unauthorized,    // 401
-  forbidden,       // 403
-  notFound,        // 404
-  serverError,     // 500
-} from 'structure-ts';
-```
+<Code
+  code={
+    `import { 
+    ok,              // 200
+    created,         // 201
+    badRequest,      // 400
+    unauthorized,    // 401
+    forbidden,       // 403
+    notFound,        // 404
+    serverError,     // 500
+} from 'structure-ts';`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 ### Status Code Examples
 
 **200 OK - Success**
-```typescript
-reply.status(ok()).json({
-  success: true,
-  data: users,
-});
-```
+
+
+<Code
+  code={
+    `reply.status(ok()).json({
+    success: true,
+    data: users,
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **201 Created - Resource Created**
-```typescript
-reply.status(created()).json({
-  success: true,
-  data: newUser,
-  message: 'User created successfully',
-});
-```
+
+<Code
+  code={
+    `reply.status(created()).json({
+    success: true,
+    data: newUser,
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **400 Bad Request - Invalid Input**
-```typescript
-reply.status(badRequest()).json({
-  success: false,
-  error: 'Invalid email format',
-});
-```
+
+<Code
+  code={
+    `reply.status(badRequest()).json({
+    success: false,
+    error: {
+      message: 'Invalid email format',
+      name: 'invalid'
+    }
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **401 Unauthorized - Authentication Required**
-```typescript
-reply.status(unauthorized()).json({
-  success: false,
-  error: 'Please log in to continue',
-});
-```
+
+<Code
+  code={
+    `reply.status(unauthorized()).json({
+    success: false,
+    error: {
+      message: 'Please log in to continue',
+      name: 'invalid'
+    }
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **403 Forbidden - No Permission**
-```typescript
-reply.status(forbidden()).json({
-  success: false,
-  error: 'You do not have permission to perform this action',
-});
-```
+
+<Code
+  code={
+    `reply.status(forbidden()).json({
+      success: false,
+      error: {
+        message:'You do not have permission to perform this action',
+        name: 'invalid'
+      }
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **404 Not Found - Resource Missing**
-```typescript
-reply.status(notFound()).json({
-  success: false,
-  error: 'User not found',
-});
-```
+
+<Code
+  code={
+    `reply.status(notFound()).json({
+    success: false,
+    error: {
+      message: 'User not found',
+      name: 'not found',
+    }
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 **500 Internal Server Error - Something Broke**
-```typescript
-reply.status(serverError()).json({
-  success: false,
-  error: 'An unexpected error occurred',
-});
-```
 
-### Custom Status Codes
-
-Use any HTTP status code:
-
-```typescript
-reply.status(418).json({
-  success: false,
-  error: "I'm a teapot",  // Yes, this is a real status code!
-});
-
-reply.status(503).json({
-  success: false,
-  error: 'Service temporarily unavailable',
-});
-```
+<Code
+  code={
+    `reply.status(serverError()).json({
+    success: false,
+    error: {
+      message: 'An unexpected error occurred',
+      name: 'server error',
+    }
+});`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
 
 ### Sending JSON Responses
 
 The most common response format:
 
-```typescript
-const controller: ControllerType = (question, reply) => {
-  reply.status(ok()).json({
-    success: true,
-    data: {
-      id: 1,
-      name: 'Alice',
-      email: 'alice@example.com',
-    },
-    meta: {
-      timestamp: new Date().toISOString(),
-      version: '1.0',
-    },
-  });
-};
-```
+<Code
+  code={
+    `const controller: ControllerType = (question, reply) => {
+    reply.status(ok()).json({
+      success: true,
+      data: {
+        id: 1,
+        name: 'Alice',
+        email: 'alice@example.com',
+      }
+    });
+};`
+  }
+  lang='ts'
+  title='app/controllers.ts'
+/>
+{/* 
 
 ### Sending Plain Text
 
@@ -886,17 +965,11 @@ describe('listUsers controller', () => {
   });
 });
 ```
+ */}
 
 ## Next Steps
 
 Now that you understand controllers:
 
-- **[Models](/guides/models/)** - Connect controllers to databases
-- **[Rendering](/guides/rendering/)** - Render HTML templates from controllers
-- **[Database Setup](/guides/database-setup/)** - Configure database connections
-
---- */}
-
-<small>
-**Documentation Notice**: The majority of this documentation was created with assistance from Claude (Anthropic AI) and refined with modifications by Rahul Roy, the project owner. We believe in transparency about our development process.
-</small>
+- **[Routing](/guides/routing/)** - Let's build routing
+- **[Template](/guides/template-rendering/)** - Let's see Template
