@@ -28,7 +28,8 @@ const scopeEnum = [
   'app', //Changes to app
   'cns', //Changes to controllers
   'hand', //Changes to handler
-  'db', //Changes to handler
+  'db', //Changes to db
+  'cli', //Changes to cli
 ];
 
 export default {

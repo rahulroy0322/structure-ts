@@ -3,10 +3,14 @@ import { create } from './create/main'
 import { migrate } from './db/migrate/main'
 import { migration } from './db/migrations/main'
 import { showHelp } from './help'
+import { version } from './version'
 
 const commands = {
   create,
   help: showHelp,
+  '--version': version,
+  '-v': version,
+  version,
   'db:migration': migration,
   'db:migrate': migrate,
 }
