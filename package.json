@@ -1,6 +1,6 @@
 {
   "name": "stratus-ts",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.",
   "homepage": "https://stratus-ts.netlify.app/",
   "main": "lib/main.js",
