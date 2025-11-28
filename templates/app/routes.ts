@@ -1,4 +1,4 @@
-import { Router } from 'structure-ts'
+import { Router } from 'stratus-ts'
 
 import { controller } from './controllers'
 

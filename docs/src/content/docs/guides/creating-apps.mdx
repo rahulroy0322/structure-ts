@@ -4,11 +4,11 @@ description: Learn how to create and organize modular applications
 ---
 import { Code, FileTree } from '@astrojs/starlight/components';
 
-Apps are the building blocks of Structure-Ts applications. This guide explains what apps are, how to create them, and best practices for organizing your code.
+Apps are the building blocks of StratusTS applications. This guide explains what apps are, how to create them, and best practices for organizing your code.
 
 ## What is an App?
 
-An **app** in Structure-Ts is a self-contained module that handles a specific domain or feature of your application. Think of apps as reusable packages of functionality.
+An **app** in StratusTS is a self-contained module that handles a specific domain or feature of your application. Think of apps as reusable packages of functionality.
 
 ### Examples of Apps
 
@@ -115,7 +115,7 @@ or the full command:
 
 <Code 
   code={
-    `structure-ts create app users`
+    `stratus-ts create app users`
   }
   lang="sh"
   title={'terminal'}
@@ -163,7 +163,7 @@ The CLI generates this structure:
 
 <Code 
   code={
-    `import { type ControllerType } from 'structure-ts';
+    `import { type ControllerType } from 'stratus-ts';
 
 // Add your controllers here`
   }
@@ -175,7 +175,7 @@ The CLI generates this structure:
 
 <Code 
   code={
-    `import { Router } from 'structure-ts';
+    `import { Router } from 'stratus-ts';
 
 const { routes, route } = Router();
 
@@ -209,7 +209,7 @@ Edit `src/settings.ts`:
 
 <Code 
   code={
-    `import type { DatabaseType, SettingsType } from 'structure-ts';
+    `import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 2000;
 const APPS = [];  // ← Currently empty
@@ -245,7 +245,7 @@ Full example:
 
 <Code 
   code={
-    `import type { DatabaseType, SettingsType } from 'structure-ts';
+    `import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 2000;
 const APPS = ['users'];  // Your app is now registered
@@ -285,11 +285,11 @@ Your app's routes are now active!
 
 ## How Automatic Route Registration Works
 
-structure-ts automatically registers routes from all apps in the `APPS` array. Here's how:
+StratusTs automatically registers routes from all apps in the `APPS` array. Here's how:
 
 ### 1. Framework Scans Apps
 
-When your server starts, structure-ts:
+When your server starts, StratusTS:
 1. Reads the `APPS` array from settings
 2. Looks for each app directory in `src/`
 3. Imports `routes.ts` from each app
@@ -322,7 +322,7 @@ Combine all the routes in one place:
 <Code
   code={
     `// users/routes.ts
-import { route } from 'structure-ts';
+import { route } from 'stratus-ts';
 
 route.get('/', listUsers);          // → /
 route.get('/<id:str>', getUser);    // → /:id
@@ -723,7 +723,7 @@ Let's walk through creating a complete blog app.
 
 <Code
   code={
-    `import { type ControllerType, ok, created, notFound } from 'structure-ts';
+    `import { type ControllerType, ok, created, notFound } from 'stratus-ts';
 
 const posts = [
     { id: 1, title: 'First Post', author: 'Alice' },
@@ -781,7 +781,7 @@ export const createPost: ControllerType = (question, reply) => {
 
 <Code
   code={
-    `import { Router } from 'structure-ts';
+    `import { Router } from 'stratus-ts';
 import { listPosts, getPost, createPost } from './controllers';
 
 const { routes, route } = Router();

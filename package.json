@@ -1,13 +1,13 @@
 {
-  "name": "structure-ts",
+  "name": "stratus-ts",
   "version": "0.5.1",
   "description": "A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.",
-  "homepage": "https://structure-ts.netlify.app/",
+  "homepage": "https://stratus-ts.netlify.app/",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "bin": {
     "st": "bin/index.js",
-    "structure-ts": "bin/index.js"
+    "stratus-ts": "bin/index.js"
   },
   "scripts": {
     "build": "npm run build:src && npm run build:cli",
@@ -58,18 +58,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rahulroy0322/structure-ts.git"
+    "url": "git+https://github.com/rahulroy0322/StratusTS.git"
   },
   "author": "Rahul Roy <rahulroyapd80@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rahulroy0322/structure-ts/issues"
+    "url": "https://github.com/rahulroy0322/StratusTS/issues"
   },
   "engines": {
     "node": ">= 16.14"
   },
   "keywords": [
-    "structure-ts",
+    "StratusTS",
+    "Stratus",
+    "stratus-ts",
     "framework",
     "django",
     "opinionated",
@@ -79,7 +81,11 @@
     "rest",
     "restful",
     "router",
-    "app"
+    "app",
+    "node",
+    "api",
+    "server",
+    "admin panel"
   ],
   "dependencies": {
     "chalk": "^5.6.2",

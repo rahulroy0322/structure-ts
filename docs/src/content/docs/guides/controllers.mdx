@@ -4,7 +4,7 @@ description: Learn how to create controllers and handle HTTP questions
 ---
 import { Code } from '@astrojs/starlight/components';
 
-Controllers are functions that handle HTTP questions and send responses. This guide covers everything you need to know about building controllers in Structure-Ts.
+Controllers are functions that handle HTTP questions and send responses. This guide covers everything you need to know about building controllers in StratusTS.
 
 ## What is a Controller?
 
@@ -21,7 +21,7 @@ Every controller follows this pattern:
 
 <Code
   code={
-`import { type ControllerType, ok } from 'structure-ts';
+`import { type ControllerType, ok } from 'stratus-ts';
 
 const myController: ControllerType = (question, reply) => {
     // 1. Get data from question
@@ -69,7 +69,7 @@ Open `src/users/controllers.ts`:
 
 <Code
   code={
-`import { type ControllerType, ok } from 'structure-ts';
+`import { type ControllerType, ok } from 'stratus-ts';
 
 const users = [
   { id: 1, name: 'Alice', email: 'alice@example.com' },
@@ -96,7 +96,7 @@ Open `src/users/routes.ts`:
 
 <Code
   code={
-`import { Router } from 'structure-ts';
+`import { Router } from 'stratus-ts';
 import { listUsers } from './controllers';
 
 const { routes, route } = Router();
@@ -298,7 +298,7 @@ Access HTTP headers:
 
 ### HTTP Status Codes
 
-Structure-Ts provides helpers for common status codes:
+StratusTS provides helpers for common status codes:
 
 <Code
   code={
@@ -310,7 +310,7 @@ Structure-Ts provides helpers for common status codes:
     forbidden,       // 403
     notFound,        // 404
     serverError,     // 500
-} from 'structure-ts';`
+} from 'stratus-ts';`
   }
   lang='ts'
   title='app/controllers.ts'
@@ -526,7 +526,7 @@ import {
   created, 
   badRequest,
   notFound,
-} from 'structure-ts';
+} from 'stratus-ts';
 
 // Mock database
 let users = [
@@ -659,7 +659,7 @@ export const deleteUser: ControllerType = (question, reply) => {
 
 ```typescript
 // src/users/routes.ts
-import { Router } from 'structure-ts';
+import { Router } from 'stratus-ts';
 import {
   listUsers,
   getUser,

@@ -1,4 +1,4 @@
-import { type ControllerType, ok } from 'structure-ts'
+import { type ControllerType, ok } from 'stratus-ts'
 
 const controller: ControllerType = (question, reply) => {
   reply.status(ok()).json({

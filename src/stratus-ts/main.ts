@@ -10,7 +10,7 @@ import { getServerInstance } from './instance'
 import { Handler } from './router/handler'
 import { BASE_DIR, loadSettings, SETTINGS } from './settings/main'
 
-const StructureImpl = (
+const StratusImpl = (
   options: ServerOptionsType = {
     keepAlive: false,
   },
@@ -31,7 +31,7 @@ const StructureImpl = (
   }
 ) => {
   if (!SETTINGS) {
-    console.error(`some thingwent wrong...`, 'StructureImpl')
+    console.error(`some thingwent wrong...`, 'StratusImpl')
 
     process.exit(1)
   }
@@ -75,7 +75,7 @@ const StructureImpl = (
   }
 }
 
-const Structure = async (options: ServerOptionsType) => {
+const Stratus = async (options: ServerOptionsType) => {
   const { PORT, TEMPLATE_DIR = 'templates' } = await loadSettings()
 
   const port = PORT
@@ -84,16 +84,16 @@ const Structure = async (options: ServerOptionsType) => {
 
   const { handel } = Handler(routes)
 
-  return StructureImpl(options, {
+  return StratusImpl(options, {
     port,
     templateDir: TEMPLATE_DIR,
     handel,
   })
 }
 
-export { Structure }
+export { Stratus }
 
 export * from './router/main'
 export * from './status/main'
 
-export default Structure
+export default Stratus

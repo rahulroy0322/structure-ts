@@ -1,5 +1,5 @@
 ---
-title: Structure-Ts
+title: StratusTS
 description: A high-level TypeScript web framework inspired by Django
 template: splash
 hero:
@@ -15,15 +15,15 @@ hero:
       icon: right-arrow
       variant: primary
     - text: View on GitHub
-      link: https://github.com/rahulroy0322/structure-ts
+      link: https://github.com/rahulroy0322/StratusTS
       icon: external
       variant: minimal
 ---
 import { Code,Card, CardGrid } from '@astrojs/starlight/components';
 
-## Why Structure-Ts?
+## Why StratusTS?
 
-`Structure-Ts` brings Django's elegant architecture to the TypeScript ecosystem. If you love Django's **"batteries included"** philosophy but want TypeScript's type safety, Structure-Ts is built for you.
+`StratusTS` brings Django's elegant architecture to the TypeScript ecosystem. If you love Django's **"batteries included"** philosophy but want TypeScript's type safety, StratusTS is built for you.
 
 <CardGrid stagger>
   <Card title="🚀 Rapid Development" icon="rocket">
@@ -61,7 +61,7 @@ Create a working API endpoint in seconds:
 
 <Code
   code={
-    `import { type ControllerType, ok } from 'structure-ts';
+    `import { type ControllerType, ok } from 'stratus-ts';
 
 export const listUsers: ControllerType = (question, reply) => {
     const users = [
@@ -81,7 +81,7 @@ export const listUsers: ControllerType = (question, reply) => {
 
 <Code
   code={
-    `import { Router } from 'structure-ts';
+    `import { Router } from 'stratus-ts';
 import { listUsers } from './controllers';
 
 const { routes, route } = Router();
@@ -98,7 +98,7 @@ That's it! Your `/` endpoint is ready to serve data.
 
 ## Philosophy
 
-Structure-Ts is built on three core principles:
+StratusTS is built on three core principles:
 
 **Convention over Configuration**  
 Sensible defaults let you build applications without endless configuration files. Customize only what you need.
@@ -111,7 +111,7 @@ From TypeScript integration to automatic route registration, every decision prio
 
 ## Comparison with Other Frameworks
 
-| Feature | Structure-Ts | Express | Fastify | NestJS |
+| Feature | StratusTS | Express | Fastify | NestJS |
 |---------|-------------|---------|---------|--------|
 | Built-in Structure | ✅ | ❌ | ❌ | ✅ |
 | Automatic Routing | ✅ | ❌ | ❌ | ⚠️ |
@@ -121,7 +121,7 @@ From TypeScript integration to automatic route registration, every decision prio
 | TypeScript First | ✅ | ⚠️ | ⚠️ | ✅ |
 | Lightweight | ✅ | ✅ | ✅ | ❌ |
 
-## Who Should Use Structure-Ts?
+## Who Should Use StratusTS?
 
 - **Django developers** wanting TypeScript's type safety
 - **TypeScript developers** tired of setting up boilerplate
@@ -133,9 +133,9 @@ From TypeScript integration to automatic route registration, every decision prio
 
 <Code
   code={
-    `# Install structure-ts globally
-pnpm add -g structure-ts 
-# or npm install -g structure-ts
+    `# Install stratus-ts globally
+pnpm add -g stratus-ts 
+# or npm install -g stratus-ts
 
 # Create your first project
 st create project my-app
@@ -160,6 +160,6 @@ Ready to dive deeper? [Start with the introduction](/getting-started/introductio
 
 ## Community & Support
 
-- **GitHub**: [rahulroy0322/structure-ts](https://github.com/rahulroy0322/structure-ts)
-- **Issues**: [Report bugs or request features](https://github.com/rahulroy0322/structure-ts/issues)
-- **Discussions**: [Join the conversation](https://github.com/rahulroy0322/structure-ts/discussions)
+- **GitHub**: [rahulroy0322/structure-ts](https://github.com/rahulroy0322/StratusTS)
+- **Issues**: [Report bugs or request features](https://github.com/rahulroy0322/StratusTS/issues)
+- **Discussions**: [Join the conversation](https://github.com/rahulroy0322/StratusTS/discussions)

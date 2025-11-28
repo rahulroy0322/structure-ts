@@ -1,10 +1,10 @@
 ---
 title: Models
-description: Define and work with database models in Structure-Ts
+description: Define and work with database models in StratusTS
 ---
 import { Code } from '@astrojs/starlight/components';
 
-Models represent your database tables and define the structure of your data. This guide explains how to create and use models in Structure-Ts.
+Models represent your database tables and define the structure of your data. This guide explains how to create and use models in StratusTS.
 
 ## What are Models?
 
@@ -31,7 +31,7 @@ Create a model in `src/users/models.ts`:
 
 <Code
   code={
-    `import { Model } from 'structure-ts';
+    `import { Model } from 'stratus-ts';
 
 const User = Model('user', {
   name: {
@@ -403,7 +403,7 @@ For strings (length) and numbers (value):
 ## Complete Model Example
 
 <Code
-  code={`import { Model } from 'structure-ts';
+  code={`import { Model } from 'stratus-ts';
 
 const User = Model('user', {
   // Basic info

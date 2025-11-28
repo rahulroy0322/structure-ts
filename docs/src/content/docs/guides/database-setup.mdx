@@ -1,14 +1,14 @@
 ---
 title: Database Setup
-description: Configure database connections in structure-ts
+description: Configure database connections in StratusTS
 ---
 import { Code } from '@astrojs/starlight/components';
 
-This guide walks you through configuring database connections in Structure-Ts, from choosing a database to testing your connection.
+This guide walks you through configuring database connections in StratusTS, from choosing a database to testing your connection.
 
 ## Overview
 
-structure-ts supports multiple database systems:
+StratusTS supports multiple database systems:
 - **SQLite** - File-based, zero-configuration
 - **PostgreSQL** - Robust, production-ready
 - **MySQL** - Popular, widely supported
@@ -189,7 +189,7 @@ Use With Warning
 
 <Code
   code={
-    `import type { DatabaseType, SettingsType } from 'structure-ts';
+    `import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 2000;
 const APPS = ['users', 'blog'];

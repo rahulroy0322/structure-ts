@@ -2,8 +2,8 @@ import pkg from '../../package.json'
 
 const showHelp = () => {
   console.log(
-    `<Structure-Ts> : ${pkg.version}
-📋 Structure-Ts - Available Commands:
+    `<StratusTS> : ${pkg.version}
+📋 StratusTS - Available Commands:
         
     help                          Show help message
     
@@ -16,8 +16,8 @@ const showHelp = () => {
     db:migrate                    Run all the pending migrations
 
 💡 Examples:
-    st/structure-ts create project first-project #creates ne project called first-project
-    st/structure-ts create app home #creates new app called home
+    st/stratus-ts create project first-project #creates ne project called first-project
+    st/stratus-ts create app home #creates new app called home
 `
   )
 }

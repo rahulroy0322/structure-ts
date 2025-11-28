@@ -54,7 +54,7 @@ const createProject = async (cwd: string, path: string) => {
 
   pkg.name = packageName
   pkg.dependencies = pkg.dependencies ?? {}
-  pkg.dependencies['structure-ts'] = `^${PKG.version}`
+  pkg.dependencies['stratus-ts'] = `^${PKG.version}`
 
   await write(
     root,

@@ -4,7 +4,7 @@ description: Render dynamic HTML pages with EJS templates
 ---
 import { Code,FileTree } from '@astrojs/starlight/components';
 
-Structure-Ts uses **`EJS (Embedded JavaScript)`** for rendering dynamic HTML pages. This guide covers everything you need to build server-side rendered applications.
+StratusTS uses **`EJS (Embedded JavaScript)`** for rendering dynamic HTML pages. This guide covers everything you need to build server-side rendered applications.
 
 ## What is Template Rendering? 
 
@@ -28,7 +28,7 @@ In `src/settings.ts`:
   title='src/settings.ts'
 />
 
-This tells structure-ts where to find your templates.
+This tells StratusTS where to find your templates.
 
 ### Create Template Directory
 
@@ -74,7 +74,7 @@ Create `templates/pages/home.ejs`:
     </head>
     <body>
       <h1>Hello, World!</h1>
-      <p>Welcome to structure-ts!</p>
+      <p>Welcome to StratusTS!</p>
     </body>
 </html>`
   }
@@ -86,7 +86,7 @@ Create `templates/pages/home.ejs`:
 
 <Code
   code={
-    `import { type ControllerType, render } from 'structure-ts';
+    `import { type ControllerType, render } from 'stratus-ts';
 
 const homeController: ControllerType = (request, reply) => {
     reply.render('pages/home.ejs');

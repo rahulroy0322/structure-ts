@@ -5,10 +5,10 @@ import { defineConfig } from 'astro/config'
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://structure-ts.netlify.app',
+  site: 'https://stratus-ts.netlify.app/',
   integrations: [
     starlight({
-      title: 'Structure Ts',
+      title: 'StratusTS',
       components: {
         Footer: './src/components/footer.astro',
       },
@@ -16,7 +16,7 @@ export default defineConfig({
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/rahulroy0322/structure-ts',
+          href: 'https://github.com/rahulroy0322/StratusTS',
         },
       ],
     }),

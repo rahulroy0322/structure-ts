@@ -1,14 +1,14 @@
 ---
 title: Quick Start
-description: Build your first Structure-Ts application in minutes
+description: Build your first StratusTS application in minutes
 ---
 import { Code,FileTree } from '@astrojs/starlight/components';
 
-Let's build your first Structure-Ts application! In this guide, you'll create a project, add an app, and build a working API endpoint—all in under 10 minutes.
+Let's build your first StratusTS application! In this guide, you'll create a project, add an app, and build a working API endpoint—all in under 10 minutes.
 
 ## Step 1: Create Your Project
 
-First, create a new Structure-Ts project:
+First, create a new StratusTS project:
 
 <Code
   code={
@@ -66,7 +66,7 @@ Your new project has this structure:
 
 <Code
   code={
-    `import type { DatabaseType, SettingsType } from 'structure-ts';
+    `import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 2000;              // Server port
 const APPS = [];                // Installed apps (empty for now)
@@ -102,7 +102,7 @@ lang="ts"
 
 <Code
 code={
-   `import { Structure } from 'structure-ts'
+   `import { Structure } from 'stratus-ts'
 
 const main = async () => {
     const app = await Structure({})
@@ -192,7 +192,7 @@ Your settings file should now look like:
 
 <Code
   code={
-    `import type { DatabaseType, SettingsType } from 'structure-ts';
+    `import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 2000;
 const APPS = ['users'];  // ← Changed!
@@ -212,7 +212,7 @@ export default {
 />
 
 :::note[Auto-Registration]
-Structure-Ts automatically registers routes from all apps in the `APPS` array. No manual route configuration needed!
+StratusTS automatically registers routes from all apps in the `APPS` array. No manual route configuration needed!
 :::
 
 ## Step 7: Create a Controller
@@ -221,7 +221,7 @@ Controllers handle HTTP requests. Open `src/users/controllers.ts`:
 
 <Code
   code={
-    `import { type ControllerType, ok } from 'structure-ts';
+    `import { type ControllerType, ok } from 'stratus-ts';
 
 const listUsers: ControllerType = (question, reply) => {
     // Sample data
@@ -257,7 +257,7 @@ Routes connect URLs to controllers. Open `src/users/routes.ts`:
 
 <Code
 code={
-   `import { Router } from 'structure-ts';
+   `import { Router } from 'stratus-ts';
 import { listUsers } from './controllers';
 const { routes, route } = Router();
 
@@ -304,7 +304,7 @@ You should see:
   title={'browser'}
 />
 
-🎉 **Congratulations!** You just built your first API endpoint with Structure-Ts!
+🎉 **Congratulations!** You just built your first API endpoint with StratusTS!
 
 ## Step 10: Add More Endpoints
 
@@ -312,7 +312,7 @@ Let's add an endpoint to get a single user. Update `src/users/controllers.ts`:
 
 <Code
 code={
-   `import { type ControllerType, ok, notFound } from 'structure-ts';
+   `import { type ControllerType, ok, notFound } from 'stratus-ts';
    
     const users = [
         { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
@@ -356,7 +356,7 @@ Update your routes in `src/users/routes.ts`:
 
 <Code
 code={
-    `import { Router } from 'structure-ts';
+    `import { Router } from 'stratus-ts';
 import { listUsers, getUser } from './controllers';
 
 const { routes, route } = Router();
@@ -388,7 +388,7 @@ http://localhost:2000/999  → Returns 404`
 
 Let's recap what you accomplished:
 
-1. **Created a project** with Structure-Ts CLI
+1. **Created a project** with StratusTS CLI
 2. **Created an app** to organize code
 3. **Registered the app** in settings
 4. **Built controllers** to handle requests
@@ -439,7 +439,7 @@ Want to build traditional web pages? See:
 <Code
 code={
     `
-    import { created } from 'structure-ts';
+    import { created } from 'stratus-ts';
 
 const createUser: ControllerType = (question, reply) => {
     const { 
@@ -538,19 +538,19 @@ Stuck on something? Here's where to get help:
 
 - **Search this documentation** - Use the search bar at the top
 - **Check examples** - Look at the code examples in each guide
-- **GitHub Issues** - [Ask questions or report bugs](https://github.com/rahulroy0322/structure-ts/issues)
-- **GitHub Discussions** - [Community Q&A](https://github.com/rahulroy0322/structure-ts/discussions)
+- **GitHub Issues** - [Ask questions or report bugs](https://github.com/rahulroy0322/StratusTS/issues)
+- **GitHub Discussions** - [Community Q&A](https://github.com/rahulroy0322/StratusTS/discussions)
 
 ## Summary
 
 You've now:
-- ✅ Created a Structure-Ts project
+- ✅ Created a StratusTS project
 - ✅ Built your first app
 - ✅ Created controllers and routes
 - ✅ Built a working REST API
 - ✅ Understand the basic workflow
 
-You're ready to build real applications with structure-ts!
+You're ready to build real applications with StratusTs!
 
 **Continue learning:**
 - [Settings Configuration](/guides/settings-configuration/) - Configure your project

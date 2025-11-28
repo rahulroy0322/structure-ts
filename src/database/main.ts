@@ -1,6 +1,6 @@
 import type { DatabaseAdapterType } from '../@types/database/adapters/main.types'
 import type { DbConfigType } from '../@types/database/config.types'
-import { loadSettings } from '../structure-ts/settings/main'
+import { loadSettings } from '../stratus-ts/settings/main'
 import { MongoAdapter } from './adapters/nosql/mongo'
 import { MySqlAdapter } from './adapters/sql/mysql/main'
 import { PostGreAdapter } from './adapters/sql/postgre'

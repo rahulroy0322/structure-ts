@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "structure-ts": "0.0.0"
+    "stratus-ts": "0.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

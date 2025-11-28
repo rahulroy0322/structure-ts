@@ -1,14 +1,14 @@
 ---
 title: Installation
-description: How to install Structure-Ts and get started
+description: How to install StratusTS and get started
 ---
 import { Code ,FileTree} from '@astrojs/starlight/components';
 
-This guide walks you through installing Structure-Ts and verifying your setup. Let's get you up and running!
+This guide walks you through installing StratusTS and verifying your setup. Let's get you up and running!
 
 ## Prerequisites
 
-Before installing Structure-Ts, ensure you have:
+Before installing StratusTS, ensure you have:
 
 **Node.js**
 - **Minimum version**: Node.js 16.x or higher
@@ -41,7 +41,7 @@ Installing globally gives you access to the `st` command anywhere on your system
 
 <Code
   code={
-    `pnpm add -g structure-ts`
+    `pnpm add -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -53,7 +53,7 @@ or,
 
 <Code
   code={
-    `npm install -g structure-ts`
+    `npm install -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -65,13 +65,13 @@ or,
 
 <Code
   code={
-    `yarn global add structure-ts`
+    `yarn global add stratus-ts`
   }
   lang='sh'
   title={'terminal'}
 />
 
-This installs the `structure-ts` CLI globally, allowing you to run commands like `st create project` from any directory.
+This installs the `stratus-ts` CLI globally, allowing you to run commands like `st create project` from any directory.
 
 {/*
    ! TODO ### Method 2: Using npx (No Installation Required)
@@ -80,13 +80,13 @@ If you don't want to install globally, use `npx` to run commands directly:
 
 <Code
   code={
-    `npx structure-ts create project my-app`
+    `npx stratus-ts create project my-app`
   }
   lang='sh'
   title={'terminal'}
 />
 
-This downloads structure-ts temporarily, creates your project, and cleans up automatically.
+This downloads stratus-ts temporarily, creates your project, and cleans up automatically.
 
 **Pros**: No global installation needed  
 **Cons**: Slower (downloads each time), requires internet connection 
@@ -95,7 +95,7 @@ This downloads structure-ts temporarily, creates your project, and cleans up aut
 
 ## Verify Installation
 
-After installing, verify `structure-ts` is accessible:
+After installing, verify `stratus-ts` is accessible:
 
 <Code
   code={
@@ -109,7 +109,7 @@ or
 
 <Code
   code={
-    `structure-ts --version`
+    `stratus-ts --version`
   }
   lang='sh'
   title={'terminal'}
@@ -171,7 +171,7 @@ pnpm i # or npm install`
 
 This installs all required packages including:
 - TypeScript compiler
-- structure-ts runtime
+- stratus-ts runtime
 - Development tools
 
 ## Start Development Server
@@ -223,7 +223,7 @@ Defines your project dependencies and scripts. Contains commands like `npm run d
 Configures how TypeScript compiles your code. Pre-configured with optimal settings.
 
 **`src/app.ts`**  
-Sets up your Structure-Ts application. Registers apps and configures the server.
+Sets up your StratusTS application. Registers apps and configures the server.
 
 **`src/main.ts`**  
 The entry point. Imports your app configuration and starts the server.
@@ -275,7 +275,7 @@ Runs the compiled production build.
 
 ### Command Not Found
 
-If `st` or `structure-ts` isn't recognized:
+If `st` or `stratus-ts` isn't recognized:
 
 **On Linux/macOS:**
 
@@ -329,7 +329,7 @@ If `st` or `structure-ts` isn't recognized:
 
 <Code
   code={
-    `npx structure-ts create project my-app`
+    `npx stratus-ts create project my-app`
   }
   lang='sh'
   title={'terminal'}
@@ -356,7 +356,7 @@ Then reinstall:
 
 <Code
   code={
-    `npm install -g structure-ts`
+    `npm install -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -365,7 +365,7 @@ Then reinstall:
 
 <Code
   code={
-    `sudo npm install -g structure-ts`
+    `sudo npm install -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -434,7 +434,7 @@ pnpm install`
   title={'terminal'}
 />
 
-## Updating structure-ts
+## Updating StratusTS
 
 To update to the latest version:
 
@@ -442,7 +442,7 @@ To update to the latest version:
 
 <Code
   code={
-    `npm update -g structure-ts`
+    `npm update -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -452,7 +452,7 @@ To update to the latest version:
 
 <Code
   code={
-    `npm outdated -g structure-ts`
+    `npm outdated -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -462,7 +462,7 @@ To update to the latest version:
 
 <Code
   code={
-    `npm install -g structure-ts@0.2.0`
+    `npm install -g stratus-ts@0.2.0`
   }
   lang='sh'
   title={'terminal'}
@@ -470,13 +470,13 @@ To update to the latest version:
 
 ## Uninstalling
 
-To remove structure-ts:
+To remove StratusTS:
 
 **Global uninstallation:**
 
 <Code
   code={
-    `npm uninstall -g structure-ts`
+    `npm uninstall -g stratus-ts`
   }
   lang='sh'
   title={'terminal'}
@@ -498,4 +498,4 @@ Installation complete! Here's what to do next:
 
 **[Quick Start Guide](/getting-started/quick-start/)** - Build your first endpoint
 
-Need help? Check [GitHub Issues](https://github.com/rahulroy0322/structure-ts/issues) or [Discussions](https://github.com/rahulroy0322/structure-ts/discussions).
+Need help? Check [GitHub Issues](https://github.com/rahulroy0322/StratusTS/issues) or [Discussions](https://github.com/rahulroy0322/StratusTS/discussions).

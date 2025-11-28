@@ -1,10 +1,10 @@
 ---
 title: Settings Configuration
-description: Complete guide to configuring your Structure-Ts application
+description: Complete guide to configuring your StratusTS application
 ---
 import { Code } from '@astrojs/starlight/components';
 
-The `src/settings.ts` file is the central configuration hub for your Structure-Ts application. This guide explains every configuration option in simple, easy-to-understand language.
+The `src/settings.ts` file is the central configuration hub for your StratusTS application. This guide explains every configuration option in simple, easy-to-understand language.
 
 ## Overview
 
@@ -18,7 +18,7 @@ Here's what a typical settings file looks like:
 
 <Code
   code={
-`import type { DatabaseType, SettingsType } from 'structure-ts';
+`import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 2000;
 const APPS = ['users', 'blog'];
@@ -60,7 +60,7 @@ Think of ports as doors to your server:
 - Port `80`: Standard HTTP (web browsers)
 - Port `443`: Standard HTTPS (secure web)
 - Port `3000`: Common for Node.js development
-- Port `2000`: Structure-Ts default
+- Port `2000`: StratusTS default
 
 **Your server URL becomes:** `http://localhost:PORT`
 
@@ -157,7 +157,7 @@ The `APPS` array lists all the apps your application should load.
 ### How It Works
 
 When your server starts:
-1. Structure-Ts reads this array
+1. StratusTS reads this array
 2. Finds each app directory in `src/`
 3. Imports `routes.ts` from each app
 4. Registers all routes automatically
@@ -403,7 +403,7 @@ const DATABASE: DatabaseType = {
   port: 5432,
   username: 'postgres',
   password: 'your_password',
-  database: 'structure_app',
+  database: 'stratus_app',
 };
 ```
 
@@ -427,7 +427,7 @@ const DATABASE: DatabaseType = {
   port: 3306,
   username: 'root',
   password: 'your_password',
-  database: 'structure_app',
+  database: 'stratus_app',
 };
 ```
 
@@ -440,7 +440,7 @@ const DATABASE: DatabaseType = {
   type: 'mongodb',
   host: 'localhost',
   port: 27017,
-  database: 'structure_app',
+  database: 'stratus_app',
 };
 ```
 
@@ -457,7 +457,7 @@ const DATABASE: DatabaseType = {
   port: parseInt(process.env.DB_PORT || '5432'),
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'structure_app',
+  database: process.env.DB_NAME || 'stratus_app',
 };
 ```
 
@@ -655,7 +655,7 @@ Once configured, render templates in controllers:
 
 <Code 
   code={
-    `import { render } from 'structure-ts';
+    `import { render } from 'stratus-ts';
 
   const homeController: ControllerType = (request, reply) => {
     render(reply, 'pages/home', {
@@ -695,7 +695,7 @@ It won't hurt to leave it—just don't create template files.
 
 <Code 
   code={
-    `import type { DatabaseType, SettingsType } from 'structure-ts';
+    `import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = 3000;
 const APPS = ['api'];
@@ -719,7 +719,7 @@ export default {
 #### Upcomming
 
 {/* ```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 2000;
 
@@ -754,7 +754,7 @@ export default {
 
 {/* 
 ```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -796,7 +796,7 @@ export default {
 ### Example 4: Multiple Environments
 
 ```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+import type { DatabaseType, SettingsType } from 'stratus-ts';
 
 const environment = process.env.NODE_ENV || 'development';
 

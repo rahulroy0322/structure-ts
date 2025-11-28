@@ -2,7 +2,7 @@
   "name": "docs",
   "type": "module",
   "version": "0.0.1",
-  "homepage": "https://structure-ts.netlify.app/",
+  "homepage": "https://stratus-ts.netlify.app/",
   "scripts": {
     "astro": "astro",
     "build": "astro build",

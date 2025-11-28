@@ -4,7 +4,7 @@ description: Learn how to define routes and connect URLs to controllers
 ---
 import { Code } from '@astrojs/starlight/components';
 
-Routes connect URLs to your controllers. This guide covers everything you need to know about routing in Structure-Ts.
+Routes connect URLs to your controllers. This guide covers everything you need to know about routing in StratusTS.
 
 ## What is Routing?
 
@@ -22,7 +22,7 @@ Each app has its own `routes.ts` file that defines its routes.
 
 <Code
   code={
-    `import { Router } from 'structure-ts';
+    `import { Router } from 'stratus-ts';
 import { listUsers } from './controllers';
 
 const { routes, route } = Router();
@@ -39,14 +39,14 @@ export default routes;`
 />
 
 **What's happening:**
-1. Import `Router` from structure-ts
+1. Import `Router` from StratusTS
 2. Create a router with `Router()`
 3. Define routes using `route.get()`, `route.post()`, etc.
 4. Export `routes` as default
 
 ## HTTP Methods
 
-Structure-Ts supports all standard HTTP methods.
+StratusTS supports all standard HTTP methods.
 
 ### GET - Retrieve Data
 
@@ -302,7 +302,7 @@ Here's a complete CRUD (Create, Read, Update, Delete) setup:
 
 <Code
   code={
-    `import { Router } from 'structure-ts';
+    `import { Router } from 'stratus-ts';
 import {
     listUsers,
     getUser,

@@ -1,1 +1,1 @@
-# Docs For Structure-Ts
+# Docs For StratusTS

@@ -1,4 +1,4 @@
-# Structure-Ts
+# StratusTS
 
 A high-level web framework for TypeScript, inspired by Django, designed for rapid development and clean code.
 
@@ -21,17 +21,17 @@ A high-level web framework for TypeScript, inspired by Django, designed for rapi
 
 ## Overview
 
-**structure‑ts** is a high-level web framework built with TypeScript. Its design is inspired by Django to promote rapid development, clear code organization, and ease of maintenance. It provides a built-in routing system, configurable server options, and a modular way to define applications (or “apps”) that can be integrat.
+**StratusTS** is a high-level web framework built with TypeScript. Its design is inspired by Django to promote rapid development, clear code organization, and ease of maintenance. It provides a built-in routing system, configurable server options, and a modular way to define applications (or “apps”) that can be integrat.
 
 ---
 
 # Installation
 
 ```bash
-pnpm i -g structure-ts
+pnpm i -g stratus‑ts
 
 # or if you using npm
-npm install -g structure-ts
+npm install -g stratus‑ts
 ```
 
 ---
@@ -42,7 +42,7 @@ npm install -g structure-ts
 st create project <project-name>
 
 # or alternative way
-structure-ts create project <project-name>
+stratus‑ts create project <project-name>
 ```
 
 it should give you structure like this
@@ -66,7 +66,7 @@ it should give you structure like this
 You can find all the configuration options in `src/settings.ts`
 
 ```typescript
-import type { DatabaseType, SettingsType } from 'structure-ts';
+import type { DatabaseType, SettingsType } from 'stratus‑ts';
 
 const PORT = 2000; // <chenge as your preffer port>
 
@@ -101,7 +101,7 @@ Here how you can create your first app
 st create app <app-name>
 
 # or alternative way
-structure-ts create app <app-name>
+stratus‑ts create app <app-name>
 ```
 
 3. Add your app name to settings.ts file :
@@ -120,7 +120,7 @@ Add all your controller in the `<app-name>/controllers.ts` file.
 
 
 ```typescript
-import { type ControllerType, ok } from 'structure-ts';
+import { type ControllerType, ok } from 'stratus‑ts';
 
 const myFirstController: ControllerType = (question, reply) => {
   reply.status(ok()).json({
@@ -141,7 +141,7 @@ Configure all your routing configurations in the `<app-name>/routes.ts` file.
 
 
 ```typescript
-import { Router } from 'structure-ts';
+import { Router } from 'stratus‑ts';
 
 import { myFirstController } from './controllers';
 

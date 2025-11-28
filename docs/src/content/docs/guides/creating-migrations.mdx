@@ -1,6 +1,6 @@
 ---
 title: Creating Migrations
-description: Learn how to create database migrations in structure-ts
+description: Learn how to create database migrations in StratusTS
 ---
 import { Code } from '@astrojs/starlight/components';
 
@@ -73,7 +73,7 @@ Don't need migrations for:
 
 <Code
   code={
-    `import { Model } from 'structure-ts';
+    `import { Model } from 'stratus-ts';
 
 const User = Model('user', {
     name: {
@@ -116,7 +116,7 @@ or
 
 <Code
   code={
-    `structure-ts create db:migration`
+    `stratus-ts create db:migration`
   }
   lang='sh'
   title='terminal'

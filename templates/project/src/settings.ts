@@ -1,4 +1,4 @@
-import type { DatabaseType, SettingsType } from 'structure-ts'
+import type { DatabaseType, SettingsType } from 'stratus-ts'
 
 const PORT = 3000
 
