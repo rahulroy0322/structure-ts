@@ -11,6 +11,7 @@
       "src/**/*",
       "cli/**/*",
       "templates/**/*",
+      "tests/**/*",
       "biome.json",
       "package.json"
     ]
@@ -105,6 +106,18 @@
         "rules": {
           "suspicious": {
             "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "tests/**/*"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
           }
         }
       }

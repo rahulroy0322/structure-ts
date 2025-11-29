@@ -25,7 +25,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
     }
     const route = routes[url]
 
-    return route[method] || false
+    return route[method.toLowerCase() as MethodsType] || false
   }
 
   const getControllerForDynamicUrl = (

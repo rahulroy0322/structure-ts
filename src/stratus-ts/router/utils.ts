@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import type { KeyValType } from '../../@types'
 
 const ERROR_EXIT_CODE = 1
@@ -158,7 +159,8 @@ const getCleanPath = (baseUrl: string, path: string) => {
   const last = 1
   const notPresent = -1
 
-  path = `${baseUrl}/${path}`.replace(/\/\//gi, '/')
+  path = join(baseUrl, path)
+
   if (path.indexOf('//') !== notPresent || path.indexOf('\\') !== notPresent) {
     throw new Error(`Invalid Path at "${path}"`)
   }

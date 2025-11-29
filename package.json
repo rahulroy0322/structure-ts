@@ -16,10 +16,9 @@
     "check": "biome check",
     "check:fix": "biome check --write",
     "commitlint": "commitlint --edit",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "node --run build",
     "prepare": "husky",
-    "test": "tsx --test tests/**/**/*.test.ts tests/**/*.test.ts",
-    "test:w": "tsx --watch --test tests/**/**/*.test.ts tests/**/*.test.ts"
+    "test": "vitest"
   },
   "files": [
     "lib",
@@ -107,6 +106,7 @@
     "mongodb": "^7.0.0",
     "mysql2": "^3.15.3",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.0.14"
   }
 }
