@@ -9,7 +9,20 @@ const APP_PATH = process.cwd()
 const ENV = process.env.ENV || 'dev'
 const IS_DEV = ENV === 'dev'
 
-const BASE_DIR = path.join(APP_PATH, IS_DEV ? 'src' : 'dist')
+const getProjectDir = () => {
+  switch (ENV as 'prod' | 'test' | 'dev') {
+    case 'prod':
+      return 'dist'
+    case 'test':
+      return 'tests'
+    case 'dev':
+      return 'src'
+    default:
+      throw new Error(`${ENV} not suppoted yet`)
+  }
+}
+
+const BASE_DIR = path.join(APP_PATH, getProjectDir())
 const settingsPath = path.join(BASE_DIR, 'settings')
 
 // const data = getSetting();

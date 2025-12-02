@@ -52,6 +52,9 @@ const checkApps = async () => {
     )
   ).reduce(
     (acc, curr) => {
+      if (!curr) {
+        return acc
+      }
       if (curr.main) {
         acc.main = {
           ...acc.main,

@@ -63,7 +63,7 @@ const getTransformedBody = async (
   }
 
   //! `invalide content type "${contentType}"`)
-  console.error(`invalide content type "${contentType}"`)
+  console.error(`invalid content type "${contentType}"`)
   // debug(`invalide content type "${contentType}"`)
 
   return {
