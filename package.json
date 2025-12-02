@@ -18,7 +18,9 @@
     "commitlint": "commitlint --edit",
     "prepublishOnly": "node --run build",
     "prepare": "husky",
-    "test": "ENV=test vitest"
+    "test": "ENV=test vitest",
+    "test:run": "ENV=test vitest --run",
+    "test:ui": "ENV=test vitest --ui"
   },
   "files": [
     "lib",
@@ -101,6 +103,7 @@
     "@types/ejs": "^3.1.5",
     "@types/node": "^22.13.13",
     "@types/pg": "^8.15.6",
+    "@vitest/ui": "4.0.14",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "mongodb": "^7.0.0",
