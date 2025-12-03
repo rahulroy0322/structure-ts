@@ -655,10 +655,8 @@ Once configured, render templates in controllers:
 
 <Code 
   code={
-    `import { render } from 'stratus-ts';
-
-  const homeController: ControllerType = (request, reply) => {
-    render(reply, 'pages/home', {
+    `const homeController: ControllerType = (question, reply) => {
+    reply.render(reply, 'pages/home', {
       title: 'Home Page',
       user: { name: 'Alice' },
     });

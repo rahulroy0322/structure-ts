@@ -213,15 +213,15 @@ Access in controller:
 
 <Code
   code={
-    `const getUserController: ControllerType = (request, reply) => {
-    const { id } = request.params;
+    `const getUserController: ControllerType = (question, reply) => {
+    const { id } = question.params();
     console.log(\`User ID: \${id}\`);
 };`
   }
   lang='ts'
   title={'src/users/routes.ts'}
   mark={[
-   `const { id } = request.params;`
+   `const { id } = question.params();`
   ]}
 />
 
@@ -242,12 +242,12 @@ Access in controller:
 
 <Code
   code={
-    `const { userId, postId } = request.params;`
+    `const { userId, postId } = question.params();`
   }
   lang='ts'
   title={'src/users/routes.ts'}
   mark={[
-    `const { userId, postId } = request.params;`
+    `const { userId, postId } = question.params();`
   ]}
 />
 
@@ -260,8 +260,8 @@ Query parameters appear after `?` in URLs: `/users?page=2&limit=10`
 {/* ### Accessing Query Parameters
 
 ```typescript
-const listUsersController: ControllerType = (request, reply) => {
-  const { page, limit } = request.query;
+const listUsersController: ControllerType = (question, reply) => {
+  const { page, limit } = question.query;
   
   const pageNumber = parseInt(page || '1');
   const pageLimit = parseInt(limit || '10');
@@ -604,11 +604,11 @@ Add logging to understand route matching:
 #### Upcomming
 
 {/* ```typescript
-const controller: ControllerType = (request, reply) => {
-  console.log('Method:', request.method);
-  console.log('URL:', request.url);
-  console.log('Params:', request.params);
-  console.log('Query:', request.query);
+const controller: ControllerType = (question, reply) => {
+  console.log('Method:', question.method);
+  console.log('URL:', question.url);
+  console.log('Params:', question.params);
+  console.log('Query:', question.query);
   
   // Your logic...
 };
@@ -739,7 +739,7 @@ This allows changes without breaking existing clients.
 
 **Check:**
 1. Using `:` prefix: `/<id:int>` not `/id`
-2. Accessing with `request.params.id`
+2. Accessing with `question.params().id`
 3. Dynamic routing is enabled (see [Dynamic Routes](/advanced/dynamic-routes/))
 
 ## Next Steps

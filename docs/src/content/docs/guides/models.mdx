@@ -549,7 +549,7 @@ export { User };`}
 
 <Code
   code={`const getUser: ControllerType = async (question, reply) => {
-    const { id } = question.params;
+    const { id } = question.params();
   
     const user = await User.findByPK(id);
     
@@ -598,7 +598,7 @@ const admins = await User.find({
 
 <Code
   code={`const updateUser: ControllerType = async (question, reply) => {
-    const { id } = question.params;
+    const { id } = question.params();
     const {
       body:{
         name, bio, age
@@ -635,7 +635,7 @@ const admins = await User.find({
 
 <Code
   code={`const deleteUser: ControllerType = async (question, reply) => {
-    const { id } = question.params;
+    const { id } = question.params();
     
     const result = await User.destroyByPK(id);
     

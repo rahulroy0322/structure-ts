@@ -329,7 +329,7 @@ code={
   
     // NEW: Get single user
     const getUser: ControllerType = (question, reply) => {
-        const { id } = question.params;
+        const { id } = question.params();
 
         const user = users.find(u => u.id === parseInt(id));
 

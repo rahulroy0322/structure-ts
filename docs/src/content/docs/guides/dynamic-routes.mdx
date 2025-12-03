@@ -9,13 +9,11 @@ import { Code } from '@astrojs/starlight/components';
 Dynamic routes allow you to capture URL segments as parameters with type safety. StratusTS uses a typed parameter syntax that makes routes explicit and predictable.
 
 :::note[Partial Implementation]
-Dynamic routing is currently implemented with typed parameter syntax. Parameter value extraction is under development. The features described on this page show both what's working and what's coming soon.
-:::
+Dynamic routing is currently implemented with typed parameter syntax. 
+Parameter value **`conversation`** is under development.
 
-:::caution[Work in Progress]
-Dynamic routing is currently under active development. The features described on this page are being implemented and may change before the final release. Use with caution in production environments.
+Use with caution in production environments.
 :::
-
 
 ## Current Status
 
@@ -204,19 +202,23 @@ StratusTS supports multiple parameters in a single route.
 
 <Code
   code={
-    `const getBlogPost: ControllerType = async (request, reply) => {
-  const { year, month, slug } = request.params;
-  // all the params
-  
-  const post = await Post.findOne({
-    where: {
-      year,
-      month,
-      slug,
-    },
-  });
-  
-  reply.status(ok()).json({ data: post });
+    `const getBlogPost: ControllerType<{
+    year: number
+    month: number
+    slug: string
+}> = async (question, reply) => {
+    const { year, month, slug } = question.params();
+    // all the params
+    
+    const post = await Post.findOne({
+      where: {
+        year,
+        month,
+        slug,
+      },
+    });
+    
+    reply.status(ok()).json({ data: post });
 };`
   }
   lang='ts'
@@ -254,7 +256,7 @@ When parameter extraction is implemented, types will be automatically converted:
 const id = parseInt(request.params.id);  // Manual conversion
 
 // No manual parsing needed
-const { id } = request.params;  // Already a number!`
+const { id } = question.params();  // Already a number!`
   }
   lang='ts'
   title='src/app/routes.ts'
@@ -297,36 +299,6 @@ route.get('/featured', getFeaturedPosts);       // Never reached`
 
 **Rule:** Define routes from most specific to least specific.
 
-
-
-## Current Workarounds
-
-Until parameter extraction is fully implemented, here are temporary workarounds:
-
-### Manual Parameter Extraction
-
-<Code
-  code={
-    `const getUser: ControllerType = (request, reply) => {
-  // Temporary: Extract from URL manually
-  const urlParts = request.url.split('/');
-  const id = parseInt(urlParts[urlParts.length - 1]);
-  
-  if (isNaN(id)) {
-    return reply.status(400).json({
-      success: false,
-      error: 'Invalid ID',
-    });
-  }
-  
-  // Use id...
-};`
-  }
-  lang='ts'
-  title='src/app/routes.ts'
-/>
-
-
 ## Optional Parameters (Planned)
 
 :::caution[Not Yet Available]
@@ -357,9 +329,7 @@ Optional parameters are planned for a future release.
   title='src/app/routes.ts'
 />
 
-
-
-{/* ## Custom Types (Planned)
+## Custom Types (Planned)
 
 :::caution[Not Yet Available]
 Custom parameter types are on the roadmap.
@@ -376,7 +346,6 @@ route.get('/<date:date>', getPostsByDate);
 <id:uuid>   → Matches UUID format only
 <date:date> → Matches date format (YYYY-MM-DD)
 ```
-*/}
 
 ## Parameter Constraints (Planned)
 
@@ -466,7 +435,7 @@ route.get('/<userId:int>/posts/<postId:int>', getPost);
 
 // ⚠️ Consider simplifying - too nested
 route.get(
-  '/<userId:int>/posts/<postId:int>/comments/<commentId:int>/replies/<replyId:int>',
+    '/<userId:int>/posts/<postId:int>/comments/<commentId:int>/replies/<replyId:int>',
   getReply
 );`
   }
@@ -483,11 +452,11 @@ Here's a complete example using typed dynamic routes:
     `// src/blog/routes.ts
 import { Router } from 'stratus-ts';
 import {
-  listPosts,
-  getPost,
-  getPostsByYear,
-  getPostsByYearMonth,
-  getUserPosts,
+    listPosts,
+    getPost,
+    getPostsByYear,
+    getPostsByYearMonth,
+    getUserPosts,
 } from './controllers';
 
 const { routes, route } = Router();
@@ -513,16 +482,19 @@ export default routes;`
     `// src/blog/controllers.ts
 import { type ControllerType, ok } from 'stratus-ts';
 
-export const getPostsByYearMonth: ControllerType = async (request, reply) => {
-  // When parameter extraction is implemented:
-  const { year, month, slug } = request.params;
-  // year: number, month: number, slug: string
-  
-  const post = await Post.findOne({
-    where: { year, month, slug },
-  });
-  
-  reply.status(ok()).json({ data: post });
+export const getPostsByYearMonth: ControllerType<{
+    year: number
+    month: number
+    slug: string
+}> = async (question, reply) => {
+    const { year, month, slug } = question.params();
+    // year: number, month: number, slug: string
+    
+    const post = await Post.findOne({
+      where: { year, month, slug },
+    });
+    
+    reply.status(ok()).json({ data: post });
 };`
   }
   lang='ts'

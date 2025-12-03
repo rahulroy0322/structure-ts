@@ -88,7 +88,7 @@ Create `templates/pages/home.ejs`:
   code={
     `import { type ControllerType, render } from 'stratus-ts';
 
-const homeController: ControllerType = (request, reply) => {
+const homeController: ControllerType = (question, reply) => {
     reply.render('pages/home.ejs');
 };
 
@@ -254,7 +254,7 @@ Create `templates/partials/header.ejs`:
 ### Form Controller
 
 ```typescript
-const showContactForm: ControllerType = (request, reply) => {
+const showContactForm: ControllerType = (question, reply) => {
   render(reply, 'pages/contact.ejs', {
     layout: 'layouts/base.ejs',
     title: 'Contact Us',
@@ -264,8 +264,8 @@ const showContactForm: ControllerType = (request, reply) => {
   });
 };
 
-const submitContactForm: ControllerType = (request, reply) => {
-  const { name, email, message } = request.body;
+const submitContactForm: ControllerType = (question, reply) => {
+  const { name, email, message } = question.body();
   const errors = [];
   
   // Validation
@@ -423,7 +423,7 @@ public/
 
 **Controller:**
 ```typescript
-const notFound: ControllerType = (request, reply) => {
+const notFound: ControllerType = (question, reply) => {
   render(reply, 'pages/404.ejs', {
     status: 404,
   });

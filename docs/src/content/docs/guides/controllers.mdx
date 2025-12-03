@@ -178,7 +178,7 @@ Access dynamic URL segments:
     `// Route: route.get('/users/<id:str>', getUser)
 
 const getUser: ControllerType = (question, reply) => {
-    const { id } = question.params;  // Get <id:str> from URL
+    const { id } = question.params();  // Get <id:str> from URL
     
     // Mock data
     const users = [
@@ -545,7 +545,7 @@ export const listUsers: ControllerType = (question, reply) => {
 
 // Get single user - GET /users/:id
 export const getUser: ControllerType = (question, reply) => {
-  const { id } = question.params;
+  const { id } = question.params();
   const userId = parseInt(id);
   
   const user = users.find(u => u.id === userId);
@@ -602,7 +602,7 @@ export const createUser: ControllerType = (question, reply) => {
 
 // Update user - PUT /users/:id
 export const updateUser: ControllerType = (question, reply) => {
-  const { id } = question.params;
+  const { id } = question.params();
   const { name, email } = question.body;
   const userId = parseInt(id);
   
@@ -631,7 +631,7 @@ export const updateUser: ControllerType = (question, reply) => {
 
 // Delete user - DELETE /users/:id
 export const deleteUser: ControllerType = (question, reply) => {
-  const { id } = question.params;
+  const { id } = question.params();
   const userId = parseInt(id);
   
   const userIndex = users.findIndex(u => u.id === userId);
@@ -688,7 +688,7 @@ Always handle potential errors:
 ```typescript
 const getUserController: ControllerType = async (question, reply) => {
   try {
-    const { id } = question.params;
+    const { id } = question.params();
     
     // Might throw error
     const user = await database.getUser(id);
@@ -762,7 +762,7 @@ For database operations or API calls, use async/await:
 
 ```typescript
 const getUserController: ControllerType = async (question, reply) => {
-  const { id } = question.params;
+  const { id } = question.params();
   
   try {
     // Async database call
@@ -912,7 +912,7 @@ const createUser: ControllerType = (question, reply) => {
 
 ```typescript
 const deleteUser: ControllerType = async (question, reply) => {
-  const { id } = question.params;
+  const { id } = question.params();
   
   console.log(`Deleting user ${id}`);
   
