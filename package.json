@@ -53,7 +53,7 @@
     "*.{ts,tsx,json}": [
       "biome check --write"
     ],
-    "*": [
+    "!(**.*.{md,mdx})": [
       "biome check --write"
     ]
   },
