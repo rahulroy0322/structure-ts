@@ -6,6 +6,7 @@ import type {
   ReplyType,
   ServerRespnsceType,
 } from '.'
+import type { ParamsUtilType, Prettify } from './model/utils.types'
 
 type ValidTypesType = 'email' | 'string' | 'number'
 
@@ -20,10 +21,7 @@ type MethodsType =
   | 'connect'
 
 type ControllerType<
-  ParamsType extends Record<string, unknown> = Record<
-    string,
-    string | number | boolean
-  >,
+  ParamsType extends Record<string, unknown> = ParamsUtilType,
 > = (
   question: QuestionType<ParamsType>,
   reply: ReplyType<ServerRespnsceType>
@@ -75,47 +73,25 @@ type ControllerOptionType = {
   >
 }
 
+type HandlerType<P extends string> = ParamsFromStringType<P> extends never
+  ? never
+  : ControllerType<ParamsFromStringType<P>>
+
+type RouteMethodeType = <P extends string>(
+  path: P,
+  cb: HandlerType<P>,
+  options?: ControllerOptionType
+) => void
+
 type RouterMethodeType = {
-  get: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  post: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  put: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  patch: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  delete: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  options: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  head: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
-  connect: (
-    path: string,
-    handler: ControllerType,
-    options?: ControllerOptionType
-  ) => void
+  get: RouteMethodeType
+  post: RouteMethodeType
+  put: RouteMethodeType
+  patch: RouteMethodeType
+  delete: RouteMethodeType
+  options: RouteMethodeType
+  head: RouteMethodeType
+  connect: RouteMethodeType
 }
 
 type RouterRoutesType = {
@@ -126,6 +102,67 @@ type ReadOnlyRouterRoutesType = {
   main: RoutesType
   dynamic: readonly DynamicRoutesType[]
 }
+
+// ? for controller only
+type ParamTypeFromStringType<S extends string> = S extends
+  | 'int'
+  | 'num'
+  | 'integer'
+  | 'number'
+  ? number
+  : S extends 'str' | 'txt' | 'text' | 'string' // ! TODO | 'uuid'
+    ? string
+    : S extends 'bool' | 'boolean'
+      ? boolean
+      : S extends 'true'
+        ? true
+        : S extends 'false'
+          ? false
+          : never
+
+type IsFirstMatchType<
+  S extends string,
+  CharToMatch extends S | (string & {}),
+> = S extends `${infer Fisrt}${string}`
+  ? Fisrt extends CharToMatch
+    ? S
+    : never
+  : never
+
+type LastCharType<S extends string> = S extends `${infer First}${infer Rest}`
+  ? Rest extends ''
+    ? First
+    : LastCharType<Rest>
+  : never
+
+type IsLastMatchType<
+  S extends string,
+  CharToMatch extends S | (string & {}),
+> = CharToMatch extends LastCharType<S> ? S : never
+
+// biome-ignore lint/complexity/noBannedTypes: ts only
+type EmptyRecord = {}
+
+type ParamsFromStringImplType<
+  First extends string,
+  Key extends string,
+  Type extends string,
+  End extends string,
+> = First extends IsLastMatchType<First, '/'> | ''
+  ? {
+      [K in Key]: ParamTypeFromStringType<Type>
+    } & ParamsFromStringType<End>
+  : never
+
+type ParamsFromStringType<P extends string> = Prettify<
+  P extends `${infer Start}<${infer Key}:${infer Type}>${infer End}`
+    ? End extends ''
+      ? ParamsFromStringImplType<Start, Key, Type, End>
+      : End extends IsFirstMatchType<End, '/'>
+        ? ParamsFromStringImplType<Start, Key, Type, End>
+        : never
+    : EmptyRecord
+>
 
 export type {
   MethodsType,

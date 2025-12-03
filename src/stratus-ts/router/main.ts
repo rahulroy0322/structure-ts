@@ -63,7 +63,7 @@ const Router = (baseUrl = '') => {
   const _route = (
     path: string,
     methode: MethodsType,
-    controller: ControllerType,
+    controller: ControllerType<any>,
     options?: ControllerOptionType
   ) => {
     const notPresent = -1

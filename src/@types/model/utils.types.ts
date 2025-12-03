@@ -10,4 +10,6 @@ type AtLeastOneType<T extends Record<string, unknown>> = {
   [K in keyof T]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<keyof T, K>>>
 }[keyof T]
 
-export type { Prettify, SchemaType, WithId, AtLeastOneType }
+type ParamsUtilType = Record<string, string | number | boolean>
+
+export type { Prettify, ParamsUtilType, SchemaType, WithId, AtLeastOneType }
