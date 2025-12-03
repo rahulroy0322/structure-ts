@@ -1,10 +1,7 @@
-import type { ControllerType, ServerRespnsceType } from '../../@types'
+import type { ControllerType } from '../../@types'
 import { notFound } from '../status/main'
 
-const notFoundController: ControllerType<ServerRespnsceType> = (
-  question,
-  reply
-) => {
+const notFoundController: ControllerType = (question, reply) => {
   const route = question.path()
   reply.status(notFound()).json({
     success: false,

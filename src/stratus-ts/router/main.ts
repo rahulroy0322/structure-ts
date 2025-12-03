@@ -8,7 +8,6 @@ import type {
   ReadOnlyRouterRoutesType,
   RouterMethodeType,
   RouterRoutesType,
-  ServerRespnsceType,
 } from '../../@types'
 import { getCleanPath, getRegexpFromUrl } from './utils'
 
@@ -41,13 +40,13 @@ const getBodySchema = (option: ControllerOptionType['body']) => {
   return Joi.object(_schema).required()
 }
 
-const Router = <T = ServerRespnsceType>(baseUrl = '') => {
+const Router = (baseUrl = '') => {
   const routes = {
     main: {},
     dynamic: [],
-  } as RouterRoutesType<T>
+  } as RouterRoutesType
 
-  const route: RouterMethodeType<T> = {
+  const route: RouterMethodeType = {
     get: (path, handler, options) => _route(path, 'get', handler, options),
     post: (path, handler, options) => _route(path, 'post', handler, options),
     patch: (path, handler, options) => _route(path, 'patch', handler, options),
@@ -64,7 +63,7 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
   const _route = (
     path: string,
     methode: MethodsType,
-    controller: ControllerType<T>,
+    controller: ControllerType,
     options?: ControllerOptionType
   ) => {
     const notPresent = -1
@@ -97,7 +96,7 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
 
     const { regexp, keys } = getRegexpFromUrl(path)
 
-    // [RegExp, KeyValType[], MethodsType, ControllerType<T>]
+    // [RegExp, KeyValType[], MethodsType, ControllerType]
     routes.dynamic.push([
       regexp,
       keys,
@@ -111,7 +110,7 @@ const Router = <T = ServerRespnsceType>(baseUrl = '') => {
 
   return {
     route,
-    routes: routes as ReadOnlyRouterRoutesType<T>,
+    routes: routes as ReadOnlyRouterRoutesType,
     ...route,
   }
 }

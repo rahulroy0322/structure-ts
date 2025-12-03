@@ -3,6 +3,7 @@ import type {
   QuestionType,
   ReplyType,
   ServerOptionsType,
+  ServerRespnsceType,
 } from '../@types'
 import { checkApps } from './app/main'
 import { handler } from './handler'
@@ -21,12 +22,9 @@ const StratusImpl = (
   }: {
     port: number
     handel: (
-      // eslint-disable-next-line no-unused-vars
       qestion: QuestionType,
-      // eslint-disable-next-line no-unused-vars
-      reply: ReplyType<unknown>
+      reply: ReplyType<ServerRespnsceType>
     ) => Promise<HandlerReturnType>
-
     templateDir: string
   }
 ) => {

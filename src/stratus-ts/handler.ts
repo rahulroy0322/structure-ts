@@ -1,19 +1,14 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
-import type {
-  ControllerType,
-  ErrorControllerType,
-  ReplyType,
-  ServerRespnsceType,
-} from '../@types'
+import type { ControllerType, ErrorControllerType } from '../@types'
 import { Question } from './question/main'
 import { Reply } from './reply/main'
 import type { Handler } from './router/handler'
 import { badRequest } from './status/main'
 
 const handler =
-  <T>(
-    handel: ReturnType<typeof Handler<T>>['handel'],
+  (
+    handel: ReturnType<typeof Handler>['handel'],
     {
       baseDir,
       errorController,
@@ -21,8 +16,8 @@ const handler =
       templateDir,
     }: {
       baseDir: string
-      errorController: ErrorControllerType<ServerRespnsceType>
-      notFoundController: ControllerType<ServerRespnsceType>
+      errorController: ErrorControllerType
+      notFoundController: ControllerType
       templateDir: string
     }
   ) =>
@@ -39,7 +34,7 @@ const handler =
       question,
     })
 
-    const handlerReply = await handel(question, reply as ReplyType<T>)
+    const handlerReply = await handel(question, reply)
 
     if (handlerReply.success) {
       return

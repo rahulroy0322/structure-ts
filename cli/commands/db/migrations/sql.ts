@@ -19,7 +19,6 @@ const getSql = (currentState: StateType, newState: StateType) => {
   // Generate SQL for new tables
   newTables.map((table, index) => {
     sqls.push(generateCreateTableSQL(table))
-    // eslint-disable-next-line no-magic-numbers
     if (index !== newTables.length - 1) {
       sqls.push(breakpoint)
     }

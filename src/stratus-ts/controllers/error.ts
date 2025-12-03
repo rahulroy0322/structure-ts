@@ -1,11 +1,7 @@
-import type { ErrorControllerType, ServerRespnsceType } from '../../@types'
+import type { ErrorControllerType } from '../../@types'
 import { internalServerError } from '../status/main'
 
-const errorController: ErrorControllerType<ServerRespnsceType> = (
-  e,
-  question,
-  reply
-) => {
+const errorController: ErrorControllerType = (e, question, reply) => {
   const route = question.path()
 
   const error =

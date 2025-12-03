@@ -6,7 +6,7 @@ import { routeSchema } from './schema'
 
 const ERROR_EXIT_CODE = 1
 
-const checkRoute = async <T>(app: string) => {
+const checkRoute = async (app: string) => {
   const { default: routes } = await import(
     path.relative(__dirname, path.join(BASE_DIR, app, 'routes'))
   )
@@ -27,7 +27,7 @@ const checkRoute = async <T>(app: string) => {
     console.warn(warning)
   }
 
-  return routes as ReadOnlyRouterRoutesType<T>
+  return routes as ReadOnlyRouterRoutesType
 }
 
 export { checkRoute }

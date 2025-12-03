@@ -36,7 +36,7 @@ const checkApps = async () => {
 
   const { APPS } = SETTINGS
 
-  const routes: ReadOnlyRouterRoutesType<unknown> = (
+  const routes: ReadOnlyRouterRoutesType = (
     await Promise.all(
       APPS.map(async (app) => {
         try {
@@ -63,9 +63,7 @@ const checkApps = async () => {
       }
 
       if (curr.dynamic) {
-        ;(acc.dynamic as RouterRoutesType<unknown>['dynamic']).push(
-          ...curr.dynamic
-        )
+        ;(acc.dynamic as RouterRoutesType['dynamic']).push(...curr.dynamic)
       }
 
       return acc

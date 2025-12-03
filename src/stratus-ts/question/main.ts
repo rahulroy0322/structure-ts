@@ -81,9 +81,16 @@ const Question = (request: IncomingMessage): QuestionType => {
     }
   }
 
+  const params: QuestionType['params'] = () =>
+    ((
+      request as unknown as {
+        _params: ReturnType<QuestionType['params']>
+      }
+    )._params?.params || {}) as any
+
   const raw = (): IncomingMessage => request
 
-  return {
+  const questionRes = {
     hostname,
     host,
 
@@ -104,8 +111,16 @@ const Question = (request: IncomingMessage): QuestionType => {
     contentType,
 
     body,
+    params,
+
     raw,
   } satisfies QuestionType
+
+  Object.assign(questionRes, {
+    request,
+  })
+
+  return questionRes
 }
 
 export { Question }

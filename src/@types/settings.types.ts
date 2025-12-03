@@ -20,8 +20,8 @@ type SettingsType = {
   MIGRATION?: MigrationType
 
   // ADMIN_PANEL_URL: string;
-  NOT_FOUND_CONTROLLER?: ControllerType<unknown>
-  ERROR_CONTROLLER?: ErrorControllerType<unknown>
+  NOT_FOUND_CONTROLLER?: ControllerType
+  ERROR_CONTROLLER?: ErrorControllerType
   DATABASE: DatabaseType
   TEMPLATE_DIR?: string
 }

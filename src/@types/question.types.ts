@@ -2,7 +2,12 @@ import type { IncomingHttpHeaders, IncomingMessage } from 'node:http'
 
 import type { MethodsType } from '.'
 
-type QuestionType = {
+type QuestionType<
+  ParamsType extends Record<string, unknown> = Record<
+    string,
+    string | number | boolean
+  >,
+> = {
   hostname: () => string
   host: () => string
 
@@ -13,9 +18,7 @@ type QuestionType = {
   method: () => MethodsType
   headers: () => IncomingHttpHeaders
 
-  // eslint-disable-next-line no-unused-vars
   header: (name: string) => string | string[] | null
-  // eslint-disable-next-line no-unused-vars
   get: (name: string) => string | string[] | null
 
   cookies: () => Record<string, string> | null
@@ -31,6 +34,8 @@ type QuestionType = {
     body: B
     files: F
   }>
+  params: () => ParamsType
+
   raw: () => IncomingMessage
 }
 

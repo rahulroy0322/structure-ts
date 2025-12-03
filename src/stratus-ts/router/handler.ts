@@ -7,13 +7,18 @@ import type {
   QuestionType,
   ReadOnlyRouterRoutesType,
   ReplyType,
+  ServerRespnsceType,
 } from '../../@types'
 import { getCleanResponseUrl, getParams } from './utils'
 
-const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
+const Handler = ({ main: routes, dynamic }: ReadOnlyRouterRoutesType) => {
   type ControllerReturnType = {
-    controller: ControllerType<T>
+    controller: ControllerType
     body: ObjectSchema | null
+  }
+
+  type ControllerWithParamsReturnType = ControllerReturnType & {
+    _params: Record<string, unknown>
   }
 
   const getControllerForUrl = (
@@ -31,7 +36,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
   const getControllerForDynamicUrl = (
     url: string,
     method: MethodsType
-  ): ControllerReturnType | boolean => {
+  ): ControllerWithParamsReturnType | boolean => {
     const urlIndex = 0
     const methodIndex = 2
     method = method.toLowerCase() as MethodsType
@@ -53,22 +58,31 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
         url
       )
 
-      return params === false ? true : { controller, body }
+      return params === false ? true : { controller, body, _params: params }
     }
 
     return false
   }
 
-  const getController = (url: string, method: MethodsType) => {
+  const getController = (
+    url: string,
+    method: MethodsType
+  ): ControllerWithParamsReturnType | false => {
     const controller = getControllerForUrl(url, method)
 
-    if ((controller as ControllerReturnType)?.controller) {
-      return controller as ControllerReturnType
+    if (controller && (controller as ControllerReturnType).controller) {
+      return {
+        ...controller,
+        _params: {},
+      } satisfies ControllerWithParamsReturnType
     }
     const dynamicController = getControllerForDynamicUrl(url, method)
 
-    if ((dynamicController as ControllerReturnType)?.controller) {
-      return dynamicController as ControllerReturnType
+    if (
+      dynamicController &&
+      (dynamicController as ControllerWithParamsReturnType).controller
+    ) {
+      return dynamicController as ControllerWithParamsReturnType
     }
 
     if (dynamicController === true) {
@@ -80,7 +94,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
 
   const handleImpl = async (
     question: QuestionType,
-    reply: ReplyType<T>
+    reply: ReplyType<ServerRespnsceType>
   ): Promise<HandlerReturnType> => {
     const method = question.method()
 
@@ -96,7 +110,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
         }
       }
 
-      const { body, controller } = res
+      const { body, controller, _params } = res
 
       if (body) {
         const { body: _body } = await question.body()
@@ -107,6 +121,12 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
             required: error.details.map((value) => value.message).join('\n'),
           }
         }
+      }
+
+      if (_params && (question as any).request) {
+        Object.assign((question as any).request, {
+          _params,
+        })
       }
 
       controller(question, reply)
@@ -124,7 +144,7 @@ const Handler = <T>({ main: routes, dynamic }: ReadOnlyRouterRoutesType<T>) => {
 
   const handel = async (
     qestion: QuestionType,
-    reply: ReplyType<T>
+    reply: ReplyType<ServerRespnsceType>
   ): Promise<HandlerReturnType> => await handleImpl(qestion, reply)
 
   return {

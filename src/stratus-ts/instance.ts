@@ -8,12 +8,10 @@ import type { ServerOptionsType } from '../@types'
 
 const getServerInstance = (
   options: ServerOptionsType,
-  /* eslint-disable no-unused-vars */
   handler: (
     qestion: IncomingMessage,
     reply: ServerResponse<IncomingMessage>
   ) => void
-  /* eslint-enable no-unused-vars */
 ): Server => {
   const server = http.createServer(options, handler)
 

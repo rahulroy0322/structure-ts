@@ -23,7 +23,7 @@ const Reply = <T = ServerRespnsceType>({
 }: {
   baseDir: string
   question: QuestionType
-  errorController: ErrorControllerType<ServerRespnsceType>
+  errorController: ErrorControllerType
   templateDir: string
   reply: ServerResponse<IncomingMessage>
 }): ReplyType<T> => {

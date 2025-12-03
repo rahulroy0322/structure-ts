@@ -11,7 +11,7 @@ type CookieOptions = Partial<{
   partitioned: boolean
 }>
 
-type ErrorRespnsceType = {
+interface ErrorRespnsceType {
   success: false
   route?: string
   error: {
@@ -21,14 +21,13 @@ type ErrorRespnsceType = {
   }
 }
 
-type SuccessRespnsceType = {
+interface SuccessRespnsceType {
   success: true
   data: Record<string, unknown> | unknown[]
 }
 
 type ServerRespnsceType = SuccessRespnsceType | ErrorRespnsceType
 
-/* eslint-disable no-unused-vars */
 type ReplyType<T> = {
   get: (field: string) => string | number | string[] | undefined
   set: (field: string, val: unknown) => ReplyType<T>
@@ -44,6 +43,5 @@ type ReplyType<T> = {
   send: (body: unknown) => void
   json: (data: T) => void
 }
-/* eslint-enable no-unused-vars */
 
-export type { ReplyType, ServerRespnsceType, CookieOptions }
+export type { ReplyType, ServerRespnsceType, CookieOptions, ErrorRespnsceType }
